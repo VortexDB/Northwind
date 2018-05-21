@@ -1,0 +1,13 @@
+name: northwind
+version: 0.1.0
+
+authors:
+  -  <>
+
+targets:
+  northwind:
+    main: src/main.cr
+
+crystal: 0.24.2
+
+license: MIT

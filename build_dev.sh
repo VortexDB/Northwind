@@ -1,0 +1,1 @@
+shards build --threads=4 -d
