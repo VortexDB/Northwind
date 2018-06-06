@@ -1,23 +1,22 @@
-require "./schedule"
+require "./*"
 
-# Периодическое расписание
+# Schedule for periodic start
 class PeriodicSchedule
     include Schedule
 
-    # Дата смещения
+    # Offset date
     @offsetDate : Time?
 
-    # Дата смещения
+    # Offset time
     getter offset : Time::Span
 
-    # Период запуска
+    # Start period
     getter period : Time::Span
-
-    # Конструктор
+    
     def initialize(@offset, @period)        
     end
 
-    # Возвращает время следующего запуска
+    # Return next start
     def nextStart : Time::Span
         now = Time.now
 

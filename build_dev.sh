@@ -1,1 +1,1 @@
-shards build --threads=4 -d
+crystal build --progress -o ./bin/northwind ./src/main.cr

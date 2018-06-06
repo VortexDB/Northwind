@@ -1,4 +1,5 @@
-require "./collector/collector"
+require "benchmark"
+require "./northwind/**"
 
 collector = Collector.new
 collector.start
