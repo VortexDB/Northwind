@@ -5,7 +5,7 @@ class CollectorScriptEvent
 end
 
 # Collector script
-class CollectorScript < AsyncWorker(CollectorScriptEvent)
+class CollectorScript
   # Period of timer to check schedule
   PERIOD = 10
 
@@ -28,6 +28,13 @@ class CollectorScript < AsyncWorker(CollectorScriptEvent)
   # Actions
   @actions : Set(SettingsAction)
 
+  # To notify script execution completed
+  @executeCompleter : Completer(Bool)?
+
+  def executeCompleter!
+    @executeCompleter.not_nil!
+  end
+
   # Deep of requests
   property deep : Int32 = DEFAULT_DEEP
 
@@ -48,26 +55,24 @@ class CollectorScript < AsyncWorker(CollectorScriptEvent)
     end
   end
 
-  # Block thread and process driver events
-  private def processDriverEvents(driver : CollectorDriver, tasks : Array(CollectorTask)) : Void
-    # Listen for driver events
-    iswork = true
-    while iswork
-      driver.listenEvent(DRIVER_SILENCE_TIMEOUT) do |event|
-        case event
-        when DriverTimeoutEvent
-          puts "Driver timeout"
-          iswork = false
-        when TaskDataEvent
-          puts "Task data: #{event.taskId}"        
-        when TaskCompleteEvent
-          puts "Task completed: #{event.taskId}"
-        else
-          raise NorthwindException.new("Unknown driver event")
-        end
-      end
-    end
-  end
+  # # Block thread and process driver events
+  # private def processDriverEvents(driver : CollectorDriver, tasks : Array(CollectorTask)) : Void
+  #   driver.listen do |event|
+  #     case event
+  #     when DriverTimeoutEvent
+  #       puts "Driver timeout"
+  #       iswork = false
+  #     when TaskDataEvent
+  #       puts "Task data: #{event.taskId}"
+  #     when TaskCompleteEvent
+  #       puts "Task completed: #{event.taskId}"
+  #     when Exception
+  #       puts e
+  #     else
+  #       raise NorthwindException.new("Unknown driver event")
+  #     end
+  #   end
+  # end
 
   # Collect data from driver for it's devices
   private def collectByDriver(driver : CollectorDriver, driverDevices : Array(CollectorDevice))
@@ -75,28 +80,24 @@ class CollectorScript < AsyncWorker(CollectorScriptEvent)
     startTime = now + Time::Span.new(@deep, 0, 0)
     endTime = now
     interval = DateInterval.new(startTime, endTime)
-    tasks = Array(CollectorTask).new    
+    tasks = Array(CollectorTask).new
 
-    spawn do
-      begin
-        driverDevices.each do |device|
-          @actions.each do |act|
-            tasks << CollectorActionTask.new(act)
-          end
-
-          @parameters.each do |par|
-            tasks << CollectorDataTask.new(par, interval)
-          end
-
-          driver.appendTask(CollectorDeviceTasks.new(device, tasks))
+    # Append task in other fiber
+    begin
+      driverDevices.each do |device|
+        @actions.each do |act|
+          tasks << CollectorActionTask.new(act)
         end
-      rescue e : Exception
-        # TODO: handle exception
-        puts e
-      end
-    end
 
-    processDriverEvents(driver, tasks)
+        @parameters.each do |par|
+          tasks << CollectorDataTask.new(par, interval)
+        end
+
+        driver.appendTask(CollectorDeviceTasks.new(device, tasks))
+      end
+    rescue e : Exception
+      puts e
+    end
   end
 
   # Start schedule of script
@@ -105,14 +106,11 @@ class CollectorScript < AsyncWorker(CollectorScriptEvent)
 
     nextStart = @schedule.nextStart
     puts "Name: #{@name} Next start: #{nextStart}"
-    delay(nextStart) do
-      begin
-        startCollect
-      rescue e : Exception
-        puts e
-      ensure
-        startSchedule
-      end
+
+    Future.delayed(nextStart) do
+      startCollect
+      # Wait for complete
+      executeCompleter!.complete(true)
     end
   end
 
@@ -143,16 +141,24 @@ class CollectorScript < AsyncWorker(CollectorScriptEvent)
     puts "Collect complete #{bench}"
   end
 
-  # Main work
-  protected def work : Void
-    startSchedule
+  # Start work
+  def start : Future
+    @executeCompleter = Completer(Bool).new
+
+    Future.new do
+      @isWorking = true
+      startSchedule
+      Nil
+    end
+
+    return executeCompleter!.future
   end
 
   def initialize(@name, @schedule)
     @devices = Set(CollectorDevice).new
     @parameters = Set(MeasureParameter).new
     @actions = Set(SettingsAction).new
-  end  
+  end
 
   # Add device to script
   def addDevice(device : CollectorDevice) : Void
@@ -167,5 +173,5 @@ class CollectorScript < AsyncWorker(CollectorScriptEvent)
   # Add action
   def addAction(action : SettingsAction) : Void
     @actions.add(action)
-  end  
+  end
 end

@@ -1,45 +1,55 @@
 # Collects data from devices
 class Collector
-    # Сценарии
-    @scripts = Array(CollectorScript).new    
+  # Сценарии
+  @scripts = Array(CollectorScript).new
 
-    # Start collector
-    def start : Void
-        init
-        work
+  # Start collector script
+  private def startScript(script : CollectorScript) : Void
+    script.start.then do
+      puts "Complete #{script.name}"
+    end.catch do |e|
+      puts e
     end
-    
-    def init : Void
-        # TODO: load scripts
+    # .whenComplete do
+    #   startScript(script)
+    # end
+  end
 
-        offset = Time::Span.new(seconds: 0, nanoseconds: 0)
-        period = Time::Span.new(seconds: 60 * 1, nanoseconds: 0)
-        script = CollectorScript.new(
-            "Collect values",
-            PeriodicSchedule.new(offset, period))
+  # Start collector
+  def start : Void
+    init
+    work
+  end
 
-        driver = Spt96xDriver.new
-        route = TcpClientRoute.new("192.168.0.196", 25301)
-        device = CollectorDevice.new(driver, route)
-        script.addDevice(device)
-        parameter = MeasureParameter.new(
-            MeasureType::ABSOLUTE_PRESSURE,
-            Discret.new(DiscretType::None, -1)
-        )
-        settingAction = SettingsAction.new(SettingsState::DateTime, StateAction::Read)
+  def init : Void
+    # TODO: load scripts
 
-        script.addParameter(parameter)
-        script.addAction(settingAction)
-        @scripts.push(script)
+    offset = Time::Span.new(seconds: 0, nanoseconds: 0)
+    period = Time::Span.new(seconds: 10 * 1, nanoseconds: 0)
+    script = CollectorScript.new(
+      "Collect values",
+      PeriodicSchedule.new(offset, period))
+
+    driver = Spt96xDriver.new
+    route = TcpClientRoute.new("192.168.0.196", 25301)
+    device = CollectorDevice.new(driver, route)
+    script.addDevice(device)
+    parameter = MeasureParameter.new(
+      MeasureType::ABSOLUTE_PRESSURE,
+      Discret.new(DiscretType::None, -1)
+    )
+    settingAction = SettingsAction.new(SettingsState::DateTime, StateAction::Read)
+
+    script.addParameter(parameter)
+    script.addAction(settingAction)
+    @scripts.push(script)
+  end
+
+  # Main work
+  def work : Void
+    # Start each script and wait events
+    @scripts.each do |script|
+      startScript(script)
     end
-
-    # Main work
-    def work : Void
-        # Start each script and wait events
-        @scripts.each do |script|
-            script.listen do |event|
-                # TODO: listen for some events like complete
-            end
-        end
-    end
+  end
 end

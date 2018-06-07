@@ -10,7 +10,7 @@ abstract class AsyncWorker(T)
   getter isWorking = false
 
   # Send event to listener
-  protected def addEvent(event : T)
+  protected def addEvent(event : T | Exception)
     @outChannel.send(event) if !@outChannel.closed?
   end
 
@@ -60,16 +60,19 @@ abstract class AsyncWorker(T)
 
   # Send event to stream
   def send(event : T) : Void
-    begin
-      @incomingChan.send(event)
-    rescue
+    spawn do
+      begin         
+        @incomingChan.send(event)
+      rescue
+      end
     end
   end
 
   # Cancel working
-  def cancel
+  def cancel : Void
+    return if !@isWorking
     @outChannel.close
     @incomingChan.close
     @isWorking = false
-  end  
+  end
 end

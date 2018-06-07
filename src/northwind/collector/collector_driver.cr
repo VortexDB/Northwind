@@ -55,30 +55,23 @@ module CollectorDriverWithExternalChannel
 end
 
 # Base collector drver
-abstract class CollectorDriver < AsyncWorker(CollectorDriverEvent)
+abstract class CollectorDriver
   # Add tasks for device
+  # For override
   abstract def appendTask(deviceTasks : CollectorDeviceTasks) : Void
-
-  # Incoming event
-  def onEvent(event : CollectorDriverEvent) : Void
-    case event
-    when AddTaskEvent
-      appendTask(event.deviceTasks)
-    end
-  end
 
   # Notify task complete
   def notifyTaskComplete(taskId : Int32) : Void
-    addEvent(
-      TaskCompleteEvent.new(taskId)
-    )
+    # addEvent(
+    #   TaskCompleteEvent.new(taskId)
+    # )
   end
 
   # Notify task complete
   def notifyData(taskId : Int32) : Void
-    addEvent(
-      TaskDataEvent.new(taskId)
-    )
+    # addEvent(
+    #   TaskDataEvent.new(taskId)
+    # )
   end
 end
 

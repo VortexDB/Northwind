@@ -1,1 +1,1 @@
-crystal build --progress -o ./bin/northwind ./src/main.cr
+crystal build --progress -o ./bin/northwind ./src/northwind.cr

@@ -67,7 +67,7 @@ class Spt96xDriver < CollectorDriver
     end
   end
 
-  # Add device task
+  # Execute device task
   def appendTask(deviceTasks : CollectorDeviceTasks) : Void
     actions = deviceTasks.tasks.compact_map do |x|
       x if x.is_a?(CollectorActionTask)
