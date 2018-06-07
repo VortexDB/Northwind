@@ -1,0 +1,1 @@
+crystal build --progress -o ./bin/collector ./src/collector/collector_main.cr

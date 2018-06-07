@@ -1,5 +1,5 @@
 # Collects data from devices
-class Collector
+class CollectorWorker
   # Сценарии
   @scripts = Array(CollectorScript).new
 
@@ -9,10 +9,9 @@ class Collector
       puts "Complete #{script.name}"
     end.catch do |e|
       puts e
+    end.whenComplete do
+      startScript(script)
     end
-    # .whenComplete do
-    #   startScript(script)
-    # end
   end
 
   # Start collector
@@ -30,7 +29,7 @@ class Collector
       "Collect values",
       PeriodicSchedule.new(offset, period))
 
-    driver = Spt96xDriver.new
+    driver = Spt96xDriver::Driver.new
     route = TcpClientRoute.new("192.168.0.196", 25301)
     device = CollectorDevice.new(driver, route)
     script.addDevice(device)

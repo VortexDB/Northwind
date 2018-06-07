@@ -1,7 +1,7 @@
 require "benchmark"
-require "./northwind/**"
+require "../**"
 
-collector = Collector.new
+collector = CollectorWorker.new
 collector.start
 
 loop do
