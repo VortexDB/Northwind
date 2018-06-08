@@ -9,18 +9,9 @@ module Spt96xDriver
 
     # Send request and read
     private def execute : Void
-      binary = IO::Memory.new
-      binary.write_bytes(SpbusSpecialBytes::HT_BYTE)
-      binary << "0" # Channel
-      binary.write_bytes(SpbusSpecialBytes::HT_BYTE)
-      binary << "60" # Parameter
-      binary.write_bytes(SpbusSpecialBytes::FF_BYTE)
-
-      binary.write_bytes(SpbusSpecialBytes::HT_BYTE)
-      binary << "0" # Channel
-      binary.write_bytes(SpbusSpecialBytes::HT_BYTE)
-      binary << "61" # Parameter
-      binary.write_bytes(SpbusSpecialBytes::FF_BYTE)
+      binary = IO::Memory.new      
+      BinaryHelper.addRequestParameter(binary, RequestBuilder.date)
+      BinaryHelper.addRequestParameter(binary, RequestBuilder.time)
 
       request = SpbusProtocolRequest.new(
         0x1D_u8,
@@ -29,7 +20,7 @@ module Spt96xDriver
 
       response = @protocol.sendRequestWithResponse(request)
       parser = ResponseParser.new
-      parser.parseReadParameters(response.data)
+      p parser.parseReadParameters(response.data)
 
       @completeBlock.call(Time.now)
     end

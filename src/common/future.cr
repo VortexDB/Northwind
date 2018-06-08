@@ -1,4 +1,4 @@
-# Lightweight future
+# Future
 class Future(T)
   @channel = Channel(T | Nil).new
 
@@ -42,7 +42,7 @@ class Future(T)
         @error = e
         @complete = true
         @catchBlock.try &.call(e)
-        @channel.send(nil)
+        @channel.close
       end
     end
   end
@@ -53,7 +53,7 @@ class Future(T)
   end
 
   # Future after
-  def then(&block : T? -> _) : Future
+  def then(&block : T -> _) : Future
     return Future.new do
       block.call(self.wait)
     end
@@ -79,8 +79,49 @@ class Future(T)
     end
   end
 
+  # Wait for result
+  def wait : T
+    @channel.receive.not_nil!
+  end
+end
+
+# Future with benchmarking
+class FutureBench(T) < Future(T)
+  # Start time
+  @startTime : Time::Span?
+
+  # End time
+  @endTime : Time::Span?
+
+  # Sure startTime
+  def startTime! : Time::Span
+    @startTime.not_nil!
+  end
+
+  # Sure endTime
+  def endTime! : Time::Span
+    @endTime.not_nil!
+  end
+
+  # Sure complete time
+  def completeTime! : Time::Span
+    endTime! - startTime!
+  end
+
+  # Overrided run
+  protected def run(&block : -> T)
+    @startTime = Time.monotonic
+	  super(&block)
+  end
+  
+  def initialize(&block : -> T)    
+	  super(&block)
+  end
+
+  # Overrided wait
   def wait : T?
-    @channel.receive
+    @endTime = Time.monotonic	
+    super
   end
 end
 
@@ -90,9 +131,11 @@ class Completer(T)
   getter future : Future(T)
 
   # Is completed
-  @channel = Channel(T).new
+  @channel : Channel(T)
 
   def initialize
+    @channel = Channel(T).new
+
     @future = Future(T).new do
       value = @channel.receive
       value
@@ -100,7 +143,7 @@ class Completer(T)
   end
 
   # Complete future
-  def complete(value : T)
+  def complete(value : T) : Void
     @channel.send(value)
   end
 end

@@ -1,7 +1,12 @@
 require "../common/*"
 
-# Event of collector script
-class CollectorScriptEvent
+# Info about completion
+class ScriptCompleteInfo
+  # Execution time
+  getter executeTime : Time::Span
+
+  def initialize(@executeTime)
+  end
 end
 
 # Collector script
@@ -29,7 +34,7 @@ class CollectorScript
   @actions : Set(SettingsAction)
 
   # To notify script execution completed
-  @executeCompleter : Completer(Bool)?
+  @executeCompleter : Completer(ScriptCompleteInfo)?
 
   def executeCompleter!
     @executeCompleter.not_nil!
@@ -54,25 +59,6 @@ class CollectorScript
       puts e
     end
   end
-
-  # # Block thread and process driver events
-  # private def processDriverEvents(driver : CollectorDriver, tasks : Array(CollectorTask)) : Void
-  #   driver.listen do |event|
-  #     case event
-  #     when DriverTimeoutEvent
-  #       puts "Driver timeout"
-  #       iswork = false
-  #     when TaskDataEvent
-  #       puts "Task data: #{event.taskId}"
-  #     when TaskCompleteEvent
-  #       puts "Task completed: #{event.taskId}"
-  #     when Exception
-  #       puts e
-  #     else
-  #       raise NorthwindException.new("Unknown driver event")
-  #     end
-  #   end
-  # end
 
   # Collect data from driver for it's devices
   private def collectByDriver(driver : CollectorDriver, driverDevices : Array(CollectorDevice))
@@ -108,9 +94,13 @@ class CollectorScript
     puts "Name: #{@name} Next start: #{nextStart}"
 
     Future.delayed(nextStart) do
+      startTime = Time.monotonic
       startCollect
+      executeTime = Time.monotonic - startTime
       # Wait for complete
-      executeCompleter!.complete(true)
+      executeCompleter!.complete(ScriptCompleteInfo.new(
+        executeTime: executeTime
+      ))
     end
   end
 
@@ -121,30 +111,28 @@ class CollectorScript
     puts "Parameters: #{@parameters.size}"
     puts "Deep: #{@deep}"
 
-    bench = Benchmark.realtime do
-      @devices.each.group_by { |x| x.route }.each do |route, routeDevices|
-        # Get a channel for route
-        channel = getChannelByRoute(route)
-        next if channel.nil?
-        routeDevices.group_by { |x| x.driver }.each do |driver, driverDevices|
-          begin
-            driver.channel = channel
-            collectByDriver(driver, driverDevices)
-          rescue e : Exception
-            puts e
-          end
+    @devices.each.group_by { |x| x.route }.each do |route, routeDevices|
+      # Get a channel for route
+      channel = getChannelByRoute(route)
+      next if channel.nil?
+      routeDevices.group_by { |x| x.driver }.each do |driver, driverDevices|
+        begin
+          driver.channel = channel
+          collectByDriver(driver, driverDevices)
+        rescue e : Exception
+          puts e
         end
-
-        channel.close
       end
+
+      channel.close
     end
-    puts "Collect complete #{bench}"
   end
 
   # Start work
   def start : Future
-    @executeCompleter = Completer(Bool).new
+    @executeCompleter = Completer(ScriptCompleteInfo).new
 
+    # TODO: catch ant complete with error
     Future.new do
       @isWorking = true
       startSchedule

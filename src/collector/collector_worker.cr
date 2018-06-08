@@ -4,9 +4,9 @@ class CollectorWorker
   @scripts = Array(CollectorScript).new
 
   # Start collector script
-  private def startScript(script : CollectorScript) : Void
-    script.start.then do
-      puts "Complete #{script.name}"
+  private def startScript(script : CollectorScript) : Void    
+    script.start.then do |info|
+      puts "Complete #{script.name} Execute time: #{info.executeTime}"
     end.catch do |e|
       puts e
     end.whenComplete do
