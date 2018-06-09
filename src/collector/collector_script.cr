@@ -51,13 +51,9 @@ class CollectorScript
 
   # Connect and return transport channel
   private def getChannelByRoute(route : DeviceRoute) : TransportChannel?
-    begin
-      channel = TransportChannel.create(route)
-      channel.open
-      return channel
-    rescue e : Exception
-      puts e
-    end
+    channel = TransportChannel.create(route)
+    channel.open
+    return channel
   end
 
   # Collect data from driver for it's devices
@@ -69,20 +65,20 @@ class CollectorScript
     tasks = Array(CollectorTask).new
 
     # Append task in other fiber
-    begin
-      driverDevices.each do |device|
-        @actions.each do |act|
-          tasks << CollectorActionTask.new(act)
-        end
-
-        @parameters.each do |par|
-          tasks << CollectorDataTask.new(par, interval)
-        end
-
-        driver.appendTask(CollectorDeviceTasks.new(device, tasks))
+    driverDevices.each do |device|
+      @actions.each do |act|
+        tasks << CollectorActionTask.new(act)
       end
-    rescue e : Exception
-      puts e
+
+      @parameters.each do |par|
+        tasks << CollectorDataTask.new(par, interval)
+      end
+      
+      begin
+        driver.appendTask(CollectorDeviceTasks.new(device, tasks))
+      rescue
+        # TODO: notify error
+      end
     end
   end
 
@@ -91,6 +87,7 @@ class CollectorScript
     return unless @isWorking
 
     nextStart = @schedule.nextStart
+    # TODO: notifyMessage
     puts "Name: #{@name} Next start: #{nextStart}"
 
     Future.delayed(nextStart) do
@@ -101,6 +98,9 @@ class CollectorScript
       executeCompleter!.complete(ScriptCompleteInfo.new(
         executeTime: executeTime
       ))
+    end.catch do |e|
+      # TODO notify error
+      # executeCompleter!.completeError(e)
     end
   end
 
@@ -112,19 +112,20 @@ class CollectorScript
     puts "Deep: #{@deep}"
 
     @devices.each.group_by { |x| x.route }.each do |route, routeDevices|
-      # Get a channel for route
-      channel = getChannelByRoute(route)
-      next if channel.nil?
-      routeDevices.group_by { |x| x.driver }.each do |driver, driverDevices|
-        begin
+      Future.new do
+        # Get a channel for route
+        channel = getChannelByRoute(route)
+        next if channel.nil?
+        routeDevices.group_by { |x| x.driver }.each do |driver, driverDevices|
           driver.channel = channel
           collectByDriver(driver, driverDevices)
-        rescue e : Exception
-          puts e
         end
-      end
 
-      channel.close
+        channel.close
+      end.catch do |e|
+        # TODO notify error
+        # Owner.notifyMessage
+      end
     end
   end
 
@@ -132,12 +133,8 @@ class CollectorScript
   def start : Future
     @executeCompleter = Completer(ScriptCompleteInfo).new
 
-    # TODO: catch ant complete with error
-    Future.new do
-      @isWorking = true
-      startSchedule
-      Nil
-    end
+    @isWorking = true
+    startSchedule
 
     return executeCompleter!.future
   end

@@ -5,9 +5,10 @@ class CollectorWorker
 
   # Start collector script
   private def startScript(script : CollectorScript) : Void    
-    script.start.then do |info|
+    script.start.then! do |info|      
       puts "Complete #{script.name} Execute time: #{info.executeTime}"
     end.catch do |e|
+      puts "ERROR"
       puts e
     end.whenComplete do
       startScript(script)

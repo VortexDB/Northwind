@@ -23,18 +23,51 @@ module Spt96xDriver
         return RequestParameter.new(channel, param)
     end
 
-    # Parse parameter date
+    # Parse date of format дд-мм-гг
+    def parseDateValue(str : String, format : String) : Time
+      if format == "дд-мм-гг"
+        dd,mm,yy = str.split("-")
+        year = yy.to_i32
+        year = (year + 2000) if year < 2000
+        return Time.new(year, mm.to_i32, dd.to_i32)
+      end      
+
+      raise NorthwindException.new("Unknown date format")
+    end
+
+    # Parse time of format чч:мм:сс
+    def parseTimeValue(str : String, format : String) : Time::Span
+      if format == "чч:мм:сс"
+        hh,mm,ss = str.split(":")        
+        return Time::Span.new(hh.to_i32, mm.to_i32, ss.to_i32)
+      end      
+
+      raise NorthwindException.new("Unknown time format")
+    end
+
+    # Parse parameter datetime
     def parseParameterDate(str : String) : Time
-        
+        dateItems, timeItems = str.split("/")
+        year = dateItems[2].to_i32
+        year = (year + 2000) if year < 2000
+        month = dateItems[1].to_i32
+        day = dateItems[0].to_i32
+
+        hour = timeItems[0].to_i32
+        minute = timeItems[1].to_i32
+        second = timeItems[2].to_i32
+
+        return Time.new(year, month, day, hour, minute, second)
     end
 
     # Parse parameter data
     def parseParameterData(str : String) : ParameterData
         items = str.split(SpbusSpecialBytes::HT_BYTE.chr)
+        items.shift
 
         value = items[0]
         measure = items[1] if items.size > 1
-        date = parseParameterDate(parseitems[2]) if items.size > 2
+        date = parseParameterDate(items[2]) if items.size > 2
 
         return ParameterData.new(value, measure, date)
     end
@@ -46,9 +79,18 @@ module Spt96xDriver
         infoStr = items[i]
         dataStr = items[i + 1]
         par = parseRequestParameter(infoStr)
-        date = 
-        yield ReadParameterResponse.new(par, data)
+        date = parseParameterData(dataStr)
+        yield ReadParameterResponse.new(par, date)
       end
+    end
+
+    # Parse params with array result
+    def parseReadParametersToArray(data : Bytes) : Array(ReadParameterResponse)
+        arr = Array(ReadParameterResponse).new
+        parseReadParameters(data) do |x|
+            arr << x
+        end
+        return arr
     end
   end
 end

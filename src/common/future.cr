@@ -1,5 +1,6 @@
 # Future
 class Future(T)
+  # Channel
   @channel = Channel(T | Nil).new
 
   # Is future complete
@@ -32,16 +33,22 @@ class Future(T)
     end
   end
 
+  # Execute future on fiber
   private def run(&block : -> T)
     spawn do
       begin
-        @result = block.call
+        @result = block.call        
         @complete = true
         @channel.send(@result)
       rescue e : Exception
         @error = e
         @complete = true
-        @catchBlock.try &.call(e)
+        if catchBlock = @catchBlock
+          catchBlock.call(e)
+        else
+          raise e
+        end
+      ensure
         @channel.close
       end
     end
@@ -53,9 +60,16 @@ class Future(T)
   end
 
   # Future after
-  def then(&block : T -> _) : Future
+  def then(&block : T? -> _) : Future
     return Future.new do
       block.call(self.wait)
+    end
+  end
+
+  # Future after
+  def then!(&block : T -> _) : Future
+    return Future.new do
+      block.call(self.wait!)
     end
   end
 
@@ -79,9 +93,14 @@ class Future(T)
     end
   end
 
-  # Wait for result
-  def wait : T
-    @channel.receive.not_nil!
+  # Wait for result with possible nil
+  def wait : T?
+    @channel.receive
+  end
+
+  # Wait for result without nil
+  def wait! : T
+    wait.not_nil!
   end
 end
 
@@ -111,16 +130,16 @@ class FutureBench(T) < Future(T)
   # Overrided run
   protected def run(&block : -> T)
     @startTime = Time.monotonic
-	  super(&block)
+    super(&block)
   end
-  
-  def initialize(&block : -> T)    
-	  super(&block)
+
+  def initialize(&block : -> T)
+    super(&block)
   end
 
   # Overrided wait
   def wait : T?
-    @endTime = Time.monotonic	
+    @endTime = Time.monotonic
     super
   end
 end
@@ -130,7 +149,7 @@ class Completer(T)
   # Future to complete
   getter future : Future(T)
 
-  # Is completed
+  # Channel to complete
   @channel : Channel(T)
 
   def initialize

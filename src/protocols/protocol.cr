@@ -27,5 +27,6 @@ abstract class Protocol
 
     # Send applied request
     # And yields response
-    abstract def sendRequestWithResponse(protocolData : ProtocolRequest) : ProtocolResponse
+    abstract def sendRequestWithResponse(
+        protocolData : ProtocolRequest) : ProtocolResponse
 end

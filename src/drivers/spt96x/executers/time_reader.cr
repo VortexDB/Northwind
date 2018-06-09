@@ -20,9 +20,11 @@ module Spt96xDriver
 
       response = @protocol.sendRequestWithResponse(request)
       parser = ResponseParser.new
-      p parser.parseReadParameters(response.data)
+      datePar, timePar = parser.parseReadParametersToArray(response.data)
+      date = parser.parseDateValue(datePar.data.value, datePar.data.measure.not_nil!) + 
+             parser.parseTimeValue(timePar.data.value, timePar.data.measure.not_nil!)
 
-      @completeBlock.call(Time.now)
+      @completeBlock.call(date)
     end
 
     def initialize(@protocol, &block : Time -> _)
