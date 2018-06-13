@@ -25,6 +25,13 @@ class Future(T)
     end
   end
 
+  # Wait all futures
+  def self.waitAll(futures : Array(Future))
+    return futures.map do |f|
+      f.wait
+    end
+  end
+
   # Start delayed future
   def self.delayed(duration : Time::Span, &block : -> T) : Future(T)
     return Future(T).new do

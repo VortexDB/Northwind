@@ -1,35 +1,21 @@
 module Spt96xDriver
   # Read time
   class TimeReader
-    # Protocol for send/receive data
-    @protocol : SpbusProtocol
-
-    # Complete block
-    @completeBlock : Proc(Time, Void)
-
     # Send request and read
-    private def execute : Void
-      binary = IO::Memory.new      
-      BinaryHelper.addRequestParameter(binary, RequestBuilder.date)
-      BinaryHelper.addRequestParameter(binary, RequestBuilder.time)
+    private def execute(protocol, &block : Time -> _) : Void
+      reader = ParameterReader.new(protocol)
+      reader.addParameter(RequestBuilder.date)
+      reader.addParameter(RequestBuilder.time)
 
-      request = SpbusProtocolRequest.new(
-        0x1D_u8,
-        binary.to_slice
-      )
+      datePar, timePar = reader.execute
+      date = ResponseParser.parseDateValue(datePar.data.value, datePar.data.measure.not_nil!) +
+             ResponseParser.parseTimeValue(timePar.data.value, timePar.data.measure.not_nil!)
 
-      response = @protocol.sendRequestWithResponse(request)
-      parser = ResponseParser.new
-      datePar, timePar = parser.parseReadParametersToArray(response.data)
-      date = parser.parseDateValue(datePar.data.value, datePar.data.measure.not_nil!) + 
-             parser.parseTimeValue(timePar.data.value, timePar.data.measure.not_nil!)
-
-      @completeBlock.call(date)
+      block.call(date)
     end
 
-    def initialize(@protocol, &block : Time -> _)
-      @completeBlock = block
-      execute
+    def initialize(protocol, &block : Time -> _)
+      execute(protocol, &block)
     end
   end
 end

@@ -16,7 +16,15 @@ module Spt96xDriver
 
     # Get device info from device
     private def getDeviceInfo(device : CollectorDevice) : DeviceInfo
-      return DeviceInfo.new
+      case device.dataSource
+      when ResourceMeterDataSource
+        return DeviceInfo.new
+      when PipeDataSource
+        # TODO: pipe number
+        return DeviceInfo.new(DeviceType::Pipe, 1)
+      else
+        raise NorthwindException.new("Unknown data source")
+      end      
     end
 
     # Prepare and execute read action
@@ -49,15 +57,35 @@ module Spt96xDriver
       end
     end
 
+    # Execute current value reading
+    private def executeCurrentValues(deviceInfo : DeviceInfo, tasks : Array(CollectorDataTask)) : Void    
+      reader = ValueReader.new
+      tasks.each do |task|
+        parameter = RequestParameter.fromChannelCurrent(deviceInfo.pipeNumber, task.parameter)
+        reader.addParameter(parameter)
+      end
+
+      reader.execute(@protocol) do |response|
+
+      end
+    end
+
     # Execute device task
     def appendTask(deviceTasks : CollectorDeviceTasks) : Void
       actions = deviceTasks.tasks.compact_map do |x|
         x if x.is_a?(CollectorActionTask)
       end
 
+      current = deviceTasks.tasks.compact_map do |x|
+        if x.is_a?(CollectorDataTask)
+          x if x.parameter.discret != DiscretType::None
+        end
+      end
+
       deviceInfo = getDeviceInfo(deviceTasks.device)
 
-      executeActions(deviceInfo, actions)
+      executeActions(deviceInfo, actions) if !actions.empty?
+      executeCurrentValues(deviceInfo, current) if !current.empty?
     end
   end
 end

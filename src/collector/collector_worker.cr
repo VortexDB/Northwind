@@ -32,7 +32,11 @@ class CollectorWorker
 
     driver = Spt96xDriver::Driver.new
     route = TcpClientRoute.new("192.168.0.196", 25301)
-    device = CollectorDevice.new(driver, route)
+    # Device
+    device = CollectorDevice.new(driver, route, ResourceMeterDataSource.new(1_i64))
+    script.addDevice(device)
+    # Pipe
+    device = CollectorDevice.new(driver, route, PipeDataSource.new(2_i64))
     script.addDevice(device)
     parameter = MeasureParameter.new(
       MeasureType::ABSOLUTE_PRESSURE,

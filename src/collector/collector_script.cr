@@ -111,8 +111,10 @@ class CollectorScript
     puts "Parameters: #{@parameters.size}"
     puts "Deep: #{@deep}"
 
+    futures = Array(Future(Void)).new
+
     @devices.each.group_by { |x| x.route }.each do |route, routeDevices|
-      Future.new do
+      futures << Future(Void).new do
         # Get a channel for route
         channel = getChannelByRoute(route)
         next if channel.nil?
@@ -122,11 +124,10 @@ class CollectorScript
         end
 
         channel.close
-      end.catch do |e|
-        # TODO notify error
-        # Owner.notifyMessage
       end
     end
+    
+    Future.waitAll(futures)
   end
 
   # Start work

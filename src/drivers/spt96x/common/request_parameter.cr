@@ -7,7 +7,18 @@ module Spt96xDriver
         # Measure parameter number
         getter parameter : String
 
-        def initialize(@channel, @parameter)            
+        # Return request parameter from channel and measure parameter for current values
+        def self.fromChannelCurrent(channel : Int32, parameter : MeasureParameter) : RequestParameter
+            chan = channel.to_s
+            case parameter.measureType
+            when MeasureType::ABSOLUTE_PRESSURE
+                return RequestParameter.new(chan, "154")
+            else
+                raise NorthwindException.new("Unknown measure type")
+            end
         end
+
+        def initialize(@channel, @parameter)            
+        end        
     end
 end

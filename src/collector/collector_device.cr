@@ -6,7 +6,10 @@ class CollectorDevice
     # Device route for connection
     # TODO: routes
     getter route : DeviceRoute
+
+    # Data source to write data
+    getter dataSource : EntityDataSource
     
-    def initialize(@driver, @route)
+    def initialize(@driver, @route, @dataSource)
     end
 end

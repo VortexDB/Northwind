@@ -13,6 +13,7 @@ end
 class MeasureType
     # Active energy
     ACTIVE_ENERGY = MeasureType.new("ActiveEnergy", BaseMeasureType::Energy)
+    
     # Reactive energy
     REACTIVE_ENERGY = MeasureType.new("ReactiveEnergy", BaseMeasureType::Energy)
     
@@ -26,6 +27,5 @@ class MeasureType
     getter baseMeasure : BaseMeasureType
 
     def initialize(@name, @baseMeasure)
-        
     end
 end
