@@ -1,4 +1,9 @@
+require "../../protocols/spbus_protocol/**"
+
 module Spt96xDriver
+  include Collector
+  include SpbusProtocol
+
   # Driver for Logica SPT96x
   class Driver < CollectorDriver
     include CollectorDriverWithExternalChannel
@@ -32,7 +37,7 @@ module Spt96xDriver
       case action.actionInfo.state
       when SettingsState::DateTime
         TimeReader.new(@protocol) do |time|
-          notifyData(action.taskId)
+          #notifyData(action.taskId)
         end
       else
         raise NorthwindException.new("Unknown read action")
@@ -45,6 +50,8 @@ module Spt96xDriver
 
     # Execute actions
     private def executeActions(deviceInfo : DeviceInfo, tasks : Array(CollectorActionTask)) : Void
+      return if deviceInfo.deviceType != DeviceType::Meter
+
       tasks.each do |task|
         case task.actionInfo.action
         when StateAction::Read
@@ -58,15 +65,23 @@ module Spt96xDriver
     end
 
     # Execute current value reading
-    private def executeCurrentValues(deviceInfo : DeviceInfo, tasks : Array(CollectorDataTask)) : Void    
+    private def executeCurrentValues(deviceInfo : DeviceInfo, tasks : Array(CollectorDataTask)) : Void          
+      return if (deviceInfo.deviceType != DeviceType::Pipe && deviceInfo.deviceType != DeviceType::Group)
+            
+      tastToRequest = Hash(RequestParameter, CollectorDataTask).new
+
       reader = ValueReader.new
       tasks.each do |task|
         parameter = RequestParameter.fromChannelCurrent(deviceInfo.pipeNumber, task.parameter)
+        tastToRequest[parameter] = task
         reader.addParameter(parameter)
       end
 
       reader.execute(@protocol) do |response|
-
+        task = tastToRequest[response.request]?
+        next if task.nil?
+        
+        notifyData(TaskDataEvent.new(task.taskId, response.value))
       end
     end
 

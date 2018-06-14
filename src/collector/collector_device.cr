@@ -1,5 +1,6 @@
-# Device that uses collector
-class CollectorDevice
+module Collector
+  # Device that uses collector
+  class CollectorDevice
     # Driver to collect data
     getter driver : CollectorDriver
 
@@ -9,7 +10,8 @@ class CollectorDevice
 
     # Data source to write data
     getter dataSource : EntityDataSource
-    
+
     def initialize(@driver, @route, @dataSource)
     end
+  end
 end

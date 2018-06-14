@@ -1,7 +1,7 @@
 require "benchmark"
 require "../**"
 
-collector = CollectorWorker.new
+collector = Collector::CollectorWorker.new
 collector.start
 
 loop do
