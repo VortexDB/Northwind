@@ -1,4 +1,5 @@
 # Future
+# TODO: make better
 class Future(T)
   # Channel
   @channel = Channel(T | Nil).new

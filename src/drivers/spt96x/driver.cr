@@ -77,10 +77,9 @@ module Spt96xDriver
         reader.addParameter(parameter)
       end
 
-      reader.execute(@protocol) do |response|
-        task = tastToRequest[response.request]?
+      reader.execute(@protocol) do |response|        
+        task = tastToRequest[response.request]?                
         next if task.nil?
-        
         notifyData(TaskDataEvent.new(task.taskId, response.value))
       end
     end

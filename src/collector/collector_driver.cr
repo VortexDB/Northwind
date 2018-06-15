@@ -5,15 +5,6 @@ module Collector
   abstract class CollectorDriverEvent
   end
 
-  # Notifies about task complete
-  class TaskCompleteEvent < CollectorDriverEvent
-    # Collector task id
-    getter taskId : Int32
-
-    def initialize(@taskId)
-    end
-  end
-
   # Data value from driver
   alias DataValue = Float64 | Time | String
 
@@ -70,18 +61,16 @@ module Collector
     # For override
     abstract def appendTask(deviceTasks : CollectorDeviceTasks) : Void
 
-    # Notify task complete
-    def notifyTaskComplete(taskId : Int32) : Void
-      # addEvent(
-      #   TaskCompleteEvent.new(taskId)
-      # )
+    def listenBlock!
+      @listenBlock.not_nil!
+    end
+
+    def listen(&@listenBlock : CollectorDriverEvent -> Void) : Void
     end
 
     # Notify task complete
     def notifyData(event : TaskDataEvent) : Void
-      # addEvent(
-      #   TaskDataEvent.new(taskId)
-      # )
+      listenBlock!.call(event)
     end
   end
 end

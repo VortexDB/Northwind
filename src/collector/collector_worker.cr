@@ -1,8 +1,15 @@
+require "../database/*"
+
 module Collector
+  include Database
+
   # Collects data from devices
   class CollectorWorker
-    # Сценарии
-    @scripts = Array(CollectorScript).new
+    # TODO: remove
+    @database : DatabaseClient
+
+    # Data collecting scripts
+    @scripts : Array(CollectorScript)
 
     # Start collector script
     private def startScript(script : CollectorScript) : Void
@@ -14,6 +21,11 @@ module Collector
       end.whenComplete do
         startScript(script)
       end
+    end
+
+    def initialize
+      @database = DatabaseClient.new
+      @scripts = Array(CollectorScript).new
     end
 
     # Start collector
@@ -29,7 +41,8 @@ module Collector
       period = Time::Span.new(seconds: 10 * 1, nanoseconds: 0)
       script = CollectorScript.new(
         "Collect values",
-        PeriodicSchedule.new(offset, period))
+        PeriodicSchedule.new(offset, period),
+        @database)
 
       driver = Spt96xDriver::Driver.new
       route = TcpClientRoute.new("192.168.0.196", 25301)

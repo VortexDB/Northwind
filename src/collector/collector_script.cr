@@ -1,4 +1,5 @@
 require "../common/*"
+require "../database/*"
 
 module Collector
   # Info about completion
@@ -10,8 +11,22 @@ module Collector
     end
   end
 
+  # Info about task. Used to process driver answer
+  private struct ScriptTaskInfo
+    # Device
+    getter device : CollectorDevice
+
+    # Task
+    getter task : CollectorTask
+
+    def initialize(@device, @task)
+    end
+  end
+
   # Collector script
   class CollectorScript
+    include Database
+
     # Period of timer to check schedule
     PERIOD = 10
 
@@ -21,6 +36,9 @@ module Collector
     # Driver no any event timeout
     # Guards from driver hangs
     DRIVER_SILENCE_TIMEOUT = 1 * 60
+
+    # For working with data
+    @database : Database::DatabaseClient
 
     # Schedule of script
     @schedule : Schedule
@@ -57,6 +75,30 @@ module Collector
       return channel
     end
 
+    # Process data event from driver
+    private def processDataEvent(event : TaskDataEvent, allTasks : Hash(Int32, ScriptTaskInfo)) : Void
+      # Get device
+      # Send to someone to write data for parameter
+      taskInfo = allTasks[event.taskId]?
+      return if taskInfo.nil?
+
+      taskData = taskInfo.task.as(CollectorDataTask)
+      return if taskData.nil?
+
+      # TODO: remove
+      parameter = EntityParameter.new(2_i64)
+      values = event.values
+
+      case values
+      when Float64
+        @database.writeValue(taskInfo.device.dataSource,
+          parameter, nil, values)
+      when Array(TimedDataValue)
+        # TODO: profile data
+      else
+      end
+    end
+
     # Collect data from driver for it's devices
     private def collectByDriver(driver : CollectorDriver, driverDevices : Array(CollectorDevice))
       now = Time.now
@@ -64,6 +106,15 @@ module Collector
       endTime = now
       interval = DateInterval.new(startTime, endTime)
       tasks = Array(CollectorTask).new
+      allTasks = Hash(Int32, ScriptTaskInfo).new
+
+      driver.listen do |event|
+        case event
+        when TaskDataEvent
+          processDataEvent(event, allTasks)
+        else
+        end
+      end
 
       # Append task in other fiber
       driverDevices.each do |device|
@@ -77,6 +128,14 @@ module Collector
           tasks << CollectorDataTask.new(par, interval)
         end
 
+        tasks.each do |x|
+          allTasks[x.taskId] = ScriptTaskInfo.new(
+            device, x
+          )
+        end
+
+        # TODO: Timeout
+        # TODO: Catch driver errors
         begin
           driver.appendTask(CollectorDeviceTasks.new(device, tasks))
         rescue
@@ -93,6 +152,7 @@ module Collector
       # TODO: notifyMessage
       puts "Name: #{@name} Next start: #{nextStart}"
 
+      # TODO: script execution timeout
       Future.delayed(nextStart) do
         startTime = Time.monotonic
         startCollect
@@ -134,6 +194,12 @@ module Collector
       Future.waitAll(futures)
     end
 
+    def initialize(@name, @schedule, @database)
+      @devices = Set(CollectorDevice).new
+      @parameters = Set(MeasureParameter).new
+      @actions = Set(SettingsAction).new
+    end
+
     # Start work
     def start : Future
       @executeCompleter = Completer(ScriptCompleteInfo).new
@@ -142,12 +208,6 @@ module Collector
       startSchedule
 
       return executeCompleter!.future
-    end
-
-    def initialize(@name, @schedule)
-      @devices = Set(CollectorDevice).new
-      @parameters = Set(MeasureParameter).new
-      @actions = Set(SettingsAction).new
     end
 
     # Add device to script

@@ -55,8 +55,8 @@ module Spt96xDriver
     end
 
     # Parse request parameter
-    def parseRequestParameter(str : String) : RequestParameter
-      channel, param = str.split(SpbusSpecialBytes::HT_BYTE.chr)
+    def parseRequestParameter(str : String) : RequestParameter      
+      _, channel, param = str.split(SpbusSpecialBytes::HT_BYTE.chr)
       return RequestParameter.new(channel, param)
     end
 
