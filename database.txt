@@ -1,3 +1,0 @@
-Entity: 2 Parameter: 2 Date:  Value: 1.0
-Entity: 2 Parameter: 2 Date:  Value: 1.0
-Entity: 2 Parameter: 2 Date:  Value: 1.0

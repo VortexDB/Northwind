@@ -164,6 +164,7 @@ module Collector
       end.catch do |e|
         # TODO notify error
         # executeCompleter!.completeError(e)
+        p e
       end
     end
 
@@ -201,7 +202,7 @@ module Collector
     end
 
     # Start work
-    def start : Future
+    def start : Future(ScriptCompleteInfo)
       @executeCompleter = Completer(ScriptCompleteInfo).new
 
       @isWorking = true

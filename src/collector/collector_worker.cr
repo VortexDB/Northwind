@@ -13,13 +13,13 @@ module Collector
 
     # Start collector script
     private def startScript(script : CollectorScript) : Void
-      script.start.then! do |info|
-        puts "Complete #{script.name} Execute time: #{info.executeTime}"
+      script.start.success do |res|
+        result = res.not_nil!
+        puts "Complete #{script.name} Execute time: #{result.executeTime}"        
+        startScript(script)        
       end.catch do |e|
         puts "ERROR"
-        puts e
-      end.whenComplete do
-        startScript(script)
+        puts e      
       end
     end
 

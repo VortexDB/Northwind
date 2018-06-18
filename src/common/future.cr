@@ -1,23 +1,27 @@
-# Future
-# TODO: make better
+# Lightweight future
 class Future(T)
   # Channel
-  @channel = Channel(T | Nil).new
+  @channel : Channel(T | Nil)?
 
   # Is future complete
-  @complete = false
+  getter complete = false
 
   # Error
-  @error : Exception?
+  getter error : Exception?
 
   # Result of future
-  @result : T?
+  getter result : T?
+
+  # Return sure value
+  def result!
+    @result.not_nil!
+  end
 
   # Block to catch
   @catchBlock : Proc(Exception, Void)?
 
   # Block on complete
-  @completeBlock : (-> Void)?
+  @succBlock : (T? -> Void)?
 
   # Wait all futures
   def self.waitAll(*futures)
@@ -45,9 +49,9 @@ class Future(T)
   private def run(&block : -> T)
     spawn do
       begin
-        @result = block.call        
-        @complete = true
-        @channel.send(@result)
+        @result = block.call
+        @complete = true        
+        @channel.try &.send(@result)        
       rescue e : Exception
         @error = e
         @complete = true
@@ -57,7 +61,11 @@ class Future(T)
           raise e
         end
       ensure
-        @channel.close
+        if succBlock = @succBlock
+          succBlock.call(@result)
+        end
+
+        @channel.try &.close
       end
     end
   end
@@ -67,48 +75,23 @@ class Future(T)
     run(&block)
   end
 
-  # Future after
-  def then(&block : T? -> _) : Future
-    return Future.new do
-      block.call(self.wait)
-    end
-  end
-
-  # Future after
-  def then!(&block : T -> _) : Future
-    return Future.new do
-      block.call(self.wait!)
-    end
-  end
-
   # Catch exception
   def catch(&block : Exception -> _) : Future
     @catchBlock = block
     self
   end
 
-  # On complete with result o not
-  def whenComplete(&block : -> _) : Future
-    return Future.new do
-      begin
-        self.wait
-      rescue e : Exception
-        raise e
-      ensure
-        block.call
-      end
-      Nil
-    end
+  # On success with result
+  def success(&block : T? -> Void) : Future
+    @succBlock = block
+    self
   end
 
   # Wait for result with possible nil
   def wait : T?
-    @channel.receive
-  end
-
-  # Wait for result without nil
-  def wait! : T
-    wait.not_nil!
+    return @result if @complete
+    @channel = Channel(T | Nil).new
+    @channel.try &.receive
   end
 end
 
@@ -172,5 +155,6 @@ class Completer(T)
   # Complete future
   def complete(value : T) : Void
     @channel.send(value)
+    @channel.close
   end
 end
