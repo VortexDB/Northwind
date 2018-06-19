@@ -4,12 +4,29 @@ module Spt96xDriver
     # Encoding of response
     ENCODING = "cp866"
 
+    # Parse date HT Day HT Month HT Year HT Hour HT Minute HT Seconds
+    def self.parseDateTime(str : String) : Time
+      _,ds,mos,ys,hs,ms,ss = str.split(SpbusSpecialBytes::HT_BYTE.chr)
+
+      year = ys.to_i32
+      year = (year + 2000) if year <= 2000
+
+      return Time.new(
+        year,
+        mos.to_i32,
+        ds.to_i32,
+        hs.to_i32,
+        ms.to_i32,
+        ss.to_i32
+      )
+    end
+
     # Parse date of format дд-мм-гг
     def self.parseDateValue(str : String, format : String) : Time
       if format == "дд-мм-гг"
         dd, mm, yy = str.split("-")
         year = yy.to_i32
-        year = (year + 2000) if year < 2000
+        year = (year + 2000) if year <= 2000
         return Time.new(year, mm.to_i32, dd.to_i32)
       end
 
@@ -30,7 +47,7 @@ module Spt96xDriver
     def self.parseParameterDate(str : String) : Time
       dateItems, timeItems = str.split("/")
       year = dateItems[2].to_i32
-      year = (year + 2000) if year < 2000
+      year = (year + 2000) if year <= 2000
       month = dateItems[1].to_i32
       day = dateItems[0].to_i32
 
@@ -55,7 +72,7 @@ module Spt96xDriver
     end
 
     # Parse request parameter
-    def parseRequestParameter(str : String) : RequestParameter      
+    def parseRequestParameter(str : String) : RequestParameter
       _, channel, param = str.split(SpbusSpecialBytes::HT_BYTE.chr)
       return RequestParameter.new(channel, param)
     end
@@ -91,6 +108,26 @@ module Spt96xDriver
         arr << x
       end
       return arr
+    end
+
+    # Parse response for date archive reading
+    def parseReadDateArchiveResponse(data : Bytes) : ReadDateArchiveResponse
+      items = parseItems(data)
+      parameter = parseRequestParameter(items[0])
+      startDate = parseDateTime(item[1])
+      endDate = parseDateTime(item[2])
+
+      values = Array(ParameterData).new
+      (3...item.size).each do |x|
+        values << parseParameterData(items[x])
+      end
+
+      return ReadDateArchiveResponse.new(
+        parameter: parameter,
+        startDate: startDate,
+        endDate: endDate,
+        values: values
+      )
     end
   end
 end

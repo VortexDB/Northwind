@@ -29,7 +29,7 @@ module Spt96xDriver
         return DeviceInfo.new(DeviceType::Pipe, 1)
       else
         raise NorthwindException.new("Unknown data source")
-      end      
+      end
     end
 
     # Prepare and execute read action
@@ -37,7 +37,7 @@ module Spt96xDriver
       case action.actionInfo.state
       when SettingsState::DateTime
         TimeReader.new(@protocol) do |time|
-          #notifyData(action.taskId)
+          # notifyData(action.taskId)
         end
       else
         raise NorthwindException.new("Unknown read action")
@@ -50,8 +50,6 @@ module Spt96xDriver
 
     # Execute actions
     private def executeActions(deviceInfo : DeviceInfo, tasks : Array(CollectorActionTask)) : Void
-      return if deviceInfo.deviceType != DeviceType::Meter
-
       tasks.each do |task|
         case task.actionInfo.action
         when StateAction::Read
@@ -65,9 +63,9 @@ module Spt96xDriver
     end
 
     # Execute current value reading
-    private def executeCurrentValues(deviceInfo : DeviceInfo, tasks : Array(CollectorDataTask)) : Void          
+    private def executeCurrentValues(deviceInfo : DeviceInfo, tasks : Array(CollectorDataTask)) : Void
       return if (deviceInfo.deviceType != DeviceType::Pipe && deviceInfo.deviceType != DeviceType::Group)
-            
+
       tastToRequest = Hash(RequestParameter, CollectorDataTask).new
 
       reader = ValueReader.new
@@ -77,29 +75,48 @@ module Spt96xDriver
         reader.addParameter(parameter)
       end
 
-      reader.execute(@protocol) do |response|        
-        task = tastToRequest[response.request]?                
+      reader.execute(@protocol) do |response|
+        task = tastToRequest[response.request]?
         next if task.nil?
         notifyData(TaskDataEvent.new(task.taskId, response.value))
       end
     end
 
+    # Execute archive reading
+    private def executeArchive(deviceInfo : DeviceInfo, tasks : Array(CollectorDataTask)) : Void
+    end
+
     # Execute device task
     def appendTask(deviceTasks : CollectorDeviceTasks) : Void
-      actions = deviceTasks.tasks.compact_map do |x|
-        x if x.is_a?(CollectorActionTask)
-      end
-
-      current = deviceTasks.tasks.compact_map do |x|
-        if x.is_a?(CollectorDataTask)
-          x if x.parameter.discret != DiscretType::None
-        end
-      end
-
       deviceInfo = getDeviceInfo(deviceTasks.device)
 
-      executeActions(deviceInfo, actions) if !actions.empty?
-      executeCurrentValues(deviceInfo, current) if !current.empty?
+      if deviceInfo.deviceType != DeviceType::Meter
+        actions = deviceTasks.tasks.compact_map do |x|
+          x if x.is_a?(CollectorActionTask)
+        end
+
+        executeActions(deviceInfo, actions) if !actions.empty?
+      end
+
+      if (deviceInfo.deviceType != DeviceType::Pipe && deviceInfo.deviceType != DeviceType::Group)
+        current = Array(CollectorDataTask).new
+        archive = Array(CollectorDataTask).new
+
+        deviceTasks.tasks.each do |task|
+          case task
+          when CollectorDataTask
+            if task.parameter.discret == DiscretType::None
+              current << task
+            else
+              archive << task
+            end
+          else
+          end
+        end
+
+        executeCurrentValues(deviceInfo, current) if !current.empty?
+        executeArchive(deviceInfo, archive) if !current.empty?
+      end
     end
   end
 end

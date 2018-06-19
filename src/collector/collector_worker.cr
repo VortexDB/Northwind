@@ -52,13 +52,19 @@ module Collector
       # Pipe
       device = CollectorDevice.new(driver, route, PipeDataSource.new(2_i64))
       script.addDevice(device)
-      parameter = MeasureParameter.new(
+      currentParameter = MeasureParameter.new(
         MeasureType::ABSOLUTE_PRESSURE,
         Discret.new(DiscretType::None, -1)
       )
+
+      archiveParameter = MeasureParameter.new(
+        MeasureType::ABSOLUTE_PRESSURE,
+        Discret.new(DiscretType::Day, 1)
+      )
+
       settingAction = SettingsAction.new(SettingsState::DateTime, StateAction::Read)
 
-      script.addParameter(parameter)
+      script.addParameter(archiveParameter)
       # script.addAction(settingAction)
       @scripts.push(script)
     end
