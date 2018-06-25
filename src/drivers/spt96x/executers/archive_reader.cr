@@ -17,18 +17,11 @@ module Spt96xDriver
     def execute(protocol : SpbusProtocol, &block : ValueData -> _) : Void
       # Read settings
 
-    #   settingsReader = ParameterReader.new(protocol)
-    #   @reader.requests.each do |param|
-    #     settingsReader.addParameter(param)
-    #   end
-
-    #   settingsReader.execute do |value|
-
-    #   end
+      settingsReader = ProfileSettingsReader.new(profile)
+      settingsResp = settingsReader.execute
 
       # Read archive
-      values = @reader.execute
-      values.each do |value|
+      @reader.execute do |response|
         
       end
     end
