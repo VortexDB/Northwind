@@ -85,9 +85,17 @@ module Spt96xDriver
     # Execute archive reading
     private def executeArchive(deviceInfo : DeviceInfo, tasks : Array(CollectorDataTask)) : Void
       # Group by profile id
-      groups = tasks.map { |x| { x, x.parameter.getArchiveId } }.group_by { |x| x[1] }
+      groups = tasks.each.map { |x| { x, x.parameter.getArchiveId } }.group_by { |x| x[1] }
       groups.each do |group|
-        group.to_a
+        filteredTasks = group.map { |x| x[1] }
+        reader = ArchiveReader.new
+        filteredTasks.each do |task|  
+          parameter = RequestParameter.fromChannelCurrent(deviceInfo.pipeNumber, task.parameter)        
+          reader.addParameter(parameter)
+          reader.execute(@protocol) do |response|
+            
+          end
+        end
       end
     end
 
