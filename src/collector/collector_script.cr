@@ -1,4 +1,5 @@
 require "../common/*"
+require "../device/*"
 require "../database/*"
 
 module Collector
@@ -26,6 +27,7 @@ module Collector
   # Collector script
   class CollectorScript
     include Database
+    include Device
 
     # Period of timer to check schedule
     PERIOD = 10

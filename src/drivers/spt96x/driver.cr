@@ -88,7 +88,10 @@ module Spt96xDriver
       groups = tasks.each.map { |x| { x, x.parameter.getArchiveId } }.group_by { |x| x[1] }
       groups.each do |group|
         filteredTasks = group.map { |x| x[1] }
-        reader = ArchiveReader.new
+        minDate = (filteredTasks.min_by { |x| x.interval.startDate }).startDate
+        maxDate = (filteredTasks.max_by { |x| x.interval.endDate }).endDate
+
+        reader = ArchiveReader.new(minDate, maxDate, group[0])
         filteredTasks.each do |task|  
           parameter = RequestParameter.fromChannelCurrent(deviceInfo.pipeNumber, task.parameter)        
           reader.addParameter(parameter)

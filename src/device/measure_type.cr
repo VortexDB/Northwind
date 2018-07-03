@@ -1,5 +1,6 @@
-# Base measure
-enum BaseMeasureType
+module Device
+  # Base measure
+  enum BaseMeasureType
     Energy,
     Power,
     Current,
@@ -7,16 +8,16 @@ enum BaseMeasureType
     Temperature,
     Pressure,
     Flow
-end
+  end
 
-# Measure type for electricity
-class MeasureType
+  # Measure type for electricity
+  class MeasureType
     # Active energy
     ACTIVE_ENERGY = MeasureType.new("ActiveEnergy", BaseMeasureType::Energy)
-    
+
     # Reactive energy
     REACTIVE_ENERGY = MeasureType.new("ReactiveEnergy", BaseMeasureType::Energy)
-    
+
     # Absolute pressure
     ABSOLUTE_PRESSURE = MeasureType.new("AbsolutePressure", BaseMeasureType::Pressure)
 
@@ -28,4 +29,5 @@ class MeasureType
 
     def initialize(@name, @baseMeasure)
     end
+  end
 end

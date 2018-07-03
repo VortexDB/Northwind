@@ -1,4 +1,6 @@
 module Collector
+  include Device
+
   # Tasks by device
   class CollectorDeviceTasks
     # Device to collect data
