@@ -1,5 +1,4 @@
 require "../common/*"
-require "../device/*"
 require "../database/*"
 
 module Collector
@@ -52,7 +51,7 @@ module Collector
     @parameters : Set(MeasureParameter)
 
     # Actions
-    @actions : Set(SettingsAction)
+    @actions : Set(DeviceAction)
 
     # To notify script execution completed
     @executeCompleter : Completer(ScriptCompleteInfo)?
@@ -200,7 +199,7 @@ module Collector
     def initialize(@name, @schedule, @database)
       @devices = Set(CollectorDevice).new
       @parameters = Set(MeasureParameter).new
-      @actions = Set(SettingsAction).new
+      @actions = Set(DeviceAction).new
     end
 
     # Start work

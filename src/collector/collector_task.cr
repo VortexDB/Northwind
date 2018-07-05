@@ -43,7 +43,7 @@ module Collector
   # Task for reading device state
   class CollectorActionTask < CollectorTask
     # Settings action
-    getter actionInfo : SettingsAction
+    getter actionInfo : DeviceAction
 
     def initialize(@actionInfo)
       super()

@@ -1,6 +1,6 @@
 module Device
-  # State to read/write
-  enum SettingsState
+  # State type to read/write
+  enum StateType
     DateTime
   end
 
@@ -11,9 +11,9 @@ module Device
   end
 
   # Action with state
-  class SettingsAction
+  class DeviceAction
     # State
-    getter state : SettingsState
+    getter state : StateType
 
     # Action
     getter action : StateAction

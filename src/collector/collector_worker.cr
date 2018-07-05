@@ -62,7 +62,7 @@ module Collector
         Discret.new(DiscretType::Day, 1)
       )
 
-      settingAction = SettingsAction.new(SettingsState::DateTime, StateAction::Read)
+      settingAction = DeviceAction.new(StateType::DateTime, StateAction::Read)
 
       script.addParameter(archiveParameter)
       # script.addAction(settingAction)

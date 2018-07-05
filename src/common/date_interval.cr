@@ -2,6 +2,7 @@
 struct DateInterval
     # Start date
     getter startDate : Time
+    
     # End date
     getter endDate : Time
     

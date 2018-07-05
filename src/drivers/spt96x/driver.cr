@@ -35,7 +35,7 @@ module Spt96xDriver
     # Prepare and execute read action
     private def executeReadAction(deviceInfo : DeviceInfo, action : CollectorActionTask) : Void
       case action.actionInfo.state
-      when SettingsState::DateTime
+      when StateType::DateTime
         TimeReader.new(@protocol) do |time|
           # notifyData(action.taskId)
         end
@@ -84,22 +84,24 @@ module Spt96xDriver
 
     # Execute archive reading
     private def executeArchive(deviceInfo : DeviceInfo, tasks : Array(CollectorDataTask)) : Void
-      # Group by profile id
-      groups = tasks.each.map { |x| { x, x.parameter.getArchiveId } }.group_by { |x| x[1] }
-      groups.each do |group|
-        filteredTasks = group.map { |x| x[1] }
-        minDate = (filteredTasks.min_by { |x| x.interval.startDate }).startDate
-        maxDate = (filteredTasks.max_by { |x| x.interval.endDate }).endDate
+      # TODO: Make it work
 
-        reader = ArchiveReader.new(minDate, maxDate, group[0])
-        filteredTasks.each do |task|  
-          parameter = RequestParameter.fromChannelCurrent(deviceInfo.pipeNumber, task.parameter)        
-          reader.addParameter(parameter)
-          reader.execute(@protocol) do |response|
+      # Group by profile id      
+      # groups = tasks.each.map { |x| { x, x.parameter.getArchiveId } }.group_by { |x| x[1] }
+      # groups.each do |group|
+      #   filteredTasks = group[1]
+      #   minDate = (filteredTasks.min_by { |x| x.interval.startDate }).startDate
+      #   maxDate = (filteredTasks.max_by { |x| x.interval.endDate }).endDate
+
+      #   reader = ArchiveReader.new(minDate, maxDate, group[0])
+      #   filteredTasks.each do |task|  
+      #     parameter = RequestParameter.fromChannelCurrent(deviceInfo.pipeNumber, task.parameter)        
+      #     reader.addParameter(parameter)
+      #     reader.execute(@protocol) do |response|
             
-          end
-        end
-      end
+      #     end
+      #   end
+      # end
     end
 
     # Execute device task
