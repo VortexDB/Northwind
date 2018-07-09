@@ -1,11 +1,24 @@
-module ModbusProtocol
-    include Collector
+require "./requests/**"
+require "./responses/**"
 
-    # Modbus protocol
-    class ModbusProtocol < Protocol
-        # Send applied data and wait request
-        def sendRequestWithResponse(protocolData : ProtocolRequest) : ProtocolResponse
-            return ProtocolResponse.new
-        end
+module ModbusProtocol
+  include Collector
+
+  # Modbus protocol
+  class ModbusProtocol < Protocol(ModbusRequest, ModbusResponse)
+    # Send applied data and wait request
+    def sendRequestWithResponse(protocolData : TRequest) : TResponse
+      frame = protocolData.getData
+      begin
+        channel!.write(frame)
+        
+        # TODO: process channel exceptions
+      rescue e : Exception
+        # Process unhandled exceptions
+        puts e
+      end
+
+      return ProtocolResponse.new
     end
+  end
 end

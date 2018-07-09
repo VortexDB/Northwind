@@ -26,7 +26,7 @@ module Spt96xDriver
         BinaryHelper.addRequestParameter(binary, x)
       end      
 
-      request = SpbusProtocolRequest.new(
+      request = SpbusRequest.new(
         FUNCTION,
         binary.to_slice
       )

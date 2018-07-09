@@ -8,7 +8,7 @@ module Collector
   end
 
   # Abstract protocol
-  abstract class Protocol
+  abstract class Protocol(TRequest, TResponse)
     # Channel to send data
     @channel : TransportChannel?
 
@@ -28,8 +28,6 @@ module Collector
 
     # Send applied request
     # And yields response
-    abstract def sendRequestWithResponse(
-      protocolData : ProtocolRequest
-    ) : ProtocolResponse
+    abstract def sendRequestWithResponse(protocolData : TRequest) : TResponse
   end
 end

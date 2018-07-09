@@ -32,7 +32,7 @@ module SpbusProtocol
     @crc : UInt16?
 
     # Add bytes
-    def addBytes(data : Bytes, count : Int32) : SpbusProtocolResponse?
+    def addBytes(data : Bytes, count : Int32) : SpbusResponse?
       count.times do |i|
         b = data[i]
         if (!@isDle) && (b == SpbusSpecialBytes::DLE_BYTE)
@@ -82,7 +82,7 @@ module SpbusProtocol
               raise NorthwindException.new("Crc not equal")
             end
 
-            return SpbusProtocolResponse.new(@fnc, @dataBuffer.to_slice)
+            return SpbusResponse.new(@fnc, @dataBuffer.to_slice)
           end
         else
           raise NorthwindException.new("Unknown unpacker state")

@@ -1,6 +1,6 @@
 module SpbusProtocol
   # Protocol response
-  class SpbusProtocolResponse < ProtocolResponse
+  class SpbusResponse < ProtocolResponse
     # Function
     getter function : UInt8
 

@@ -1,6 +1,8 @@
 module SpbusProtocol
+  include Collector
+
   # Protocol data for creating requests
-  class SpbusProtocolRequest < ProtocolRequest
+  class SpbusRequest < ProtocolRequest
     # Device using address
     getter usingAddress : Bool
 
