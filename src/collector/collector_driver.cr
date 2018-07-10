@@ -55,6 +55,23 @@ module Collector
     abstract def channel=(value : TransportChannel)
   end
 
+  # Simple driver with protocol that will be transfered from collector
+  module CollectorDriverWithProtocol
+    include CollectorDriverWithExternalChannel
+
+    # Setter of channel
+    setter protocol : Protocol?
+
+    def protocol! : Protocol
+      @protocol.not_nil!
+    end
+
+    # Channel setter
+    def channel=(value : TransportChannel)
+      protocol!.channel = value
+    end
+  end
+
   # Base collector drver
   abstract class CollectorDriver
     # Add tasks for device

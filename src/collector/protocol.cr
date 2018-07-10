@@ -1,14 +1,28 @@
 module Collector
   # Data for sending to protocol
-  class ProtocolRequest
+  abstract class ProtocolRequest
   end
 
   # Data from protocol
-  class ProtocolResponse
+  abstract class ProtocolResponse
   end
 
   # Abstract protocol
-  abstract class Protocol(TRequest, TResponse)
+  abstract class Protocol
+    # All known protocols
+    class_property knownProtocols = Hash(String, Protocol.class).new 
+    
+    # Get protocol by name
+    def self.get(name : String) : Protocol
+      protCls = Protocol.knownProtocols[name]?
+      return protCls.new if !protCls.nil?
+      raise NorthwindException.new("Unknown protocol")
+    end
+  
+    macro register()
+      Protocol.knownProtocols["{{ @type.id }}"] = {{ @type }}
+    end
+
     # Channel to send data
     @channel : TransportChannel?
 
@@ -28,6 +42,6 @@ module Collector
 
     # Send applied request
     # And yields response
-    abstract def sendRequestWithResponse(protocolData : TRequest) : TResponse
+    abstract def sendRequestWithResponse(protocolData : TRequest) : TResponse forall TRequest, TResponse 
   end
 end

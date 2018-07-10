@@ -100,8 +100,8 @@ module Collector
       end
     end
 
-    # Collect data from driver for it's devices
-    private def collectByDriver(driver : CollectorDriver, driverDevices : Array(CollectorDevice))
+    # Collect data from common drivers for it's devices
+    private def collectCommonByDriver(channel : TransportChannel, driver : CollectorDriver, driverDevices : Array(CollectorDevice))
       now = Time.now
       startTime = now + Time::Span.new(@deep, 0, 0)
       endTime = now
@@ -134,6 +134,10 @@ module Collector
             device, x
           )
         end
+
+        # TODO: catch wrong protocol
+        driver.protocol = Protocol.get(device.protocolName)
+        driver.channel = channel
 
         # TODO: Timeout
         # TODO: Catch driver errors
@@ -182,11 +186,12 @@ module Collector
       @devices.each.group_by { |x| x.route }.each do |route, routeDevices|
         futures << Future(Void).new do
           # Get a channel for route
+          # TODO: Drivers with own channels and protocols
+          # Now only simple drivers with common protocols allowed
           channel = getChannelByRoute(route)
           next if channel.nil?
           routeDevices.group_by { |x| x.driver }.each do |driver, driverDevices|
-            driver.channel = channel
-            collectByDriver(driver, driverDevices)
+            collectCommonByDriver(channel, driver, driverDevices)
           end
 
           channel.close

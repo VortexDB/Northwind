@@ -1,6 +1,6 @@
-module ModbusProtocol
+module ModbusProtocol::ModbusRtu
     # Base modbus request
-    abstract class ReadHoldingRegisters < ModbusRequest     
+    class ReadHoldingRegistersRequest < ModbusRtuRequest     
         register(0x03)        
 
         # Start address to read

@@ -1,8 +1,8 @@
-module ModbusProtocol
+module ModbusProtocol::ModbusRtu
     include Collector
 
-    # Base modbus request
-    abstract class ModbusRequest < ProtocolRequest
+    # Base modbus rtu request
+    abstract class ModbusRtuRequest < ModbusRequest
         macro register(id)
             FUNCTION_ID = id
 

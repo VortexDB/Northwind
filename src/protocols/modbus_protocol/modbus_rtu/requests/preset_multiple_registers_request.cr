@@ -1,6 +1,6 @@
-module ModbusProtocol
+module ModbusProtocol::ModbusRtu
     # Base modbus request
-    abstract class PresetMultipleRegisters < ModbusRequest
+    class PresetMultipleRegistersRequest < ModbusRtuRequest
         register(0x10)
 
         # Start address to read

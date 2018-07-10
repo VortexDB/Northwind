@@ -10,10 +10,13 @@ module Collector
     # TODO: routes
     getter route : DeviceRoute
 
+    # Device protocol name
+    getter protocolName : String
+
     # Data source to write data
     getter dataSource : Database::EntityDataSource
 
-    def initialize(@driver, @route, @dataSource)
+    def initialize(@driver, @route, @protocolName, @dataSource)
     end
   end
 end

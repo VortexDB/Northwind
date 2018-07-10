@@ -1,4 +1,6 @@
 module SpbusProtocol
+  include Collector
+
   # Protocol response
   class SpbusResponse < ProtocolResponse
     # Function
