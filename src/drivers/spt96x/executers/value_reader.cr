@@ -26,7 +26,7 @@ module Spt96xDriver
     end
 
     # Send request and read
-    def execute(protocol : SpbusProtocol, &block : ValueData -> _) : Void
+    def execute(protocol : Protocol, &block : ValueData -> _) : Void
       reader = ParameterReader.new(protocol)
       @requests.each do |param|
         reader.addParameter(param)

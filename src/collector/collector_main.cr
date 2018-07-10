@@ -1,5 +1,6 @@
 require "benchmark"
-require "../**"
+require "../protocols/**"
+require "./collector_worker"
 
 collector = Collector::CollectorWorker.new
 collector.start

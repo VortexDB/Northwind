@@ -14,10 +14,10 @@ module ModbusProtocol::ModbusRtu
 
         # Return binary data of request
         def getData : Bytes
-            res = Bytes.new
+            res = IO::Memory.new
             res.write_bytes(address)
             res.write_bytes(length)
-            return res
+            return res.to_slice
         end
 
         # Return answer length or -1 of it's unknown

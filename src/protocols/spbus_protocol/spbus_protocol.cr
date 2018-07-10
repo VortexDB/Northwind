@@ -46,8 +46,8 @@ module SpbusProtocol
     end
 
     # Send applied data and wait request
-    def sendRequestWithResponse(protocolData : SpbusRequest) : SpbusResponse
-      frame = createFrame(protocolData)
+    def sendRequestWithResponse(request : ProtocolRequest) : ProtocolResponse
+      frame = createFrame(request.as(SpbusRequest))
       begin
         channel!.write(frame)
         unpacker = SpbusFrameUnpacker.new

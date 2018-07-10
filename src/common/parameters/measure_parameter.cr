@@ -1,3 +1,5 @@
+require "../discret"
+
 module Device
   # Measure parameter
   class MeasureParameter

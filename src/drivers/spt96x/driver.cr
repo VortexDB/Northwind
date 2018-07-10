@@ -1,4 +1,4 @@
-require "../../protocols/spbus_protocol/**"
+require "../../protocols/spbus_protocol/spbus_protocol"
 
 module Spt96xDriver
   include Collector
@@ -6,15 +6,7 @@ module Spt96xDriver
 
   # Driver for Logica SPT96x
   class Driver < CollectorDriver
-    include CollectorDriverWithExternalChannel
-
-    # Protocol
-    @protocol = SpbusProtocol.new
-
-    # Set transport channel
-    def channel=(value : TransportChannel)
-      @protocol.channel = value
-    end
+    include CollectorDriverWithProtocol    
 
     def initialize
     end
@@ -36,7 +28,7 @@ module Spt96xDriver
     private def executeReadAction(deviceInfo : DeviceInfo, action : CollectorActionTask) : Void
       case action.actionInfo.state
       when StateType::DateTime
-        TimeReader.new(@protocol) do |time|
+        TimeReader.new(protocol!) do |time|
           # notifyData(action.taskId)
         end
       else
@@ -75,7 +67,7 @@ module Spt96xDriver
         reader.addParameter(parameter)
       end
 
-      reader.execute(@protocol) do |response|
+      reader.execute(protocol!) do |response|
         task = tastToRequest[response.request]?
         next if task.nil?
         notifyData(TaskDataEvent.new(task.taskId, response.value))

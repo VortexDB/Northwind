@@ -1,4 +1,9 @@
-module Collector
+require "../common/date_interval"
+require "../common/parameters/measure_parameter"
+require "../common/parameters/measure_type"
+require "../common/parameters/device_action"
+
+module Collector  
   include Device
 
   # Tasks by device

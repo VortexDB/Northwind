@@ -7,8 +7,8 @@ module ModbusProtocol::ModbusRtu
     register()
 
     # Send applied data and wait request
-    def sendRequestWithResponse(protocolData : TRequest) : TResponse
-      frame = protocolData.getData
+    def sendRequestWithResponse(request : ProtocolRequest) : ProtocolResponse
+      frame = request.as(ModbusRtuRequest).getData
       begin
         channel!.write(frame)
         
@@ -18,7 +18,7 @@ module ModbusProtocol::ModbusRtu
         puts e
       end
 
-      return ProtocolResponse.new
+      return ModbusRtuResponse.new
     end
   end
 end

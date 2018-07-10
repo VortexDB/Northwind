@@ -1,4 +1,4 @@
-require "../common/*"
+require "./protocol"
 
 module Collector
   # Base event

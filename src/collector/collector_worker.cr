@@ -1,4 +1,5 @@
-require "../database/*"
+require "./collector_script"
+require "../drivers/**"
 
 module Collector
   include Database
@@ -47,10 +48,10 @@ module Collector
       driver = Spt96xDriver::Driver.new
       route = TcpClientRoute.new("192.168.0.196", 25301)
       # Device
-      device = CollectorDevice.new(driver, route, ResourceMeterDataSource.new(1_i64))
+      device = CollectorDevice.new(driver, route, "ModbusRtuProtocol", ResourceMeterDataSource.new(1_i64))
       script.addDevice(device)
       # Pipe
-      device = CollectorDevice.new(driver, route, PipeDataSource.new(2_i64))
+      device = CollectorDevice.new(driver, route, "ModbusRtuProtocol", PipeDataSource.new(2_i64))
       script.addDevice(device)
       currentParameter = MeasureParameter.new(
         MeasureType::ABSOLUTE_PRESSURE,

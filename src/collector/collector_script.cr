@@ -1,5 +1,11 @@
-require "../common/*"
-require "../database/*"
+require "./collector_driver"
+require "./collector_device"
+require "./collector_task"
+require "../common/schedule/schedule"
+require "../common/schedule/periodic_schedule"
+require "../utils/future"
+require "../database/database"
+#require "../common/parameters/"
 
 module Collector
   # Info about completion
@@ -26,7 +32,7 @@ module Collector
   # Collector script
   class CollectorScript
     include Database
-    include Device
+    #include Device
 
     # Period of timer to check schedule
     PERIOD = 10

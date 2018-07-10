@@ -1,3 +1,5 @@
+require "./transport_channel"
+
 module Collector
   # Data for sending to protocol
   abstract class ProtocolRequest
@@ -20,7 +22,7 @@ module Collector
     end
   
     macro register()
-      Protocol.knownProtocols["{{ @type.id }}"] = {{ @type }}
+      #Protocol.knownProtocols["{{ @type.id }}"] = {{ @type }}
     end
 
     # Channel to send data
@@ -42,6 +44,6 @@ module Collector
 
     # Send applied request
     # And yields response
-    abstract def sendRequestWithResponse(protocolData : TRequest) : TResponse forall TRequest, TResponse 
+    abstract def sendRequestWithResponse(request : ProtocolRequest) : ProtocolResponse
   end
 end

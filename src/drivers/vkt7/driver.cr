@@ -1,4 +1,4 @@
-require "../../protocols/modbus_protocol/**"
+require "../../protocols/modbus_protocol/modbus_protocol"
 
 module Vkt7Driver  
   include Collector

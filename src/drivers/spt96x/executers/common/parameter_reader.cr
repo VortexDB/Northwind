@@ -5,7 +5,7 @@ module Spt96xDriver
     FUNCTION = 0x1D_u8
 
     # Protocol to send data
-    @protocol : SpbusProtocol
+    @protocol : Protocol
 
     # Parameters to read
     @parameters : Set(RequestParameter)
@@ -31,7 +31,7 @@ module Spt96xDriver
         binary.to_slice
       )
 
-      response = @protocol.sendRequestWithResponse(request)
+      response = @protocol.sendRequestWithResponse(request).as(SpbusResponse)
       parser = ResponseParser.new
       return parser.parseReadParametersToArray(response.data)
     end
