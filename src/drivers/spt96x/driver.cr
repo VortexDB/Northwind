@@ -6,8 +6,6 @@ module Spt96xDriver
 
   # Driver for Logica SPT96x
   class Driver < CollectorDriver
-    include CollectorDriverWithProtocol    
-
     def initialize
     end
 

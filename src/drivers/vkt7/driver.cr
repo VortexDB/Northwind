@@ -6,8 +6,6 @@ module Vkt7Driver
 
   # Driver for VKT-7 thermal meter
   class Driver < CollectorDriver
-    include CollectorDriverWithProtocol
-
     # Execute device task
     def appendTask(deviceTasks : CollectorDeviceTasks) : Void
       

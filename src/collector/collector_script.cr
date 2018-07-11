@@ -107,7 +107,7 @@ module Collector
     end
 
     # Collect data from common drivers for it's devices
-    private def collectCommonByDriver(channel : TransportChannel, driver : CollectorDriver, driverDevices : Array(CollectorDevice))
+    private def collectCommonByDriver(driver : CollectorDriverWithExternalChannel, driverDevices : Array(CollectorDevice))
       now = Time.now
       startTime = now + Time::Span.new(@deep, 0, 0)
       endTime = now
@@ -140,10 +140,6 @@ module Collector
             device, x
           )
         end
-
-        # TODO: catch wrong protocol
-        driver.protocol = Protocol.get(device.protocolName)
-        driver.channel = channel
 
         # TODO: Timeout
         # TODO: Catch driver errors
@@ -194,13 +190,21 @@ module Collector
           # Get a channel for route
           # TODO: Drivers with own channels and protocols
           # Now only simple drivers with common protocols allowed
-          channel = getChannelByRoute(route)
-          next if channel.nil?
-          routeDevices.group_by { |x| x.driver }.each do |driver, driverDevices|
-            collectCommonByDriver(channel, driver, driverDevices)
-          end
 
-          channel.close
+          routeDevices.group_by { |x| x.protocolName }.each do |protocolName, protocolDevices|
+            driver = CollectorDriverFactory.get(route, protocolName)            
+            case driver
+            when CollectorDriverWithExternalChannel
+              channel = getChannelByRoute(route)
+              if channel
+                driver.channel = channel
+                collectCommonByDriver(driver, protocolDevices)
+              end
+              channel.close
+            else
+              raise NorthwindException.new("Driver of unknown type")
+            end            
+          end
         end
       end
 
