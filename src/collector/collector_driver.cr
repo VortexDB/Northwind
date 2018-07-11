@@ -37,7 +37,11 @@ module Collector
   end
   
   # Base collector drver
-  abstract class CollectorDriver    
+  abstract class CollectorDriver
+    macro register(deviceType, protocolType)
+      CollectorDriverFactory.knownDrivers[DriverKey.new({{ deviceType }}, {{ protocolType }})] = {{ @type }}
+    end
+
     # Add tasks for device
     # For override
     abstract def appendTask(deviceTasks : CollectorDeviceTasks) : Void
@@ -63,32 +67,46 @@ module Collector
 
   # Key for known drivers hash
   struct DriverKey
-    getter route : DeviceRoute
-    getter protocolName : String
+    # Device type name
+    getter deviceType : String
 
-    def initialize(@route, @protocolName)
+    # Protocol name
+    getter protocolType : String
+
+    def initialize(@deviceType, @protocolType)
     end
 
     def hash
-      @route.hash ^ @protocolName.hash
+      @deviceType.hash ^ @protocolType.hash
     end
 
     def ==(other : DriverKey)
-      return @route == other.route &&
-        @protocolName == other.protocolName
+      return @deviceType == other.deviceType &&
+        @protocolType == other.protocolType
     end
   end
 
   # Factory to get driver by Device
   abstract class CollectorDriverFactory
     # Known drivers
-    class_property knownDrivers = Hash(DriverKey, CollectorDriver).new
+    class_property knownDrivers = Hash(DriverKey, CollectorDriver.class).new
+
+    # Cache for drivers
+    @@driverCache = Hash(DriverKey, CollectorDriver).new
 
     # Get device driver
-    def self.get(route : DeviceRoute, protocolName : String) : CollectorDriver
-      key = DriverKey.new(route, protocolName)
-      res = knownDrivers[key]?
-      return res if !res.nil?
+    def self.get(deviceType : String, protocolType : String) : CollectorDriver
+      key = DriverKey.new(deviceType, protocolType)
+      driver = @@driverCache[key]?
+      return driver if !driver.nil?
+
+      driverClass = knownDrivers[key]?
+      if !driverClass.nil?
+        ndriver = driverClass.new
+        @@driverCache[key] = ndriver
+        return ndriver
+      end
+
       raise NorthwindException.new("No possible driver can be created")
     end
   end

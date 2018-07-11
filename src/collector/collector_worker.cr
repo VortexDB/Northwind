@@ -44,14 +44,14 @@ module Collector
         "Collect values",
         PeriodicSchedule.new(offset, period),
         @database)
-
-      driver = Spt96xDriver::Driver.new
+      
+      driver = CollectorDriverFactory.get("Vkt7", "ModbusRtuProtocol")
       route = TcpClientRoute.new("192.168.0.196", 25301)
       # Device
-      device = CollectorDevice.new(driver, route, "ModbusRtuProtocol", ResourceMeterDataSource.new(1_i64))
+      device = CollectorDevice.new("Vkt7", "ModbusRtuProtocol", route, driver, ResourceMeterDataSource.new(1_i64))
       script.addDevice(device)
       # Pipe
-      device = CollectorDevice.new(driver, route, "ModbusRtuProtocol", PipeDataSource.new(2_i64))
+      device = CollectorDevice.new("Vkt7", "ModbusRtuProtocol", route, driver, PipeDataSource.new(2_i64))
       script.addDevice(device)
       currentParameter = MeasureParameter.new(
         MeasureType::ABSOLUTE_PRESSURE,

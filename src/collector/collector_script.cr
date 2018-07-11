@@ -5,7 +5,8 @@ require "../common/schedule/schedule"
 require "../common/schedule/periodic_schedule"
 require "../utils/future"
 require "../database/database"
-#require "../common/parameters/"
+
+# require "../common/parameters/"
 
 module Collector
   # Info about completion
@@ -27,12 +28,12 @@ module Collector
 
     def initialize(@device, @task)
     end
-  end
+  end  
 
   # Collector script
   class CollectorScript
     include Database
-    #include Device
+    # include Device
 
     # Period of timer to check schedule
     PERIOD = 10
@@ -183,30 +184,30 @@ module Collector
       puts "Actions: #{@actions.size}"
       puts "Deep: #{@deep}"
 
-      futures = Array(Future(Void)).new
+      futures = Array(Future(Void)).new      
 
-      @devices.each.group_by { |x| x.route }.each do |route, routeDevices|
-        futures << Future(Void).new do
-          # Get a channel for route
-          # TODO: Drivers with own channels and protocols
-          # Now only simple drivers with common protocols allowed
+      # @devices.each.group_by { |x| x.route }.each do |route, routeDevices|
+      #   futures << Future(Void).new do
+      #     # Get a channel for route
+      #     # TODO: Drivers with own channels and protocols
+      #     # Now only simple drivers with common protocols allowed
 
-          routeDevices.group_by { |x| x.protocolName }.each do |protocolName, protocolDevices|
-            driver = CollectorDriverFactory.get(route, protocolName)            
-            case driver
-            when CollectorDriverWithExternalChannel
-              channel = getChannelByRoute(route)
-              if channel
-                driver.channel = channel
-                collectCommonByDriver(driver, protocolDevices)
-              end
-              channel.close
-            else
-              raise NorthwindException.new("Driver of unknown type")
-            end            
-          end
-        end
-      end
+      #     routeDevices.group_by { |x| x.protocolName }.each do |protocolName, protocolDevices|
+      #       driver = CollectorDriverFactory.get(route, protocolName)
+      #       case driver
+      #       when CollectorDriverWithExternalChannel
+      #         channel = getChannelByRoute(route)
+      #         if channel
+      #           driver.channel = channel
+      #           collectCommonByDriver(driver, protocolDevices)
+      #         end
+      #         channel.close
+      #       else
+      #         raise NorthwindException.new("Driver of unknown type")
+      #       end
+      #     end
+      #   end
+      # end
 
       Future.waitAll(futures)
     end
