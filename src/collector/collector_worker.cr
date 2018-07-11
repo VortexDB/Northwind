@@ -12,21 +12,25 @@ module Collector
     # Data collecting scripts
     @scripts : Array(CollectorScript)
 
+    # All devices
+    @devices : Set(CollectorDevice)
+
     # Start collector script
     private def startScript(script : CollectorScript) : Void
       script.start.success do |res|
         result = res.not_nil!
-        puts "Complete #{script.name} Execute time: #{result.executeTime}"        
-        startScript(script)        
+        puts "Complete #{script.name} Execute time: #{result.executeTime}"
+        startScript(script)
       end.catch do |e|
         puts "ERROR"
-        puts e      
+        puts e
       end
     end
 
     def initialize
       @database = DatabaseClient.new
       @scripts = Array(CollectorScript).new
+      @devices = Set(CollectorDevice).new
     end
 
     # Start collector
@@ -36,23 +40,25 @@ module Collector
     end
 
     def init : Void
-      # TODO: load scripts
+      # TODO: load devices, routes from database
+      driver = CollectorDriverFactory.get("Vkt7", "ModbusRtuProtocol")
+      route = TcpClientRoute.new("192.168.0.196", 25301)
+      @devices.add(CollectorDevice.new("Vkt7", "ModbusRtuProtocol", route, driver, ResourceMeterDataSource.new(1_i64)))
+      @devices.add(CollectorDevice.new("Vkt7", "ModbusRtuProtocol", route, driver, PipeDataSource.new(2_i64)))
 
+      # TODO: load scripts
       offset = Time::Span.new(seconds: 0, nanoseconds: 0)
       period = Time::Span.new(seconds: 10 * 1, nanoseconds: 0)
       script = CollectorScript.new(
         "Collect values",
         PeriodicSchedule.new(offset, period),
         @database)
-      
-      driver = CollectorDriverFactory.get("Vkt7", "ModbusRtuProtocol")
-      route = TcpClientRoute.new("192.168.0.196", 25301)
-      # Device
-      device = CollectorDevice.new("Vkt7", "ModbusRtuProtocol", route, driver, ResourceMeterDataSource.new(1_i64))
-      script.addDevice(device)
-      # Pipe
-      device = CollectorDevice.new("Vkt7", "ModbusRtuProtocol", route, driver, PipeDataSource.new(2_i64))
-      script.addDevice(device)
+
+      @devices.each do |device|
+        script.addDevice(device)
+        script.addDevice(device)
+      end
+
       currentParameter = MeasureParameter.new(
         MeasureType::ABSOLUTE_PRESSURE,
         Discret.new(DiscretType::None, -1)
@@ -72,6 +78,9 @@ module Collector
 
     # Main work
     def work : Void
+      # TODO: subscribe for driver data events (sporadic)
+      
+
       # Start each script and wait events
       @scripts.each do |script|
         startScript(script)
