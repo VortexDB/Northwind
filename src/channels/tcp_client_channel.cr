@@ -5,7 +5,7 @@ module TransportChannels
   include Collector
 
   # Channel for tcp
-  class TcpClientChannel < TransportChannel
+  class TcpClientChannel < BinaryTransportChannel
     register(TcpClientRoute)
 
     # Read buffer size

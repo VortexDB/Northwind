@@ -46,6 +46,9 @@ module Collector
       @devices.add(CollectorDevice.new("Vkt7", "ModbusRtuProtocol", route, driver, ResourceMeterDataSource.new(1_i64)))
       @devices.add(CollectorDevice.new("Vkt7", "ModbusRtuProtocol", route, driver, PipeDataSource.new(2_i64)))
 
+      # Start listen sporadic event data from drivers if driver support sporadic
+      #
+
       # TODO: load scripts
       offset = Time::Span.new(seconds: 0, nanoseconds: 0)
       period = Time::Span.new(seconds: 10 * 1, nanoseconds: 0)

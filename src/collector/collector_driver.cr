@@ -59,7 +59,7 @@ module Collector
     end
   end
 
-  # Driver with channel that be created by collector 
+  # Driver with channel that be created by collector
   abstract class CollectorDriverWithExternalChannel < CollectorDriver
     # Channel setter
     abstract def channel=(value : TransportChannel)
