@@ -38,9 +38,17 @@ module Collector
     abstract def close : Void
   end
 
-  # Base binary transport channel
-  # Common channel for most devices
-  abstract class BinaryTransportChannel < TransportChannel
+  # Client channel that connects to some server
+  abstract class ClientTransportChannel < TransportChannel
+  end
+
+  # Client channel that connects to some server
+  abstract class ServerTransportChannel < TransportChannel
+  end
+
+  # Base binary transport channel mixin
+  # Common interface for most devices
+  module BinaryTransportChannel
     # Send data to channel
     abstract def write(data : Bytes) : Void
 
@@ -48,7 +56,16 @@ module Collector
     abstract def read : {Bytes, Int32}
   end
 
-  # Base custom channel for specific devices
+  # Channel to write, read text
+  module TextTransportChannel
+    # Send text to channel
+    abstract def write(data : String) : Void
+
+    # Read data from channel
+    abstract def readLine : String
+  end
+
+  # Base custom channel for specific devices that can be client and server or something else
   abstract class CustomTransportChannel < TransportChannel
   end
 end

@@ -5,7 +5,9 @@ module Spt96xDriver
   include SpbusProtocol
 
   # Driver for Logica SPT96x
-  class Driver < CollectorDriver
+  class Spt96xSpbusDriver < CollectorDriver
+    register("SPT96x", SpbusProtocol)
+
     def initialize
     end
 

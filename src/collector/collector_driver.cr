@@ -39,7 +39,14 @@ module Collector
   # Base collector drver
   abstract class CollectorDriver
     macro register(deviceType, protocolType)
-      CollectorDriverFactory.knownDrivers[DriverKey.new({{ deviceType }}, {{ protocolType }})] = {{ @type }}
+      CollectorDriverFactory.knownDrivers[DriverKey.new({{ deviceType }}, {{ protocolType.id.stringify }})] = {{ @type }}
+
+      @protocol = {{ protocolType }}.new
+    end
+
+    # Return protocol
+    def protocol : Protocol
+      @protocol
     end
 
     # Add tasks for device
@@ -57,12 +64,6 @@ module Collector
     def notifyData(event : TaskDataEvent) : Void
       listenBlock!.call(event)
     end
-  end
-
-  # Driver with channel that be created by collector
-  abstract class CollectorDriverWithExternalChannel < CollectorDriver
-    # Channel setter
-    abstract def channel=(value : TransportChannel)
   end
 
   # Key for known drivers hash
