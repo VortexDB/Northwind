@@ -1,5 +1,3 @@
-require "../database/*"
-
 module Collector
   # Device that uses collector
   class CollectorDevice

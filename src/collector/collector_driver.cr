@@ -1,5 +1,3 @@
-require "./protocol"
-
 module Collector
   # Base event
   abstract class CollectorDriverEvent
@@ -41,13 +39,9 @@ module Collector
     macro register(deviceType, protocolType)
       CollectorDriverFactory.knownDrivers[DriverKey.new({{ deviceType }}, {{ protocolType.id.stringify }})] = {{ @type }}
 
-      @protocol = {{ protocolType }}.new
-    end
-
-    # Return protocol
-    def protocol : Protocol
-      @protocol
-    end
+      getter deviceType = {{ deviceType }}      
+      getter protocol = {{ protocolType }}.new
+    end    
 
     # Add tasks for device
     # For override

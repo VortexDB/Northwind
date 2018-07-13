@@ -1,7 +1,4 @@
-require "../common/date_interval"
-require "../common/parameters/measure_parameter"
-require "../common/parameters/measure_type"
-require "../common/parameters/device_action"
+require "./common/**"
 
 module Collector  
   include Device

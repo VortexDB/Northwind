@@ -1,5 +1,3 @@
-require "./transport_channel"
-
 module Collector
   # Data for sending to protocol
   abstract class ProtocolRequest

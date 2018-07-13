@@ -1,13 +1,3 @@
-require "./collector_driver"
-require "./collector_device"
-require "./collector_task"
-require "../common/schedule/schedule"
-require "../common/schedule/periodic_schedule"
-require "../utils/future"
-require "../database/database"
-
-# require "../common/parameters/"
-
 module Collector
   # Info about completion
   class ScriptCompleteInfo
@@ -28,7 +18,7 @@ module Collector
 
     def initialize(@device, @task)
     end
-  end  
+  end
 
   # Collector script
   class CollectorScript
@@ -74,14 +64,7 @@ module Collector
     getter isWorking : Bool = false
 
     # Name of script
-    getter name : String
-
-    # Connect and return transport channel
-    private def getChannelByRoute(route : DeviceRoute) : TransportChannel?
-      channel = TransportChannel.create(route)
-      channel.open
-      return channel
-    end
+    getter name : String    
 
     # Process data event from driver
     private def processDataEvent(event : TaskDataEvent, allTasks : Hash(Int32, ScriptTaskInfo)) : Void
@@ -108,7 +91,7 @@ module Collector
     end
 
     # Collect data from common drivers for it's devices
-    private def collectCommonByDriver(driver : CollectorDriverWithExternalChannel, driverDevices : Array(CollectorDevice))
+    private def collectByDriver(driver : CollectorDriver, driverDevices : Array(CollectorDevice))
       now = Time.now
       startTime = now + Time::Span.new(@deep, 0, 0)
       endTime = now
@@ -185,6 +168,26 @@ module Collector
       puts "Deep: #{@deep}"
 
       futures = Array(Future(Void)).new      
+
+      @devices.each.group_by { |x| x.route }.each do |route, routeDevices|
+        futures << Future(Void).new do
+          channelType = route.channelType
+                  
+          case channelType            
+          when ClientTransportChannel.class
+            channel = channelType.new(route)
+            channel.open
+
+            routeDevices.group_by { |x| x.driver }.each do |driver, driverDevices|
+              collectByDriver(driver, driverDevices)
+            end
+
+            channel.close
+          else
+            # TODO: other types of channels
+          end
+        end
+      end
 
       # @devices.each.group_by { |x| x.route }.each do |route, routeDevices|
       #   futures << Future(Void).new do

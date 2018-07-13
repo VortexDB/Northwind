@@ -1,5 +1,3 @@
-require "../../protocols/modbus_protocol/modbus_protocol"
-
 module Vkt7Driver  
   include Collector  
   include ModbusProtocol::ModbusRtu

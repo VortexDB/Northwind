@@ -1,6 +1,3 @@
-require "./device_route"
-require "../utils/northwind_exception"
-
 module Collector
   # Base transport channel
   abstract class TransportChannel

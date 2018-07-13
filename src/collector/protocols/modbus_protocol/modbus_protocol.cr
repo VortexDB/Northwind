@@ -1,5 +1,3 @@
-require "../../collector/protocol"
-
 module ModbusProtocol
   include Collector
 

@@ -1,3 +1,5 @@
+require "./*"
+
 # Schedule for periodic start
 class PeriodicSchedule
     include Schedule

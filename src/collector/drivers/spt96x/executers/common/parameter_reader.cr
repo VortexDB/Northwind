@@ -5,7 +5,7 @@ module Spt96xDriver
     FUNCTION = 0x1D_u8
 
     # Protocol to send data
-    @protocol : Protocol
+    @protocol : SpbusProtocol
 
     # Parameters to read
     @parameters : Set(RequestParameter)

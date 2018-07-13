@@ -1,6 +1,3 @@
-require "./collector_script"
-require "../drivers/**"
-
 module Collector
   include Database
 

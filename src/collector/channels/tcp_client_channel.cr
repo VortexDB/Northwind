@@ -1,4 +1,3 @@
-require "../collector/*"
 require "socket"
 
 module TransportChannels
