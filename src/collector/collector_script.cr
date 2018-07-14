@@ -170,23 +170,23 @@ module Collector
       futures = Array(Future(Void)).new
 
       @devices.each.group_by { |x| x.route }.each do |route, routeDevices|
-        futures << Future(Void).new do
-          channelType = route.channelType
-
+        futures << Future(Void).new do          
           begin
-            case channelType
-            when ClientTransportChannel.class
-              channel = channelType.new(route)
-              channel.open
+            channel = TransportChannelFactory.get(route)            
 
-              routeDevices.group_by { |x| x.driver }.each do |driver, driverDevices|
+            case channel
+            when ClientTransportChannel
+              channel.open
+              
+              routeDevices.group_by { |x| x.driver }.each do |driver, driverDevices|                
                 driver.protocol.channel = channel
                 collectByDriver(driver, driverDevices)
               end
-
+                            
               channel.close
             else
               # TODO: other types of channels
+              puts "Unsupported channel type"
             end
           rescue e : Exception
             # TODO: diagnostics

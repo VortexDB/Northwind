@@ -7,10 +7,13 @@ module TransportChannels
   class TcpClientChannel < ClientTransportChannel
     include BinaryTransportChannel    
 
-    register(TcpClientRoute)
+    registerRoute(TcpClientRoute)
 
-    # Connect timeout in secods
+    # Connect timeout in seconds
     DEFAULT_CONNECT_TIMEOUT = 3
+
+    # Read timeout
+    DEFAULT_READ_TIMEOUT = 1
 
     # Read buffer size
     READ_BUFFER_SIZE = 4096
@@ -43,8 +46,9 @@ module TransportChannels
     end
 
     # Read data from channel
-    def read : {Bytes, Int32}
+    def read(timeout = DEFAULT_READ_TIMEOUT) : {Bytes, Int32}
       buffer = Bytes.new(READ_BUFFER_SIZE)
+      @socket.read_timeout = timeout
       count = @socket.read(buffer)
       return {buffer, count}
     end

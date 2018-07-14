@@ -1,26 +1,9 @@
 module Collector
   # Base transport channel
   abstract class TransportChannel
-    macro register(*routeTypes)
-      {% for r in routeTypes %}
-        Collector::TransportChannel.possibleChannels["Collector::" + {{ r.stringify }}] =
-              Proc(Collector::DeviceRoute, Collector::TransportChannel).new { |x| {{ @type.id }}.new(x) }
-      {% end %}
+    macro registerRoute(routeType)      
+      TransportChannelFactory.possibleChannels[{{ routeType }}] = {{ @type }}
     end
-
-    # Create channel by route
-    def self.create(route : DeviceRoute)
-      routeClassName = route.class.to_s      
-      constructor = TransportChannel.possibleChannels[routeClassName]?
-      if constructor.nil?
-        raise NorthwindException.new("No possible channel to handle route")
-      end
-
-      return constructor.call(route)
-    end
-
-    # Possible channels for creating
-    class_property possibleChannels = Hash(String, Proc(DeviceRoute, TransportChannel)).new
 
     # Route to device
     getter route : DeviceRoute
@@ -64,5 +47,21 @@ module Collector
 
   # Base custom channel for specific devices that can be client and server or something else
   abstract class CustomTransportChannel < TransportChannel
+  end
+
+  # Channel factory
+  class TransportChannelFactory
+    # Possible channels for creating
+    class_property possibleChannels = Hash(DeviceRoute.class, TransportChannel.class).new
+
+    # Create channel by route
+    def self.get(route : DeviceRoute)
+      classType = TransportChannelFactory.possibleChannels[route.class]?
+      if classType.nil?
+        raise NorthwindException.new("No possible channel to handle #{route.class.name} route")
+      end
+
+      return classType.new(route)
+    end
   end
 end
