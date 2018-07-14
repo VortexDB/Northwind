@@ -20,7 +20,7 @@ module Collector
         startScript(script)
       end.catch do |e|
         puts "ERROR"
-        puts e
+        puts e.inspect_with_backtrace
       end
     end
 
@@ -38,10 +38,13 @@ module Collector
 
     def init : Void
       # TODO: load devices, routes from database
-      driver = CollectorDriverFactory.get("Vkt7", "ModbusRtuProtocol")
-      route = TcpClientRoute.new("192.168.0.196", 25301)
-      @devices.add(CollectorDevice.new("Vkt7", "ModbusRtuProtocol", route, driver, ResourceMeterDataSource.new(1_i64)))
-      @devices.add(CollectorDevice.new("Vkt7", "ModbusRtuProtocol", route, driver, PipeDataSource.new(2_i64)))
+      #driver = CollectorDriverFactory.get("Vkt7", "ModbusRtuProtocol")
+      route = TcpClientRoute.new("localhost", 25301)
+      # @devices.add(CollectorDevice.new("Vkt7", "ModbusRtuProtocol", route, driver, ResourceMeterDataSource.new(1_i64)))
+      # @devices.add(CollectorDevice.new("Vkt7", "ModbusRtuProtocol", route, driver, PipeDataSource.new(2_i64)))
+
+      driver = CollectorDriverFactory.get("Spt96x", SpbusProtocol)
+      @devices.add(CollectorDevice.new("Vkt7", "SpbusProtocol", route, driver, ResourceMeterDataSource.new(3_i64)))
 
       # Start listen sporadic event data from drivers if driver support sporadic
       #
@@ -71,8 +74,8 @@ module Collector
 
       settingAction = DeviceAction.new(StateType::DateTime, StateAction::Read)
 
-      script.addParameter(archiveParameter)
-      # script.addAction(settingAction)
+      # script.addParameter(archiveParameter)
+      script.addAction(settingAction)
       @scripts.push(script)
     end
 

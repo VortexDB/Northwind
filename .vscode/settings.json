@@ -1,0 +1,7 @@
+{
+    "crystal-lang.mainFile": "${workspaceRoot}/src/northwind.cr",
+    "crystal-lang.implementations": true,
+    "crystal-lang.hover": true,
+    "crystal-lang.completion": true,
+    "crystal-lang.server": "/home/grabli66/Workspace/scry/scry"
+}

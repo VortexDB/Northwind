@@ -7,35 +7,37 @@ module Collector
   abstract class ProtocolResponse
   end
 
-  # Abstract protocol
-  abstract class Protocol
-    # All known protocols
-    class_property knownProtocols = Hash(String, Protocol.class).new
+  # Protocol channel mixin
+  module ProtocolChannel(T)
+    # macro included
+    # end
 
-    # Get protocol by name
-    def self.get(name : String) : Protocol
-      protCls = Protocol.knownProtocols[name]?
-      return protCls.new if !protCls.nil?
-      raise NorthwindException.new("Unknown protocol")
-    end
+    # Transport channel
+    @channel : T?
 
-    macro register()
-      #Protocol.knownProtocols["{{ @type.id }}"] = {{ @type }}
-    end
-
-    # Channel to send data
-    @channel : TransportChannel?
-
-    def channel=(chan : TransportChannel)
-      @channel = chan
-      # channel!.onChannelData do |data, count|
-      #     onChannelData(data, count)
-      # end
-    end
-
-    def channel!
+    def channel! : T
       @channel.not_nil!
     end
+
+    # Channel    
+    def channel=(channel : T)
+      @channel = channel
+    end
+
+    # Channel sure
+    # def channel!
+    #   @channel.not_nil!
+    # end
+  end
+
+  # Abstract protocol
+  abstract class Protocol 
+    # def channel=(chan : TransportChannel)
+    #   @channel = chan
+    #   # channel!.onChannelData do |data, count|
+    #   #     onChannelData(data, count)
+    #   # end
+    # end
 
     def initialize
     end
@@ -43,15 +45,15 @@ module Collector
     # Send applied request
     # And yields response
     abstract def sendRequestWithResponse(request : ProtocolRequest) : ProtocolResponse
-  end
 
-  # Factory that creates protocols
-  class ProtocolFactory
-    # Get protocol by protocol type and route
-    def self.get(protocolType : String, route : DeviceRoute) : Protocol
-      protCls = Protocol.knownProtocols[name]?
-      return protCls.new if !protCls.nil?
-      raise NorthwindException.new("Unknown protocol")
+    # Calc hash
+    def hash
+      self.class.name.hash
+    end
+
+    # Equals
+    def ==(other : Protocol)
+      hash == other.hash
     end
   end
 end

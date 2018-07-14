@@ -6,7 +6,7 @@ module Spt96xDriver
 
   # Driver for Logica SPT96x
   class Spt96xSpbusDriver < CollectorDriver
-    register("SPT96x", SpbusProtocol)
+    register("Spt96x", SpbusProtocol)
 
     def initialize
     end
@@ -98,9 +98,9 @@ module Spt96xDriver
 
     # Execute device task
     def appendTask(deviceTasks : CollectorDeviceTasks) : Void
-      deviceInfo = getDeviceInfo(deviceTasks.device)
+      deviceInfo = getDeviceInfo(deviceTasks.device)      
 
-      if deviceInfo.deviceType != DeviceType::Meter
+      if deviceInfo.deviceType == DeviceType::Meter
         actions = deviceTasks.tasks.compact_map do |x|
           x if x.is_a?(CollectorActionTask)
         end
@@ -108,7 +108,7 @@ module Spt96xDriver
         executeActions(deviceInfo, actions) if !actions.empty?
       end
 
-      if (deviceInfo.deviceType != DeviceType::Pipe && deviceInfo.deviceType != DeviceType::Group)
+      if (deviceInfo.deviceType == DeviceType::Pipe && deviceInfo.deviceType == DeviceType::Group)
         current = Array(CollectorDataTask).new
         archive = Array(CollectorDataTask).new
 

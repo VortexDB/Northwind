@@ -36,6 +36,7 @@ module Collector
   
   # Base collector drver
   abstract class CollectorDriver
+    # TODO: mixin
     macro register(deviceType, protocolType)
       CollectorDriverFactory.knownDrivers[DriverKey.new({{ deviceType }}, {{ protocolType.id.stringify }})] = {{ @type }}
 
@@ -57,6 +58,16 @@ module Collector
     # Notify task complete
     def notifyData(event : TaskDataEvent) : Void
       listenBlock!.call(event)
+    end
+
+    # Calc hash
+    def hash
+      deviceType.hash ^ protocol.hash
+    end
+
+    # Equals
+    def ==(other : CollectorDriver)
+      hash == other.hash
     end
   end
 
@@ -90,8 +101,8 @@ module Collector
     @@driverCache = Hash(DriverKey, CollectorDriver).new
 
     # Get device driver
-    def self.get(deviceType : String, protocolType : String) : CollectorDriver
-      key = DriverKey.new(deviceType, protocolType)
+    def self.get(deviceType : String, protocolType : T.class) : CollectorDriver forall T
+      key = DriverKey.new(deviceType, protocolType.name)
       driver = @@driverCache[key]?
       return driver if !driver.nil?
 
@@ -102,7 +113,7 @@ module Collector
         return ndriver
       end
 
-      raise NorthwindException.new("No possible driver can be created")
+      raise NorthwindException.new("No possible driver can be created for DeviceType: #{deviceType} and ProtocolType: #{protocolType}")
     end
   end
 end

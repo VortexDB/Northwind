@@ -5,9 +5,12 @@ module TransportChannels
 
   # Channel for tcp
   class TcpClientChannel < ClientTransportChannel
-    include BinaryTransportChannel
+    include BinaryTransportChannel    
 
     register(TcpClientRoute)
+
+    # Connect timeout in secods
+    DEFAULT_CONNECT_TIMEOUT = 3
 
     # Read buffer size
     READ_BUFFER_SIZE = 4096
@@ -29,10 +32,9 @@ module TransportChannels
     end
 
     # Open channel
-    def open : Void
-      @socket.connect(tcpRoute.hostOrIp, tcpRoute.port)
+    def open(timeout : Int32 = DEFAULT_CONNECT_TIMEOUT) : Void
+      @socket.connect(tcpRoute.hostOrIp, tcpRoute.port, timeout)
       @isWorking = true
-      # startRead
     end
 
     # Send data to channel

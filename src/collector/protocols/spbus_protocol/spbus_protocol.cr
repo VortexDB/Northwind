@@ -3,8 +3,7 @@ module SpbusProtocol
 
   # Protocol of Logica devices
   class SpbusProtocol < Protocol
-    # Register protocol
-    register()
+    include ProtocolChannel(BinaryTransportChannel)
 
     # Add DLE array to IO
     private def addDleArray(io : IO, data : Bytes) : Void
@@ -60,7 +59,7 @@ module SpbusProtocol
         # TODO: process channel exceptions
       rescue e : Exception
         # Process unhandled exceptions
-        puts e
+        puts e.inspect_with_backtrace
       end
 
       raise NorthwindException.new("Protocol read error")

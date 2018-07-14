@@ -3,8 +3,10 @@ module ModbusProtocol::ModbusRtu
 
   # Modbus RTU protocol
   class ModbusRtuProtocol < ModbusProtocol
-    # Register protocol
-    register()
+    include ProtocolChannel(BinaryTransportChannel)    
+
+    def channel=(channel : BinaryTransportChannel)
+    end
 
     # Send applied data and wait request
     def sendRequestWithResponse(request : ProtocolRequest) : ProtocolResponse
@@ -15,7 +17,7 @@ module ModbusProtocol::ModbusRtu
         # TODO: process channel exceptions
       rescue e : Exception
         # Process unhandled exceptions
-        puts e
+        puts e.inspect_with_backtrace
       end
 
       return ModbusRtuResponse.new

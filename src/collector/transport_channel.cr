@@ -29,7 +29,7 @@ module Collector
     end
 
     # Open channel
-    abstract def open : Void
+    abstract def open(timeout : Int32) : Void
 
     # Close channel
     abstract def close : Void

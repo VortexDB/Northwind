@@ -64,7 +64,7 @@ module Collector
     getter isWorking : Bool = false
 
     # Name of script
-    getter name : String    
+    getter name : String
 
     # Process data event from driver
     private def processDataEvent(event : TaskDataEvent, allTasks : Hash(Int32, ScriptTaskInfo)) : Void
@@ -155,7 +155,7 @@ module Collector
       end.catch do |e|
         # TODO notify error
         # executeCompleter!.completeError(e)
-        p e
+        p e.inspect_with_backtrace
       end
     end
 
@@ -167,50 +167,33 @@ module Collector
       puts "Actions: #{@actions.size}"
       puts "Deep: #{@deep}"
 
-      futures = Array(Future(Void)).new      
+      futures = Array(Future(Void)).new
 
       @devices.each.group_by { |x| x.route }.each do |route, routeDevices|
         futures << Future(Void).new do
           channelType = route.channelType
-                  
-          case channelType            
-          when ClientTransportChannel.class
-            channel = channelType.new(route)
-            channel.open
 
-            routeDevices.group_by { |x| x.driver }.each do |driver, driverDevices|
-              collectByDriver(driver, driverDevices)
+          begin
+            case channelType
+            when ClientTransportChannel.class
+              channel = channelType.new(route)
+              channel.open
+
+              routeDevices.group_by { |x| x.driver }.each do |driver, driverDevices|
+                driver.protocol.channel = channel
+                collectByDriver(driver, driverDevices)
+              end
+
+              channel.close
+            else
+              # TODO: other types of channels
             end
-
-            channel.close
-          else
-            # TODO: other types of channels
+          rescue e : Exception
+            # TODO: diagnostics
+            puts e.inspect_with_backtrace
           end
         end
       end
-
-      # @devices.each.group_by { |x| x.route }.each do |route, routeDevices|
-      #   futures << Future(Void).new do
-      #     # Get a channel for route
-      #     # TODO: Drivers with own channels and protocols
-      #     # Now only simple drivers with common protocols allowed
-
-      #     routeDevices.group_by { |x| x.protocolName }.each do |protocolName, protocolDevices|
-      #       driver = CollectorDriverFactory.get(route, protocolName)
-      #       case driver
-      #       when CollectorDriverWithExternalChannel
-      #         channel = getChannelByRoute(route)
-      #         if channel
-      #           driver.channel = channel
-      #           collectCommonByDriver(driver, protocolDevices)
-      #         end
-      #         channel.close
-      #       else
-      #         raise NorthwindException.new("Driver of unknown type")
-      #       end
-      #     end
-      #   end
-      # end
 
       Future.waitAll(futures)
     end
@@ -242,7 +225,7 @@ module Collector
     end
 
     # Add action
-    def addAction(action : SettingsAction) : Void
+    def addAction(action : DeviceAction) : Void
       @actions.add(action)
     end
   end
