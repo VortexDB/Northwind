@@ -4,7 +4,9 @@ module Vkt7Driver
 
   # Driver for VKT-7 thermal meter
   class Vkt7ModbusRtuDriver < CollectorDriver
-    register("Vkt7", ModbusRtuProtocol)
+    include CollectorDriverProtocol(ModbusRtuProtocol)
+
+    registerDevice("Vkt7")
 
     # Execute device task
     def appendTask(deviceTasks : CollectorDeviceTasks) : Void

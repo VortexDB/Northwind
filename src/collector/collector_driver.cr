@@ -34,16 +34,26 @@ module Collector
   class DriverTimeoutEvent < CollectorDriverEvent
   end
   
+  # Driver protocol mixin
+  module CollectorDriverProtocol(TProtocolType)
+    macro included
+      class_getter protocol = TProtocolType.new      
+      def protocol : TProtocolType
+        @@protocol
+      end
+    end
+  end
+
   # Base collector drver
   abstract class CollectorDriver
-    # TODO: mixin
-    macro register(deviceType, protocolType)
-      p {{ protocolType }}
-      CollectorDriverFactory.knownDrivers[DriverKey.new({{ deviceType }}, {{ protocolType }})] = {{ @type }}
+    # Device types
+    class_property deviceTypes = Set(String).new
 
-      getter deviceType = {{ deviceType }}      
-      getter protocol = {{ protocolType }}.new
-    end    
+    macro registerDevice(deviceType)
+      @@deviceTypes.add({{ deviceType }})
+
+      CollectorDriverFactory.register(protocol.class, {{ deviceType }}, {{ @type }})
+    end
 
     # Add tasks for device
     # For override
@@ -63,7 +73,7 @@ module Collector
 
     # Calc hash
     def hash
-      deviceType.hash ^ protocol.hash
+      @@deviceTypes.hash ^ protocol.hash
     end
 
     # Equals
@@ -71,47 +81,48 @@ module Collector
       hash == other.hash
     end
   end
-
-  # Key for known drivers hash
-  struct DriverKey
-    # Device type name
-    getter deviceType : String
-
-    # Protocol name
-    getter protocolType : Protocol.class
-
-    def initialize(@deviceType, @protocolType)
-    end
-
-    def hash
-      @deviceType.hash ^ @protocolType.name.hash
-    end
-
-    def ==(other : DriverKey)
-      return @deviceType == other.deviceType &&
-        @protocolType == other.protocolType
-    end
-  end
-
+  
   # Factory to get driver by Device
   abstract class CollectorDriverFactory
-    # Known drivers
-    class_property knownDrivers = Hash(DriverKey, CollectorDriver.class).new
+    # Known drivers    
+    class_property knownDrivers = Hash(Protocol.class, Hash(String, CollectorDriver.class)).new
+
+    # Register device driver
+    def self.register(protocolClass : Protocol.class, deviceType : String, driverClass : CollectorDriver.class) : Void
+      drivers = knownDrivers[protocolClass]?
+      if drivers.nil?
+        drivers = Hash(String, CollectorDriver.class).new
+        knownDrivers[protocolClass] = drivers
+      end
+
+      drivers[deviceType] = driverClass
+    end
 
     # Cache for drivers
-    @@driverCache = Hash(DriverKey, CollectorDriver).new
+    @@driverCache = Hash(Protocol.class, Hash(String, CollectorDriver)).new
 
     # Get device driver
     def self.get(deviceType : String, protocolType : T.class) : CollectorDriver forall T
-      key = DriverKey.new(deviceType, protocolType)
-      driver = @@driverCache[key]?
-      return driver if !driver.nil?
+      drivers = @@driverCache[protocolType]?
+      if drivers
+        driver = drivers[deviceType]?
+        return driver if !driver.nil?
+      end
 
-      driverClass = knownDrivers[key]?
-      if !driverClass.nil?
-        ndriver = driverClass.new
-        @@driverCache[key] = ndriver
-        return ndriver
+      drivers = knownDrivers[protocolType]?
+      
+      if drivers
+        driverClass = drivers[deviceType]?
+        if driverClass
+          driver = driverClass.new
+          cacheDrivers = @@driverCache[protocolType]?
+          if cacheDrivers.nil?
+            cacheDrivers = Hash(String, CollectorDriver).new            
+            @@driverCache[protocolType] = cacheDrivers
+          end
+          cacheDrivers[deviceType] = driver
+          return driver
+        end
       end
 
       raise NorthwindException.new("No possible driver can be created for DeviceType: #{deviceType} and ProtocolType: #{protocolType}")

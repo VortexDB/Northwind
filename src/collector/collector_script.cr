@@ -179,10 +179,8 @@ module Collector
             case channel
             when ClientTransportChannel
               channel.open
-              
-              p routeDevices
+
               routeDevices.group_by { |x| x.driver }.each do |driver, driverDevices|
-                pp driver
                 driver.protocol.channel = channel
                 collectByDriver(driver, driverDevices)
               end
