@@ -129,8 +129,10 @@ module Collector
         # TODO: Catch driver errors
         begin
           driver.appendTask(CollectorDeviceTasks.new(device, tasks))
-        rescue
-          # TODO: notify error
+        rescue e : Exception
+          # TODO: diagnostics
+          puts "collectByDriver"
+          puts e.inspect_with_backtrace
         end
       end
     end
@@ -178,7 +180,9 @@ module Collector
             when ClientTransportChannel
               channel.open
               
-              routeDevices.group_by { |x| x.driver }.each do |driver, driverDevices|                
+              p routeDevices
+              routeDevices.group_by { |x| x.driver }.each do |driver, driverDevices|
+                pp driver
                 driver.protocol.channel = channel
                 collectByDriver(driver, driverDevices)
               end
@@ -190,6 +194,7 @@ module Collector
             end
           rescue e : Exception
             # TODO: diagnostics
+            puts "startCollect"
             puts e.inspect_with_backtrace
           end
         end

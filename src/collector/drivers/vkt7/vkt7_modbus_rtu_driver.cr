@@ -8,7 +8,7 @@ module Vkt7Driver
 
     # Execute device task
     def appendTask(deviceTasks : CollectorDeviceTasks) : Void
-      
+      p "VKT appendTask"
     end
   end
 end

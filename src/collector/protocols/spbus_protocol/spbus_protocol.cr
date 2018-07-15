@@ -51,7 +51,7 @@ module SpbusProtocol
         channel!.write(frame)
         unpacker = SpbusFrameUnpacker.new
         loop do
-          packet = channel!.read # TODO: read timeout
+          packet = channel!.read
           response = unpacker.addBytes(packet[0], packet[1])
           return response if !response.nil?
         end

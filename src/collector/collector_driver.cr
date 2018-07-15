@@ -38,7 +38,8 @@ module Collector
   abstract class CollectorDriver
     # TODO: mixin
     macro register(deviceType, protocolType)
-      CollectorDriverFactory.knownDrivers[DriverKey.new({{ deviceType }}, {{ protocolType.id.stringify }})] = {{ @type }}
+      p {{ protocolType }}
+      CollectorDriverFactory.knownDrivers[DriverKey.new({{ deviceType }}, {{ protocolType }})] = {{ @type }}
 
       getter deviceType = {{ deviceType }}      
       getter protocol = {{ protocolType }}.new
@@ -77,13 +78,13 @@ module Collector
     getter deviceType : String
 
     # Protocol name
-    getter protocolType : String
+    getter protocolType : Protocol.class
 
     def initialize(@deviceType, @protocolType)
     end
 
     def hash
-      @deviceType.hash ^ @protocolType.hash
+      @deviceType.hash ^ @protocolType.name.hash
     end
 
     def ==(other : DriverKey)
@@ -102,7 +103,7 @@ module Collector
 
     # Get device driver
     def self.get(deviceType : String, protocolType : T.class) : CollectorDriver forall T
-      key = DriverKey.new(deviceType, protocolType.name)
+      key = DriverKey.new(deviceType, protocolType)
       driver = @@driverCache[key]?
       return driver if !driver.nil?
 
