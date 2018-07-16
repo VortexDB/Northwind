@@ -1,9 +1,13 @@
+require "./spbus_request"
+require "./spbus_response"
+
 module SpbusProtocol
   include Collector
 
   # Protocol of Logica devices
   class SpbusProtocol < Protocol
     include ProtocolChannel(BinaryTransportChannel)
+    include ResponseRequestProtocol(SpbusRequest, SpbusResponse)
 
     # Add DLE array to IO
     private def addDleArray(io : IO, data : Bytes) : Void
@@ -45,8 +49,8 @@ module SpbusProtocol
     end
 
     # Send applied data and wait request
-    def sendRequestWithResponse(request : ProtocolRequest) : ProtocolResponse
-      frame = createFrame(request.as(SpbusRequest))
+    def sendRequestWithResponse(request : SpbusRequest) : SpbusResponse
+      frame = createFrame(request)
       begin
         channel!.write(frame)
         unpacker = SpbusFrameUnpacker.new

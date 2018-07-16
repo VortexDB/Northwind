@@ -39,11 +39,11 @@ module Collector
     def init : Void
       # TODO: load devices, routes from database
       #driver = CollectorDriverFactory.get("Vkt7", "ModbusRtuProtocol")
-      route = TcpClientRoute.new("localhost", 25301)      
+      route = TcpClientRoute.new("192.168.0.196", 25301)      
       # @devices.add(CollectorDevice.new("Vkt7", "ModbusRtuProtocol", route, driver, PipeDataSource.new(2_i64)))
 
-      driver1 = CollectorDriverFactory.get("Spt96x", SpbusProtocol::SpbusProtocol)
-      @devices.add(CollectorDevice.new("Spt96x", "SpbusProtocol", route, driver1, ResourceMeterDataSource.new(1_i64)))
+      # driver1 = CollectorDriverFactory.get("Spt96x", SpbusProtocol::SpbusProtocol)
+      # @devices.add(CollectorDevice.new("Spt96x", "SpbusProtocol", route, driver1, ResourceMeterDataSource.new(1_i64)))
       driver2 = CollectorDriverFactory.get("Vkt7", ModbusProtocol::ModbusRtu::ModbusRtuProtocol)
       @devices.add(CollectorDevice.new("Vkt7", "ModbusRtuProtocol", route, driver2, ResourceMeterDataSource.new(2_i64)))
 

@@ -5,7 +5,7 @@ module Spt96xDriver
   include SpbusProtocol
 
   # Driver for Logica SPT96x
-  class SptSpbusDriver < CollectorDriver
+  class SptSpbusDriver < PipeMeterDriver
     include CollectorDriverProtocol(SpbusProtocol)
 
     registerDevice("Spt96x")
@@ -13,22 +13,9 @@ module Spt96xDriver
 
     def initialize
     end
-
-    # Get device info from device
-    private def getDeviceInfo(device : CollectorDevice) : DeviceInfo
-      case device.dataSource
-      when ResourceMeterDataSource
-        return DeviceInfo.new
-      when PipeDataSource
-        # TODO: pipe number
-        return DeviceInfo.new(DeviceType::Pipe, 1)
-      else
-        raise NorthwindException.new("Unknown data source")
-      end
-    end
-
+    
     # Prepare and execute read action
-    private def executeReadAction(deviceInfo : DeviceInfo, action : CollectorActionTask) : Void
+    private def executeReadAction(deviceInfo : PipeMeterDeviceInfo, action : CollectorActionTask) : Void
       case action.actionInfo.state
       when StateType::DateTime
         TimeReader.new(protocol) do |time|
@@ -40,11 +27,11 @@ module Spt96xDriver
     end
 
     # Prepare and execute write action
-    private def executeWriteAction(deviceInfo : DeviceInfo, action : CollectorActionTask) : Void
+    private def executeWriteAction(deviceInfo : PipeMeterDeviceInfo, action : CollectorActionTask) : Void
     end
 
     # Execute actions
-    private def executeActions(deviceInfo : DeviceInfo, tasks : Array(CollectorActionTask)) : Void
+    private def executeActions(deviceInfo : PipeMeterDeviceInfo, tasks : Array(CollectorActionTask)) : Void
       tasks.each do |task|
         case task.actionInfo.action
         when StateAction::Read
@@ -58,7 +45,7 @@ module Spt96xDriver
     end
 
     # Execute current value reading
-    private def executeCurrentValues(deviceInfo : DeviceInfo, tasks : Array(CollectorDataTask)) : Void
+    private def executeCurrentValues(deviceInfo : PipeMeterDeviceInfo, tasks : Array(CollectorDataTask)) : Void
       return if (deviceInfo.deviceType != DeviceType::Pipe && deviceInfo.deviceType != DeviceType::Group)
 
       tastToRequest = Hash(RequestParameter, CollectorDataTask).new
@@ -78,7 +65,7 @@ module Spt96xDriver
     end
 
     # Execute archive reading
-    private def executeArchive(deviceInfo : DeviceInfo, tasks : Array(CollectorDataTask)) : Void
+    private def executeArchive(deviceInfo : PipeMeterDeviceInfo, tasks : Array(CollectorDataTask)) : Void
       # TODO: Make it work
 
       # Group by profile id      

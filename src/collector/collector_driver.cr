@@ -1,4 +1,40 @@
 module Collector
+  # Device type
+  enum DeviceType
+    # Self meter
+    Meter,
+    # Pipe of device
+    Pipe,
+    # Pipe group of device
+    Group
+  end
+
+  # Base device info
+  abstract class MeterDeviceInfo
+    # Device type
+    getter deviceType : DeviceType
+
+    def initialize(@deviceType)
+    end
+  end
+
+  # Info for passing to protocol driver
+  class PipeMeterDeviceInfo < MeterDeviceInfo
+    # Pipe number
+    getter pipeNumber : Int32
+
+    # Group number
+    getter groupNumber : Int32
+
+    def initialize(
+      deviceType = DeviceType::Meter,
+      @pipeNumber = 0,
+      @groupNumber = 0
+    )
+      super(deviceType)
+    end
+  end
+
   # Base event
   abstract class CollectorDriverEvent
   end
@@ -33,11 +69,11 @@ module Collector
   # Timeout
   class DriverTimeoutEvent < CollectorDriverEvent
   end
-  
+
   # Driver protocol mixin
   module CollectorDriverProtocol(TProtocolType)
     macro included
-      class_getter protocol = TProtocolType.new      
+      class_getter protocol = TProtocolType.new
       def protocol : TProtocolType
         @@protocol
       end
@@ -81,10 +117,26 @@ module Collector
       hash == other.hash
     end
   end
-  
+
+  # Driver for pipe meter like heat meter or flow meter
+  abstract class PipeMeterDriver < CollectorDriver
+    # Get device info from device
+    protected def getDeviceInfo(device : CollectorDevice) : PipeMeterDeviceInfo
+      case device.dataSource
+      when ResourceMeterDataSource
+        return PipeMeterDeviceInfo.new
+      when PipeDataSource
+        # TODO: pipe number
+        return PipeMeterDeviceInfo.new(DeviceType::Pipe, 1)
+      else
+        raise NorthwindException.new("Unknown data source")
+      end
+    end
+  end
+
   # Factory to get driver by Device
   abstract class CollectorDriverFactory
-    # Known drivers    
+    # Known drivers
     class_property knownDrivers = Hash(Protocol.class, Hash(String, CollectorDriver.class)).new
 
     # Register device driver
@@ -110,14 +162,14 @@ module Collector
       end
 
       drivers = knownDrivers[protocolType]?
-      
+
       if drivers
         driverClass = drivers[deviceType]?
         if driverClass
           driver = driverClass.new
           cacheDrivers = @@driverCache[protocolType]?
           if cacheDrivers.nil?
-            cacheDrivers = Hash(String, CollectorDriver).new            
+            cacheDrivers = Hash(String, CollectorDriver).new
             @@driverCache[protocolType] = cacheDrivers
           end
           cacheDrivers[deviceType] = driver

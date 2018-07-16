@@ -9,9 +9,6 @@ module Collector
 
   # Protocol channel mixin
   module ProtocolChannel(T)
-    # macro included
-    # end
-
     # Transport channel
     @channel : T?
 
@@ -23,28 +20,19 @@ module Collector
     def channel=(channel : T)
       @channel = channel
     end
+  end
 
-    # Channel sure
-    # def channel!
-    #   @channel.not_nil!
-    # end
+  # Simple response request protocol
+  module ResponseRequestProtocol(TRequest, TResponse)
+    # Send applied request
+    # And yields response
+    abstract def sendRequestWithResponse(request : TRequest) : TResponse
   end
 
   # Abstract protocol
-  abstract class Protocol 
-    # def channel=(chan : TransportChannel)
-    #   @channel = chan
-    #   # channel!.onChannelData do |data, count|
-    #   #     onChannelData(data, count)
-    #   # end
-    # end
-
+  abstract class Protocol
     def initialize
-    end
-
-    # Send applied request
-    # And yields response
-    abstract def sendRequestWithResponse(request : ProtocolRequest) : ProtocolResponse
+    end    
 
     # Calc hash
     def hash
