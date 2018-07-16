@@ -118,11 +118,33 @@ module Collector
     end
   end
 
-  # Driver for pipe meter like heat meter or flow meter
-  abstract class PipeMeterDriver < CollectorDriver
+  # Base driver for meter
+  abstract class CollectorMeterDriver < CollectorDriver
+    # Current device info
+    @currentDeviceInfo : MeterDeviceInfo?
+
+    def currentDeviceInfo!
+      @currentDeviceInfo.not_nil!
+    end
+
+    # Execute actions
+    private def executeActions(tasks : Array(CollectorActionTask)) : Void
+      tasks.each do |task|
+        case task.actionInfo.action
+        when StateAction::Read
+          executeReadAction(task)
+        when StateAction::Write
+          executeWriteAction(task)
+        else
+          raise NorthwindException.new("Unknown action")
+        end
+      end
+    end
+
     # Get device info from device
-    protected def getDeviceInfo(device : CollectorDevice) : PipeMeterDeviceInfo
+    protected def getDeviceInfo(device : CollectorDevice) : MeterDeviceInfo
       case device.dataSource
+      # TODO: common meter
       when ResourceMeterDataSource
         return PipeMeterDeviceInfo.new
       when PipeDataSource
@@ -132,6 +154,55 @@ module Collector
         raise NorthwindException.new("Unknown data source")
       end
     end
+
+    # Process read action. Virtual
+    def executeReadAction(action : CollectorActionTask) : Void
+    end
+
+    # Process write action. Virtual
+    def executeWriteAction(action : CollectorActionTask) : Void
+    end
+
+    # Process read current values. Virtual
+    def executeCurrentValues(tasks : Array(CollectorDataTask)) : Void
+    end
+
+    # Process read archive. Virtual
+    def executeArchive(tasks : Array(CollectorDataTask)) : Void
+    end
+
+    # Execute device task
+    def appendTask(deviceTasks : CollectorDeviceTasks) : Void
+      deviceInfo = getDeviceInfo(deviceTasks.device)
+      @currentDeviceInfo = deviceInfo
+
+      actions = deviceTasks.tasks.compact_map do |x|
+        x if x.is_a?(CollectorActionTask)
+      end
+
+      current = Array(CollectorDataTask).new
+      archive = Array(CollectorDataTask).new
+
+      deviceTasks.tasks.each do |task|
+        case task
+        when CollectorDataTask
+          if task.parameter.discret == DiscretType::None
+            current << task
+          else
+            archive << task
+          end
+        else
+        end
+      end
+
+      executeActions(actions) if !actions.empty?
+      executeCurrentValues(current) if !current.empty?
+      executeArchive(archive) if !current.empty?
+    end
+  end
+
+  # Mixin for driver of pipe meter like heat meter or flow meter
+  module CollectorPipeMeterDriver
   end
 
   # Factory to get driver by Device
