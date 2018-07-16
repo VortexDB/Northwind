@@ -9,14 +9,15 @@ module ModbusProtocol::ModbusRtu
         # Length to read
         getter length : UInt16
 
-        def initialize(@address, @length)
+        def initialize(networkAddress, @address, @length)
+            super(networkAddress)
         end
 
         # Return binary data of request
         def getData : Bytes
             res = IO::Memory.new
-            res.write_bytes(address)
-            res.write_bytes(length)
+            res.write_bytes(address, IO::ByteFormat::BigEndian)
+            res.write_bytes(length, IO::ByteFormat::BigEndian)
             return res.to_slice
         end
 

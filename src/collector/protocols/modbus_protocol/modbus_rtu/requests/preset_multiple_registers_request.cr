@@ -12,7 +12,8 @@ module ModbusProtocol::ModbusRtu
         # Data to write
         getter data : Bytes
 
-        def initialize(@address, @length, @data)
+        def initialize(networkAddress, @address, @length, @data)
+            super(networkAddress)
         end
 
         # Return binary data of request
