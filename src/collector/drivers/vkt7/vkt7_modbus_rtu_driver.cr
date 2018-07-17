@@ -16,7 +16,8 @@ module Vkt7Driver
         # TimeReader.new(protocol) do |time|
         #   # notifyData(action.taskId)
         # end
-        protocol.sendRequestWithResponse(ReadHoldingRegistersRequest.new(1_u8, 0x3FFE_u16, 0_u16))
+        res = protocol.sendRequestWithResponse(ReadHoldingRegistersRequest.new(1_u8, 0x3FFB_u16, 0_u16))
+        pp res
       else
         raise NorthwindException.new("Unknown read action")
       end      

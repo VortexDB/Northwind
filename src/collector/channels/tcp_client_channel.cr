@@ -46,11 +46,11 @@ module TransportChannels
     end
 
     # Read data from channel
-    def read(timeout = DEFAULT_READ_TIMEOUT) : {Bytes, Int32}
+    def read(timeout = DEFAULT_READ_TIMEOUT) : Bytes
       buffer = Bytes.new(READ_BUFFER_SIZE)
       @socket.read_timeout = timeout
       count = @socket.read(buffer)
-      return {buffer, count}
+      return buffer[0, count]
     end
 
     # Close channel

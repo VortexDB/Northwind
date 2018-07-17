@@ -21,7 +21,8 @@ module ModbusProtocol::ModbusRtu
             return res.to_slice
         end
 
-        # Return answer length or -1 of it's unknown
+        # Return answer length. If length == 0 then answer length is unknown
+        # Only data, no header and crc
         def getAnswerLength : Int32
             return -1 if length == 0
             return 1 + (1 + length) * 2
