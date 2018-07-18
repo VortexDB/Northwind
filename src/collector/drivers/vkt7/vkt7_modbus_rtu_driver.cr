@@ -12,9 +12,11 @@ module Vkt7Driver
     def executeReadAction(action : CollectorActionTask) : Void
       case action.actionInfo.state
       when StateType::DateTime
-        TimeReader.new(deviceInfo, protocol) do |time|
-          p time
-          # notifyData(action.taskId)
+        TimeReader.new(deviceInfo, protocol) do |time|          
+          notifyData(TaskDataEvent.new(
+            action.taskId,
+            time
+          ))
         end
       else
         raise NorthwindException.new("Unknown read action")

@@ -14,6 +14,8 @@ module Spt96xDriver
     def initialize
     end
     
+    # TODO: refactor
+
     # # Prepare and execute read action
     # private def executeReadAction(deviceInfo : PipeMeterDeviceInfo, action : CollectorActionTask) : Void
     #   case action.actionInfo.state
