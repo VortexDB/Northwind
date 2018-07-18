@@ -67,12 +67,10 @@ module Collector
     getter name : String
 
     # Process device action event
-    private def processActionEvent(task : CollectorActionTask, event : DriverTaskResponseEvent) : Void
-      pp event
+    private def processActionEvent(task : CollectorActionTask, event : DriverTaskResponseEvent) : Void      
       case task.actionInfo.state
       when Device::StateType::DateTime
-        p event.value
-        # pp resp
+        pp event
       end
 
       # p typeof(event)
@@ -116,26 +114,20 @@ module Collector
     end
 
     # Process task response event from driver
-    private def processTaskResponseEvent(event : DriverTaskResponseEvent, allTasks : Hash(Int32, ScriptTaskInfo)) : Void
-      puts typeof(event)
-      case event
-      when Collector::DriverTaskResponseEvent
-        p "GOOD"
+    private def processTaskResponseEvent(event : DriverTaskResponseEvent, allTasks : Hash(Int32, ScriptTaskInfo)) : Void      
+      # Get device
+      # Send to someone to write data for parameter
+      taskInfo = allTasks[event.taskId]?
+      return if taskInfo.nil?
+
+      task = taskInfo.task
+
+      case task
+      when CollectorActionTask
+        processActionEvent(task, event)
+      when CollectorDataTask
+
       end
-
-      # # Get device
-      # # Send to someone to write data for parameter
-      # taskInfo = allTasks[event.taskId]?
-      # return if taskInfo.nil?
-
-      # task = taskInfo.task
-
-      # case task
-      # when CollectorActionTask
-      #   processActionEvent(task, event)
-      # when CollectorDataTask
-
-      # end
     end
 
     # Process driver event
@@ -143,7 +135,6 @@ module Collector
       begin
         case event
         when DriverTaskResponseEvent
-          puts typeof(event)
           processTaskResponseEvent(event, allTasks)
         else
           raise NorthwindException.new("Unsupported driver event")
@@ -163,7 +154,6 @@ module Collector
       allTasks = Hash(Int32, ScriptTaskInfo).new
 
       driver.listen do |event|
-        puts typeof(event)
         processDriverEvent(event, allTasks)
       end
 

@@ -56,21 +56,36 @@ module Collector
     def initialize(@dateTime, @value)
     end
   end
+
+  # Mixin for response value
+  module TaskResponseValue(TValue)
+    getter value : TValue
+  end
   
   # Event on task
-  abstract class DriverTaskResponseEvent(TValue) < CollectorDriverEvent
-     # Collector task id
+  abstract class DriverTaskResponseEvent < CollectorDriverEvent    
      getter taskId : Int32
 
-     # Some task value
-     getter value : TValue
-
-     def initialize(@taskId, @value)
+     def initialize(@taskId)
      end
   end
 
+  # Event on task with some values from device
+  class DriverTaskDataResponseEvent < CollectorDriverEvent
+    include TaskResponseValue(DataTaskValue)    
+    
+    def initialize(taskId, @value)
+      super(taskId)
+    end
+ end
+
   # Response event on time read
-  class ReadTimeResponseEvent < DriverTaskResponseEvent(Time)
+  class ReadTimeResponseEvent < DriverTaskResponseEvent    
+    include TaskResponseValue(Time) 
+    
+    def initialize(taskId, @value)
+      super(taskId)
+    end
   end
 
   # Timeout
