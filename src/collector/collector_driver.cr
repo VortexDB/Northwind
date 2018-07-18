@@ -42,6 +42,9 @@ module Collector
   # Data value from driver
   alias DataValue = Float64 | Time | String
 
+  # Type of TaskDataEvent
+  alias DataTaskValue = DataValue | TimedDataValue
+  
   # Value with time
   struct TimedDataValue
     # Date time for value
@@ -53,17 +56,21 @@ module Collector
     def initialize(@dateTime, @value)
     end
   end
+  
+  # Event on task
+  abstract class DriverTaskResponseEvent(TValue) < CollectorDriverEvent
+     # Collector task id
+     getter taskId : Int32
 
-  # Notifies about task data
-  class TaskDataEvent < CollectorDriverEvent
-    # Collector task id
-    getter taskId : Int32
+     # Some task value
+     getter value : TValue
 
-    # Some value
-    getter values : DataValue | Array(TimedDataValue)
+     def initialize(@taskId, @value)
+     end
+  end
 
-    def initialize(@taskId, @values)
-    end
+  # Response event on time read
+  class ReadTimeResponseEvent < DriverTaskResponseEvent(Time)
   end
 
   # Timeout
@@ -102,8 +109,8 @@ module Collector
     def listen(&@listenBlock : CollectorDriverEvent -> Void) : Void
     end
 
-    # Notify task complete
-    def notifyData(event : TaskDataEvent) : Void
+    # Notify task event
+    def notifyTaskEvent(event : CollectorDriverEvent) : Void
       listenBlock!.call(event)
     end
 

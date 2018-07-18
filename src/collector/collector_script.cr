@@ -66,6 +66,26 @@ module Collector
     # Name of script
     getter name : String
 
+    # Process device action event
+    private def processActionEvent(task : CollectorActionTask, event : DriverTaskResponseEvent) : Void
+      pp event
+      case task.actionInfo.state
+      when Device::StateType::DateTime
+        p event.value
+        # pp resp
+      end
+
+      # p typeof(event)
+      # case event
+      # when ReadTimeResponseEvent
+      #   p "GOOD"
+      #   time = event.value
+      #   p time
+      # else
+      #   raise NorthwindException.new("Wrong event data for CollectorActionTask")
+      # end
+    end
+
     # Process data event from driver
     private def processDataEvent(event : TaskDataEvent, allTasks : Hash(Int32, ScriptTaskInfo)) : Void
       # Get device
@@ -73,12 +93,17 @@ module Collector
       taskInfo = allTasks[event.taskId]?
       return if taskInfo.nil?
 
+      if !taskInfo.task.is_a?(CollectorDataTask)
+        puts "Task must be CollectorDataTask for task ID: #{taskInfo.task.taskId}"
+        return
+      end
+
       taskData = taskInfo.task.as(CollectorDataTask)
       return if taskData.nil?
 
       # TODO: remove
       parameter = EntityParameter.new(2_i64)
-      values = event.values
+      values = event.value
 
       case values
       when Float64
@@ -87,6 +112,44 @@ module Collector
       when Array(TimedDataValue)
         # TODO: profile data
       else
+      end
+    end
+
+    # Process task response event from driver
+    private def processTaskResponseEvent(event : DriverTaskResponseEvent, allTasks : Hash(Int32, ScriptTaskInfo)) : Void
+      puts typeof(event)
+      case event
+      when Collector::DriverTaskResponseEvent
+        p "GOOD"
+      end
+
+      # # Get device
+      # # Send to someone to write data for parameter
+      # taskInfo = allTasks[event.taskId]?
+      # return if taskInfo.nil?
+
+      # task = taskInfo.task
+
+      # case task
+      # when CollectorActionTask
+      #   processActionEvent(task, event)
+      # when CollectorDataTask
+
+      # end
+    end
+
+    # Process driver event
+    private def processDriverEvent(event : CollectorDriverEvent, allTasks : Hash(Int32, ScriptTaskInfo)) : Void
+      begin
+        case event
+        when DriverTaskResponseEvent
+          puts typeof(event)
+          processTaskResponseEvent(event, allTasks)
+        else
+          raise NorthwindException.new("Unsupported driver event")
+        end
+      rescue e : Exception
+        puts e.inspect_with_backtrace
       end
     end
 
@@ -100,11 +163,8 @@ module Collector
       allTasks = Hash(Int32, ScriptTaskInfo).new
 
       driver.listen do |event|
-        case event
-        when TaskDataEvent
-          processDataEvent(event, allTasks)
-        else
-        end
+        puts typeof(event)
+        processDriverEvent(event, allTasks)
       end
 
       # Append task in other fiber
@@ -172,9 +232,9 @@ module Collector
       futures = Array(Future(Void)).new
 
       @devices.each.group_by { |x| x.route }.each do |route, routeDevices|
-        futures << Future(Void).new do          
+        futures << Future(Void).new do
           begin
-            channel = TransportChannelFactory.get(route)            
+            channel = TransportChannelFactory.get(route)
 
             case channel
             when ClientTransportChannel
@@ -184,7 +244,7 @@ module Collector
                 driver.protocol.channel = channel
                 collectByDriver(driver, driverDevices)
               end
-                            
+
               channel.close
             else
               # TODO: other types of channels

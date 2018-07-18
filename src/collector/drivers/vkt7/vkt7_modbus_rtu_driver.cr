@@ -12,8 +12,8 @@ module Vkt7Driver
     def executeReadAction(action : CollectorActionTask) : Void
       case action.actionInfo.state
       when StateType::DateTime
-        TimeReader.new(deviceInfo, protocol) do |time|          
-          notifyData(TaskDataEvent.new(
+        TimeReader.new(deviceInfo, protocol) do |time|
+          notifyTaskEvent(ReadTimeResponseEvent.new(
             action.taskId,
             time
           ))

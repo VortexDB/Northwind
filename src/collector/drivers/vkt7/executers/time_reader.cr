@@ -23,7 +23,8 @@ module Vkt7Driver
       
         year = 2000 + yearByte
         yield Time.new(year, month.to_i32, day.to_i32, hour.to_i32, minute.to_i32, second.to_i32)
-      rescue      
+      rescue e : Exception
+        pp e.inspect_with_backtrace
         raise NorthwindException.new("Wrong answer")
       end
     end
