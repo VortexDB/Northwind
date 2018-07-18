@@ -10,16 +10,17 @@ module Collector
   end
 
   # Base device info
-  abstract class MeterDeviceInfo
-    # Device type
-    getter deviceType : DeviceType
+  abstract class DeviceInfo
+  end
 
-    def initialize(@deviceType)
-    end
+  # Base device info
+  class MeterDeviceInfo < DeviceInfo
+    # Device network number
+    getter networkNumber : Int32 = 1
   end
 
   # Info for passing to protocol driver
-  class PipeMeterDeviceInfo < MeterDeviceInfo
+  class PipeDeviceInfo < MeterDeviceInfo
     # Pipe number
     getter pipeNumber : Int32
 
@@ -27,11 +28,10 @@ module Collector
     getter groupNumber : Int32
 
     def initialize(
-      deviceType = DeviceType::Meter,
       @pipeNumber = 0,
       @groupNumber = 0
     )
-      super(deviceType)
+      super()
     end
   end
 
@@ -116,15 +116,36 @@ module Collector
     def ==(other : CollectorDriver)
       hash == other.hash
     end
-  end
+  end  
 
   # Base driver for meter
   abstract class CollectorMeterDriver < CollectorDriver
-    # Current device info
-    @currentDeviceInfo : MeterDeviceInfo?
+    # Current collector device
+    @currentDevice : CollectorDevice?
 
-    def currentDeviceInfo!
-      @currentDeviceInfo.not_nil!
+    # Current device info
+    @deviceInfo : DeviceInfo?
+
+    # Sure current DeviceInfo
+    def deviceInfo
+      if @deviceInfo.nil?
+        @deviceInfo = getDeviceInfo(@currentDevice.not_nil!)
+      end
+      @deviceInfo.not_nil!
+    end
+
+    # Get device info from device    
+    protected def getDeviceInfo(device : CollectorDevice) : DeviceInfo
+      case device.dataSource
+      # TODO: common meter
+      when MeterDataSource
+        return MeterDeviceInfo.new
+      when PipeDataSource
+        # TODO: pipe number
+        return PipeDeviceInfo.new(1)
+      else
+        raise NorthwindException.new("Unknown data source")
+      end
     end
 
     # Execute actions
@@ -138,20 +159,6 @@ module Collector
         else
           raise NorthwindException.new("Unknown action")
         end
-      end
-    end
-
-    # Get device info from device
-    protected def getDeviceInfo(device : CollectorDevice) : MeterDeviceInfo
-      case device.dataSource
-      # TODO: common meter
-      when ResourceMeterDataSource
-        return PipeMeterDeviceInfo.new
-      when PipeDataSource
-        # TODO: pipe number
-        return PipeMeterDeviceInfo.new(DeviceType::Pipe, 1)
-      else
-        raise NorthwindException.new("Unknown data source")
       end
     end
 
@@ -173,8 +180,7 @@ module Collector
 
     # Execute device task
     def appendTask(deviceTasks : CollectorDeviceTasks) : Void
-      deviceInfo = getDeviceInfo(deviceTasks.device)
-      @currentDeviceInfo = deviceInfo
+      @currentDevice = deviceTasks.device
 
       actions = deviceTasks.tasks.compact_map do |x|
         x if x.is_a?(CollectorActionTask)
@@ -199,10 +205,6 @@ module Collector
       executeCurrentValues(current) if !current.empty?
       executeArchive(archive) if !current.empty?
     end
-  end
-
-  # Mixin for driver of pipe meter like heat meter or flow meter
-  module CollectorPipeMeterDriver
   end
 
   # Factory to get driver by Device

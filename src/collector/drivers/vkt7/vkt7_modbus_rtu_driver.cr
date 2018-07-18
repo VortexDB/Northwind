@@ -5,19 +5,17 @@ module Vkt7Driver
   # Driver for VKT-7 heat meter
   class Vkt7ModbusRtuDriver < CollectorMeterDriver
     include CollectorDriverProtocol(ModbusRtuProtocol)
-    include CollectorPipeMeterDriver
-
+        
     registerDevice("Vkt7")
 
     # Process read action. Virtual
     def executeReadAction(action : CollectorActionTask) : Void
       case action.actionInfo.state
       when StateType::DateTime
-        # TimeReader.new(protocol) do |time|
-        #   # notifyData(action.taskId)
-        # end
-        res = protocol.sendRequestWithResponse(ReadHoldingRegistersRequest.new(1_u8, 0x3FFB_u16, 0_u16))
-        pp res
+        TimeReader.new(deviceInfo, protocol) do |time|
+          p time
+          # notifyData(action.taskId)
+        end
       else
         raise NorthwindException.new("Unknown read action")
       end      

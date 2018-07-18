@@ -7,7 +7,6 @@ module Spt96xDriver
   # Driver for Logica SPT96x
   class SptSpbusDriver < CollectorMeterDriver
     include CollectorDriverProtocol(SpbusProtocol)
-    include CollectorPipeMeterDriver
 
     registerDevice("Spt96x")
     registerDevice("Spt76x")

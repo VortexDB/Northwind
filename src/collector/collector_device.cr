@@ -9,6 +9,7 @@ module Collector
     getter route : DeviceRoute
 
     # Device type name
+    # TODO: database device
     getter deviceType : String
 
     # Device protocol name
