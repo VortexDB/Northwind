@@ -229,6 +229,24 @@ module Collector
     end
   end
 
+  # Base driver task executer
+  abstract class CollectorDriverExecuter(TDevice, TProtocol)
+    def initialize(@deviceInfo : TDevice, @protocol : TProtocol)      
+    end    
+  end  
+
+  # Driver base for time reader
+  abstract class DriverTimeReader(TDevice, TProtocol) < CollectorDriverExecuter(TDevice, TProtocol)
+    # Execute and iterate values in block
+    abstract def execute(&block : Time -> _)
+  end
+
+  # Driver base for current value reader
+  abstract class DriverCurrentValueReader(TDevice, TProtocol) < CollectorDriverExecuter(TDevice, TProtocol)
+    # Execute and iterate values in block
+    abstract def execute(&block : ValueData -> _)
+  end
+
   # Factory to get driver by Device
   abstract class CollectorDriverFactory
     # Known drivers
