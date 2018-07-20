@@ -12,8 +12,7 @@ module Vkt7Driver
     def executeReadAction(action : CollectorActionTask) : Void
       case action.actionInfo.state
       when StateType::DateTime
-        reader = TimeReader.new(deviceInfo, protocol)
-        reader.execute do |time|
+        TimeReader.new(deviceInfo, protocol) do |time|
           notifyTaskEvent(ReadTimeResponseEvent.new(
             action.taskId,
             time
@@ -26,7 +25,11 @@ module Vkt7Driver
 
     # Process current value requests
     def executeCurrentValues(tasks : Array(CollectorDataTask)) : Void
-      tasks.each do |task|
+      case deviceInfo
+      when PipeDeviceInfo
+        tasks.each do |task|
+          
+        end
       end
     end
   end

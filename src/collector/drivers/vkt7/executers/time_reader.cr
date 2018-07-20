@@ -1,7 +1,7 @@
 module Vkt7Driver
   # Read time
   class TimeReader < DriverTimeReader(MeterDeviceInfo, ModbusRtuProtocol)    
-    TIME_ADDRESS = 0x3FFB_u16
+    TIME_ADDRESS = 0x3FFB_u16    
 
     # Send request and read
     def execute(&block : Time -> _) : Void
