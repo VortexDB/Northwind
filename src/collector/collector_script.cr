@@ -67,21 +67,15 @@ module Collector
     getter name : String
 
     # Process device action event
-    private def processActionEvent(task : CollectorActionTask, event : DriverTaskResponseEvent) : Void      
+    private def processActionEvent(device : CollectorDevice, task : CollectorActionTask, event : DriverTaskResponseEvent) : Void      
+      parameter = EntityParameter.new(2_i64)
+      
       case task.actionInfo.state
       when Device::StateType::DateTime
-        pp event
+        time = event.value
+        @database.writeTime(device.dataSource,
+          parameter, nil, time)
       end
-
-      # p typeof(event)
-      # case event
-      # when ReadTimeResponseEvent
-      #   p "GOOD"
-      #   time = event.value
-      #   p time
-      # else
-      #   raise NorthwindException.new("Wrong event data for CollectorActionTask")
-      # end
     end
 
     # Process data event from driver
@@ -124,7 +118,7 @@ module Collector
 
       case task
       when CollectorActionTask
-        processActionEvent(task, event)
+        processActionEvent(taskInfo.device, task, event)
       when CollectorDataTask
 
       end
