@@ -14,7 +14,10 @@ module ModbusProtocol::ModbusRtu
     # Address of device
     getter networkAddress : UInt8
 
-    def initialize(@networkAddress)
+    # Length of packet
+    getter knownLength : Int32
+
+    def initialize(@networkAddress, @knownLength = -1)
     end
 
     # Return function ID
@@ -22,10 +25,5 @@ module ModbusProtocol::ModbusRtu
 
     # Return binary data of request
     abstract def getData : Bytes
-
-    # Return answer length or -1 of it's unknown
-    def getAnswerLength : Int32
-      return -1
-    end
   end
 end

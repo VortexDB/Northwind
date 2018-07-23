@@ -3,6 +3,9 @@ module ModbusProtocol::ModbusRtu
     class PresetMultipleRegistersRequest < ModbusRtuRequest
         register(0x10)
 
+        # Response length
+        RESPONSE_LENGTH = 2
+
         # Start address to read
         getter address : UInt16
 
@@ -12,8 +15,8 @@ module ModbusProtocol::ModbusRtu
         # Data to write
         getter data : Bytes
 
-        def initialize(networkAddress, @address, @length, @data)
-            super(networkAddress)
+        def initialize(networkAddress, @address, @length, @data, knownLength = RESPONSE_LENGTH)
+            super(networkAddress, knownLength)
         end
 
         # Return binary data of request
@@ -23,12 +26,6 @@ module ModbusProtocol::ModbusRtu
             res.write_bytes(length)
             res.write(data)
             return res.to_slice
-        end
-
-        # Return answer length or -1 of it's unknown
-        def getAnswerLength : Int32
-            return -1 if length == 0
-            return 1 + (1 + length) * 2
         end
     end
 end

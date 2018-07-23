@@ -19,7 +19,9 @@ module ModbusProtocol::ModbusRtu
         buffer.read_at(2, 1) do |reader|
           lenByte = reader.read_byte
           return lenByte.to_i32 if lenByte          
-        end              
+        end   
+      when PresetMultipleRegistersRequest::FUNCTION_ID
+        return PresetMultipleRegistersRequest::RESPONSE_LENGTH
       end
 
       return -1
@@ -65,7 +67,11 @@ module ModbusProtocol::ModbusRtu
                 functionId = readBuff.read_byte
               end
               if functionId
-                answerLength = getAnswerLength(functionId, buffer)
+                if request.knownLength > 0
+                  answerLength = request.knownLength
+                else
+                  answerLength = getAnswerLength(functionId, buffer)
+                end
               end
               lengthRead = true
             end
@@ -73,7 +79,6 @@ module ModbusProtocol::ModbusRtu
             next if answerLength < 1
             break if fullSize - MIN_PACKET_SIZE >= answerLength
           rescue e : IO::Timeout
-            # Get packet by timeout            
             break
           end
         end
