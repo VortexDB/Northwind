@@ -184,6 +184,14 @@ module Collector
       end
     end
 
+    # Execute before all task execution for device
+    def executeBefore() : Void
+    end
+
+    # Execute after all task execution for device
+    def executeAfter() : Void
+    end
+
     # Process read action. Virtual
     def executeReadAction(action : CollectorActionTask) : Void
     end
@@ -223,9 +231,11 @@ module Collector
         end
       end
 
+      executeBefore
       executeActions(actions) if !actions.empty?
       executeCurrentValues(current) if !current.empty?
       executeArchive(archive) if !current.empty?
+      executeAfter
     end
   end
 
