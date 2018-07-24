@@ -1,5 +1,5 @@
 module Vkt7Driver
-  # Element type there stored
+  # Element measure type
   enum Vkt7MeasureElementType
     # Measure type for temperature
     TTypeM = 44,
@@ -26,7 +26,11 @@ module Vkt7Driver
     # Measure type for time on normal working
     QntTypeHIM = 55,
     # Measure type for time of calculation absent
-    QntTypeM = 56,
+    QntTypeM = 56
+  end
+
+  # Element fraction type
+  enum Vkt7FractionElementType
     # Faction for temperature of heat system 1
     TTypeFractDiNum = 57,
     # Faction for volume flow of heat system 1
@@ -66,7 +70,7 @@ module Vkt7Driver
     # Faction for mass taken from system of heat system 2
     MgTypeFractDigNum2 = 75,
     # Faction for heat energy of heat system 2
-    QoTypeFractDigNum2 = 76,
+    QoTypeFractDigNum2 = 76
   end
 
   # Data element type
@@ -172,8 +176,6 @@ module Vkt7Driver
     # Additional input
     DopInpImpP_Type = 81,
     # Pressure pipe 3
-    P3P_Type = 82,
-    # Unknown
-    None
+    P3P_Type = 82
   end
 end

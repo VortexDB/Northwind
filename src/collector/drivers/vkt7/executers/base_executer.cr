@@ -6,12 +6,7 @@ module Vkt7Driver
   # Common executer with start session
   abstract class CommonExecuter(TResponseType) < BaseExecuter(TResponseType)
     # Version of VKT-7
-    @serverVersion : UInt8?
-
-    # Server verions sure
-    def serverVersion! : UInt8
-      @serverVersion.not_nil!
-    end
+    @serverVersion : UInt8 = 0    
 
     # To implement
     abstract def postExecute(&block : TResponseType -> _) : Void

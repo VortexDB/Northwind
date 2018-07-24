@@ -10,7 +10,7 @@ module Vkt7Driver
     end
 
     # Execute and iterate values in block
-    def postExecute(&block : Float64 -> _)    
+    def postExecute(&block : Float64 -> _) : Void  
       #infoReader = ItemInfoReader.new(@requestParameters)
       #itemsInfo = infoReader.execute
       
