@@ -5,14 +5,23 @@ module Vkt7Driver
 
   # Common executer with start session
   abstract class CommonExecuter(TResponseType) < BaseExecuter(TResponseType)
+    # Version of VKT-7
+    @serverVersion : UInt8?
+
+    # Server verions sure
+    def serverVersion! : UInt8
+      @serverVersion.not_nil!
+    end
+
     # To implement
-    abstract def postExecute(&block : TResponseType -> _) : Void    
+    abstract def postExecute(&block : TResponseType -> _) : Void
 
     # Start session and execute other
     def execute(&block : TResponseType -> _) : Void
-        StartSessionExecuter.new(@deviceInfo, @protocol) do
-            postExecute(&block)
-        end        
+      StartSessionExecuter.new(@deviceInfo, @protocol) do |version|
+        @serverVersion = version
+        postExecute(&block)
+      end
     end
   end
 end
