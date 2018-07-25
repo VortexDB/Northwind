@@ -21,6 +21,9 @@ module Device
     # Absolute pressure
     ABSOLUTE_PRESSURE = MeasureType.new("AbsolutePressure", BaseMeasureType::Pressure)
 
+    # Temperature
+    TEMPERATURE = MeasureType.new("Temperature", BaseMeasureType::Temperature)
+
     # Name of parameter
     getter name : String
 
@@ -28,6 +31,14 @@ module Device
     getter baseMeasure : BaseMeasureType
 
     def initialize(@name, @baseMeasure)
+    end
+
+    def hash
+      name.hash
+    end
+
+    def ==(other : MeasureType)
+      name == other.name && baseMeasure == other.baseMeasure
     end
   end
 end

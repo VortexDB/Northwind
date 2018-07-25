@@ -13,9 +13,10 @@ module Vkt7Driver
 
     # Execute and iterate values in block
     def postExecute(&block : Float64 -> _) : Void
-      #infoReader = ItemInfoReader.new(@requestParameters)
-      #itemsInfo = infoReader.execute
-      
+      parameterInfos = @requestParameters.map { |x| Vkt7Model.getParameterInfoByRequestParameter(x) }      
+      ItemInfoReader.new(parameterInfos) do |infoData|
+
+      end            
     end
   end
 end

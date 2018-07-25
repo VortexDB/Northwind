@@ -11,7 +11,7 @@ module Vkt7Driver
         getter digitsType : Vkt7FractionElementType
 
         # Value type for request
-        getter valueType : Vkt7DataElementType
+        getter valueType : Vkt7DataElementType        
 
         def initialize(@requestParameter, @measureType, @digitsType, @valueType)            
         end

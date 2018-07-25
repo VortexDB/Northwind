@@ -9,5 +9,13 @@ module Vkt7Driver
 
         def initialize(@pipeNumber, @groupNumber)
         end
+
+        def hash
+            "#{pipeNumber}_#{groupNumber}".hash
+        end
+
+        def ==(other : RequestParameter)
+            hash == other.hash
+        end
     end
 end
