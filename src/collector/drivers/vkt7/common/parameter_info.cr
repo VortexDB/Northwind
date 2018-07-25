@@ -13,8 +13,29 @@ module Vkt7Driver
         # Value type for request
         getter valueType : Vkt7DataElementType
 
-        def initialize(@requestParameter, @measureType, @digitsType, @valueType)
-            
+        def initialize(@requestParameter, @measureType, @digitsType, @valueType)            
+        end
+    end
+
+    # Parameter info with data from device
+    class ParameterInfoWithData < ParameterInfo
+        # Loaded digit data from device
+        getter digits : Int32
+
+        # Loaded element size data
+        getter elementSize : Int32
+
+        # Scaler for data
+        getter scaler : Int32
+        
+        def initialize(requestParameter, 
+            measureType, 
+            digitsType, 
+            valueType,
+            @digits,
+            @elementSize,
+            @scaler)
+            super(requestParameter, measureType, digitsType, valueType)
         end
     end
 end

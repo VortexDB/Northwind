@@ -1,3 +1,5 @@
+require "./common/base_executer"
+
 module Vkt7Driver
   # Read time
   class ValueReader < CommonExecuter(Float64)
@@ -10,7 +12,7 @@ module Vkt7Driver
     end
 
     # Execute and iterate values in block
-    def postExecute(&block : Float64 -> _) : Void  
+    def postExecute(&block : Float64 -> _) : Void
       #infoReader = ItemInfoReader.new(@requestParameters)
       #itemsInfo = infoReader.execute
       
