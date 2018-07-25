@@ -64,7 +64,7 @@ module Collector
       end
 
       currentParameter = MeasureParameter.new(
-        MeasureType::ABSOLUTE_PRESSURE,
+        MeasureType::TEMPERATURE,
         Discret.new(DiscretType::None, -1)
       )
 
@@ -75,7 +75,7 @@ module Collector
 
       settingAction = DeviceAction.new(StateType::DateTime, StateAction::Read)
 
-      # script.addParameter(archiveParameter)
+      script.addParameter(currentParameter)
       script.addAction(settingAction)
       @scripts.push(script)
     end
