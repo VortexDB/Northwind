@@ -9,5 +9,7 @@ module Vkt7Driver
         ReadDataAddress = 0x3FFE_u16
         # Write data type
         WriteDataType = 0x3FFD_u16
+        # Write element types
+        WriteElementTypes = 0x3FFF_u16
     end
 end

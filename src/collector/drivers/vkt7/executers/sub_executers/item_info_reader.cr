@@ -1,6 +1,11 @@
 module Vkt7Driver
     # Read Vkt7 item info
     class ItemInfoReader < BaseExecuter(ParameterInfoWithData)
+        # Size of digits element
+        DIGITS_SIZE = 1_u16
+        # Size of measure type element
+        MEASURE_TYPE_SIZE = 7_u16
+
         # Parameters to get data
         @requests = Set(ParameterInfo).new
 
@@ -16,9 +21,19 @@ module Vkt7Driver
             response = @protocol.sendRequestWithResponse(PresetMultipleRegistersRequest.new(
                 network, Vkt7StartAddress::WriteDataType, 0_u16, Bytes[0x02, Vkt7DataType::Property, 0x00]))
             # Select items
-            # response = @protocol.sendRequestWithResponse(PresetMultipleRegistersRequest.new(network, Vkt7StartAddress::WriteDataType, 0_u16))
-            # Read values
-            #response = @protocol.sendRequestWithResponse(ReadHoldingRegistersRequest.new(network, Vkt7StartAddress::TimeAddress, 0_u16))
+            itemSelector = SelectItemsExecuter.new(@deviceInfo, @protocol)
+            @requests.each do |item|
+                element = ElementRequest.new(item.digitsType.to_u8, DIGITS_SIZE)
+                itemSelector.addItemType(element)
+                element = ElementRequest.new(item.measureType.to_u8, MEASURE_TYPE_SIZE)
+                itemSelector.addItemType(element)
+            end
+
+            itemSelector.execute do |_|
+                # Read values
+                response = @protocol.sendRequestWithResponse(ReadHoldingRegistersRequest.new(network, Vkt7StartAddress::ReadDataAddress, 0_u16))
+                pp response
+            end
         end
     end
 end

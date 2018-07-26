@@ -1,8 +1,6 @@
 module Vkt7Driver
   # Base executer
-  abstract class BaseExecuter(TResponseType) < CollectorDriverExecuter(MeterDeviceInfo, ModbusRtuProtocol, TResponseType)    
-    # Execute and return response
-    abstract def execute(&block : TResponseType -> Void) : Void
+  abstract class BaseExecuter(TResponseType) < CollectorDriverExecuter(MeterDeviceInfo, ModbusRtuProtocol, TResponseType)
   end
 
   # Common executer with start session
@@ -11,7 +9,7 @@ module Vkt7Driver
     @serverVersion : UInt8 = 0    
 
     # To implement
-    abstract def postExecute(&block : TResponseType -> _) : Void
+    abstract def postExecute(&block : TResponseType -> Void) : Void
 
     # Start session and execute other
     def execute(&block : TResponseType -> Void) : Void
