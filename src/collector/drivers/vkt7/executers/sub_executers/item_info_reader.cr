@@ -11,8 +11,10 @@ module Vkt7Driver
 
         # Execute and iterate values in block
         def execute(&block : ParameterInfoWithData -> Void) : Void
-            
-            #@protocol.sendRequestWithResponse(ReadHoldingRegistersRequest.new(network, Vkt7StartAddress::TimeAddress, 0_u16))
+            network = @deviceInfo.networkNumber.to_u8
+            # Select item
+            # Select item types
+            #response = @protocol.sendRequestWithResponse(ReadHoldingRegistersRequest.new(network, Vkt7StartAddress::TimeAddress, 0_u16))
         end
     end
 end

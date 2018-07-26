@@ -1,6 +1,6 @@
 module Vkt7Driver
     # Return item type
-    enum Vkt7ItemType
+    enum Vkt7DataType
         HourProfile,
         DayProfile
         MonthProfile,

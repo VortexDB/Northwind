@@ -15,7 +15,7 @@ module Vkt7Driver
     def postExecute(&block : Float64 -> _) : Void
       parameterInfos = @parameters.map { |x| Vkt7Model.getParameterInfo(x, @deviceInfo) }      
       ItemInfoReader.new(parameterInfos) do |infoData|
-
+        
       end            
     end
   end
