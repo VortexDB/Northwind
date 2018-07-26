@@ -1,6 +1,6 @@
 module Vkt7Driver
     # Read Vkt7 item info
-    class ItemInfoReader < BaseExecuter(Bool)
+    class ItemInfoReader < BaseExecuter(ParameterInfoWithData)
         # Parameters to get data
         @requests = Set(ParameterInfo).new
 
