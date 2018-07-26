@@ -12,11 +12,16 @@ module Vkt7Driver
     end
 
     # Execute and iterate values in block
-    def postExecute(&block : Float64 -> _) : Void
-      parameterInfos = @parameters.map { |x| Vkt7Model.getParameterInfo(x, @deviceInfo) }      
-      ItemInfoReader.new(parameterInfos) do |infoData|
-        
-      end            
+    def postExecute(&block : Float64 -> Void) : Void
+      devInfo =  @deviceInfo
+      case devInfo
+      when PipeDeviceInfo
+        parameterInfos = @parameters.map { |x| Vkt7Model.getParameterInfo(x, devInfo) }      
+        ItemInfoReader.new(@deviceInfo, @protocol) do |infoData|
+        end
+      else
+        raise NorthwindException.new("Unsupported device type")
+      end      
     end
   end
 end

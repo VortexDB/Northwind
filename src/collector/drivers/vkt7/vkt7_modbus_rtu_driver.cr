@@ -28,8 +28,12 @@ module Vkt7Driver
       case deviceInfo
       when PipeDeviceInfo
         valueReader = ValueReader.new(deviceInfo, protocol)        
-        tasks.each do |task|
+        tasks.each do |task|          
           valueReader.addParameter(task.parameter)
+        end
+
+        valueReader.execute do |value|
+          
         end
       end
     end

@@ -244,12 +244,12 @@ module Collector
     def initialize(@deviceInfo : TDevice, @protocol : TProtocol)      
     end
 
-    def initialize(@deviceInfo : TDevice, @protocol : TProtocol, &block : TResponseType -> _)
+    def initialize(@deviceInfo : TDevice, @protocol : TProtocol, &block : TResponseType -> Void)
       execute(&block)
     end
 
     # Execute and iterate values in block
-    abstract def execute(&block : TResponseType -> _)
+    abstract def execute(&block : TResponseType -> Void)
   end
 
   # Factory to get driver by Device

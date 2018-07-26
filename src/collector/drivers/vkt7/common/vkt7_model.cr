@@ -4,7 +4,7 @@ module Vkt7Driver
         def self.getTemperatureDigitsType(requestParameter : RequestParameter) : Vkt7FractionElementType?
             return case requestParameter.groupNumber
             when 1 then Vkt7FractionElementType::TTypeFractDiNum
-            when 2 then Vkt7FractionElementType::TTypeFractDiNum2
+            when 2 then Vkt7FractionElementType::TTypeFractDigNum2
             end
         end
 
@@ -29,13 +29,14 @@ module Vkt7Driver
         # Get parameter info by measure parameter and device info
         def self.getParameterInfo(measureParameter : MeasureParameter, device : PipeDeviceInfo) : ParameterInfo
             requestParameter = RequestParameter.new(device.pipeNumber, device.groupNumber)
-
+            
+            res : ParameterInfo?
             case measureParameter.measureType
             when MeasureType::TEMPERATURE
-                return self.getTemperatureInfo(measureParameter, requestParameter)
+                res = self.getTemperatureInfo(measureParameter, requestParameter)
             end
 
-            raise NorthwindException.new("Unsupported parameter")
+            return res || raise NorthwindException.new("Unsupported parameter")
         end
     end
 end
