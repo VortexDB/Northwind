@@ -23,9 +23,9 @@ module Vkt7Driver
             # Select items
             itemSelector = SelectItemsExecuter.new(@deviceInfo, @protocol)
             @requests.each do |item|
-                element = ElementRequest.new(item.digitsType.to_u8, DIGITS_SIZE)
+                element = ElementRequest.new(item.digitsType, DIGITS_SIZE)
                 itemSelector.addItemType(element)
-                element = ElementRequest.new(item.measureType.to_u8, MEASURE_TYPE_SIZE)
+                element = ElementRequest.new(item.measureType, MEASURE_TYPE_SIZE)
                 itemSelector.addItemType(element)
             end
 

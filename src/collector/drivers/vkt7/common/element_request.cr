@@ -1,13 +1,13 @@
 module Vkt7Driver
     # Request for element
     struct ElementRequest
-        # Item id : Vkt7MeasureElementType, Vkt7FractionElementType, Vkt7DataElementType
-        getter itemId : UInt8
+        # Item type : Vkt7MeasureElementType, Vkt7FractionElementType, Vkt7DataElementType
+        getter itemType : Vkt7ElementType
 
         # Size of element
         getter size : UInt16
 
-        def initialize(@itemId, @size)
+        def initialize(@itemType, @size)
         end
     end
 end

@@ -1,4 +1,6 @@
 module Vkt7Driver
+  alias Vkt7ElementType = Vkt7MeasureElementType | Vkt7FractionElementType | Vkt7DataElementType
+
   # Element measure type
   enum Vkt7MeasureElementType
     # Measure type for temperature

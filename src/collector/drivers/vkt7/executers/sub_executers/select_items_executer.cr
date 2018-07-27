@@ -15,7 +15,7 @@ module Vkt7Driver
             binary = IO::Memory.new
             binary.write_bytes((@requests.size * 6).to_u8)
             @requests.each do |request|
-                binary.write_bytes((0x40000000 + request.itemId).to_i32)
+                binary.write_bytes((0x40000000 + request.itemType.to_i32).to_i32)
                 binary.write_bytes(request.size)
             end
 
