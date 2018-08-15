@@ -22,8 +22,8 @@ module ModbusProtocol::ModbusRtu
         # Return binary data of request
         def getData : Bytes
             res = IO::Memory.new
-            res.write_bytes(address)
-            res.write_bytes(length)
+            res.write_bytes(address, IO::ByteFormat::BigEndian)
+            res.write_bytes(length, IO::ByteFormat::BigEndian)
             res.write(data)
             return res.to_slice
         end

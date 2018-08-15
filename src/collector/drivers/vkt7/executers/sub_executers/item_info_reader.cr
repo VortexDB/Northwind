@@ -20,6 +20,7 @@ module Vkt7Driver
             # Select data type
             response = @protocol.sendRequestWithResponse(PresetMultipleRegistersRequest.new(
                 network, Vkt7StartAddress::WriteDataType, 0_u16, Bytes[0x02, Vkt7DataType::Property, 0x00]))
+                
             # Select items
             itemSelector = SelectItemsExecuter.new(@deviceInfo, @protocol)
             @requests.each do |item|

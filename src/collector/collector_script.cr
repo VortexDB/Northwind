@@ -175,7 +175,6 @@ module Collector
           driver.appendTask(CollectorDeviceTasks.new(device, tasks))
         rescue e : Exception
           # TODO: diagnostics
-          puts "collectByDriver"
           puts e.inspect_with_backtrace
         end
       end

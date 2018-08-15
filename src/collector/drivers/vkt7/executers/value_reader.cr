@@ -28,24 +28,24 @@ module Vkt7Driver
           currentInfoItems.push(infoData)
         end
 
-        network = @deviceInfo.networkNumber.to_u8
+        # network = @deviceInfo.networkNumber.to_u8
 
-        # Select data type
-        response = @protocol.sendRequestWithResponse(PresetMultipleRegistersRequest.new(
-          network, Vkt7StartAddress::WriteDataType, 0_u16, Bytes[0x02, Vkt7DataType::CurrentValue, 0x00]))
+        # # Select data type
+        # response = @protocol.sendRequestWithResponse(PresetMultipleRegistersRequest.new(
+        #   network, Vkt7StartAddress::WriteDataType, 0_u16, Bytes[0x02, Vkt7DataType::CurrentValue, 0x00]))
 
-        # TODO current and total
-        itemSelector = SelectItemsExecuter.new(@deviceInfo, @protocol)
-        currentInfoItems.each do |item|
-          element = ElementRequest.new(item.valueType, item.digits.to_u16)
-          itemSelector.addItemType(element)
-        end
+        # # TODO current and total
+        # itemSelector = SelectItemsExecuter.new(@deviceInfo, @protocol)
+        # currentInfoItems.each do |item|
+        #   element = ElementRequest.new(item.valueType, item.digits.to_u16)
+        #   itemSelector.addItemType(element)
+        # end
 
-        itemSelector.execute do |_|
-        end
+        # itemSelector.execute do |_|
+        # end
 
-        response = @protocol.sendRequestWithResponse(ReadHoldingRegistersRequest.new(network, Vkt7StartAddress::ReadDataAddress, 0_u16))
-        pp response
+        # response = @protocol.sendRequestWithResponse(ReadHoldingRegistersRequest.new(network, Vkt7StartAddress::ReadDataAddress, 0_u16))
+        # pp response
       else
         raise NorthwindException.new("Unsupported device type")
       end
