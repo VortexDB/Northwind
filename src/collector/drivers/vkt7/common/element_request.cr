@@ -9,5 +9,13 @@ module Vkt7Driver
 
         def initialize(@itemType, @size)
         end
+
+        def hash
+            itemType.hash
+        end
+
+        def ==(other : ElementRequest)
+            itemType == other.itemType
+        end
     end
 end
