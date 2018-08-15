@@ -33,7 +33,7 @@ module Vkt7Driver
             res : ParameterInfo?
             case measureParameter.measureType
             when MeasureType::TEMPERATURE
-                res = self.getTemperatureInfo(measureParameter, requestParameter)
+                res = self.getTemperatureInfo(measureParameter, requestParameter)                
             end
 
             return res || raise NorthwindException.new("Unsupported parameter")

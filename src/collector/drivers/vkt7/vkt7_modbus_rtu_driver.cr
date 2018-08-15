@@ -27,13 +27,16 @@ module Vkt7Driver
     def executeCurrentValues(tasks : Array(CollectorDataTask)) : Void
       case deviceInfo
       when PipeDeviceInfo
-        valueReader = ValueReader.new(deviceInfo, protocol)        
+        valueReader = ValueReader.new(deviceInfo, protocol)
         tasks.each do |task|          
           valueReader.addParameter(task.parameter)
         end
 
         valueReader.execute do |value|
-          
+          # notifyTaskEvent(TaskDataResponseEvent.new(
+          #   action.taskId,
+          #   value
+          # ))
         end
       end
     end

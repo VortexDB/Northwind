@@ -71,7 +71,7 @@ module Collector
   end
 
   # Event on task with some values from device
-  class DriverTaskDataResponseEvent < CollectorDriverEvent
+  class TaskDataResponseEvent < CollectorDriverEvent
     include TaskResponseValue(DataTaskValue)    
     
     def initialize(taskId, @value)
@@ -163,8 +163,8 @@ module Collector
       when MeterDataSource
         return MeterDeviceInfo.new
       when PipeDataSource
-        # TODO: pipe number
-        return PipeDeviceInfo.new(1)
+        # TODO: pipe number, group number
+        return PipeDeviceInfo.new(1, 1)
       else
         raise NorthwindException.new("Unknown data source")
       end
@@ -219,10 +219,10 @@ module Collector
       current = Array(CollectorDataTask).new
       archive = Array(CollectorDataTask).new
 
-      deviceTasks.tasks.each do |task|
+      deviceTasks.tasks.each do |task|        
         case task
         when CollectorDataTask
-          if task.parameter.discret == DiscretType::None
+          if task.parameter.discret.discretType == DiscretType::None
             current << task
           else
             archive << task
@@ -230,7 +230,7 @@ module Collector
         else
         end
       end
-
+      
       executeBefore
       executeActions(actions) if !actions.empty?
       executeCurrentValues(current) if !current.empty?
