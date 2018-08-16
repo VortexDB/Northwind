@@ -6,8 +6,15 @@ module Vkt7Driver
     # Size of measure type element
     MEASURE_TYPE_SIZE = 7_u16
 
+    # Meter version
+    @version : UInt8
+
     # Parameters to get data
     @requests = Set(ParameterInfo).new
+
+    def initialize(deviceInfo : MeterDeviceInfo, protocol : ModbusRtuProtocol, @version : UInt8)
+      super(deviceInfo, protocol)
+    end
 
     # Add item to read info
     def addItemType(parameter : ParameterInfo) : Void
@@ -26,31 +33,22 @@ module Vkt7Driver
         element = ElementRequest.new(item.measureType, MEASURE_TYPE_SIZE)
         elementRequests.push(element)
       end
-
-      # Select data type
-      response = @protocol.sendRequestWithResponse(PresetMultipleRegistersRequest.new(
-        network, Vkt7StartAddress::WriteDataType, 0_u16, Bytes[0x02, Vkt7DataType::Property, 0x00]))
-
+      
       # Select items
-      itemSelector = SelectItemsExecuter.new(@deviceInfo, @protocol)
+      itemSelector = SelectItemsExecuter.new(@deviceInfo, @protocol, Vkt7DataType::Property)
       elementRequests.each do |x|
         itemSelector.addItemType(x)
       end
       itemSelector.execute
 
-      dataReader = ItemValueReader.new(@deviceInfo, @protocol)
+      dataReader = ItemValueReader.new(@deviceInfo, @protocol, @version)
       elementRequests.each do |item|
         dataReader.addItemType(item)
       end
 
       dataReader.execute do |value|
-
+        
       end
-
-      # # Read values
-      # response = @protocol.sendRequestWithResponse(ReadHoldingRegistersRequest.new(network, Vkt7StartAddress::ReadDataAddress, 0_u16))
-      # binary = IO::Memory.new
-
     end
   end
 end

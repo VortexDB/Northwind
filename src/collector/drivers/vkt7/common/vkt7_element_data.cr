@@ -15,7 +15,7 @@ module Vkt7Driver
     getter element : Vkt7ElementType
 
     # Size of element data
-    getter size : Int32
+    getter size : UInt16
 
     # Data of element
     getter data : (Float64 | String)
