@@ -23,10 +23,10 @@ module Vkt7Driver
         getter digits : Int32
 
         # Loaded element size data
-        getter elementSize : Int32
+        getter elementSize : UInt16
 
         # Scaler for data
-        getter scaler : Int32
+        getter scaler : Float64
         
         def initialize(requestParameter, 
             measureType, 

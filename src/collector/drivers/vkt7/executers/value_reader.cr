@@ -25,6 +25,7 @@ module Vkt7Driver
         # TODO switch current and total
         currentInfoItems = Array(ParameterInfoWithData).new
         infoReader.execute do |infoData|
+          pp infoData
           currentInfoItems.push(infoData)
         end
 

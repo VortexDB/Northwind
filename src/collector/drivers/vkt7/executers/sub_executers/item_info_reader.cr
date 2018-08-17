@@ -12,6 +12,17 @@ module Vkt7Driver
     # Parameters to get data
     @requests = Set(ParameterInfo).new
 
+    # Get scaler for measure
+    private def getScaler(measure : String) : Float64
+      p measure
+      case measure
+      when ""
+
+      end
+
+      return 1_f64
+    end
+
     def initialize(deviceInfo : MeterDeviceInfo, protocol : ModbusRtuProtocol, @version : UInt8)
       super(deviceInfo, protocol)
     end
@@ -33,7 +44,7 @@ module Vkt7Driver
         element = ElementRequest.new(item.measureType, MEASURE_TYPE_SIZE)
         elementRequests.push(element)
       end
-      
+
       # Select items
       itemSelector = SelectItemsExecuter.new(@deviceInfo, @protocol, Vkt7DataType::Property)
       elementRequests.each do |x|
@@ -46,8 +57,39 @@ module Vkt7Driver
         dataReader.addItemType(item)
       end
 
+      activeElements = Hash(Vkt7DataElementType, UInt16).new
+      activeReader = ActiveElementReader.new(@deviceInfo, @protocol)
+      activeReader.execute do |element|
+        activeElements[element.elementType] = element.size
+      end      
+
+      state = 0
+      digits = 0
+      scaler = 1_f64
       dataReader.execute do |value|
-        
+        case state
+        when 0  # Digit size state
+          digits = value.data.to_i32
+          state = 1
+        when 1  # Measure type state
+          @requests.each do |param|
+            elementSize = activeElements[param.valueType]?
+            next unless elementSize
+
+            scaler = getScaler(value.data.to_s)
+
+            yield ParameterInfoWithData.new(
+              param.requestParameter,
+              param.measureType,
+              param.digitsType,
+              param.valueType,
+              digits,
+              elementSize,
+              scaler
+            )
+          end
+          state = 0
+        end
       end
     end
   end
