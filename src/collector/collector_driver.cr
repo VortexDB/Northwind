@@ -71,7 +71,7 @@ module Collector
   end
 
   # Event on task with some values from device
-  class TaskDataResponseEvent < CollectorDriverEvent
+  class TaskDataResponseEvent < DriverTaskResponseEvent
     include TaskResponseValue(DataTaskValue)    
     
     def initialize(taskId, @value)

@@ -14,7 +14,6 @@ module Vkt7Driver
 
     # Get scaler for measure
     private def getScaler(measure : String) : Float64
-      p measure
       case measure
       when ""
 
@@ -79,6 +78,7 @@ module Vkt7Driver
             scaler = getScaler(value.data.to_s)
 
             yield ParameterInfoWithData.new(
+              param.measureParameter,
               param.requestParameter,
               param.measureType,
               param.digitsType,

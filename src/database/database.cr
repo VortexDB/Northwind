@@ -19,6 +19,6 @@ module Database
     def writeTime(entity : EntityDataSource, parameter : EntityParameter, date : Time?, value : Time) : Void
       strData = "Entity: #{entity.id} Parameter: #{parameter.id} Date: #{date} Value: #{value}\n"
       @database << strData
-    end
+    end    
   end
 end

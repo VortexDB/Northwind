@@ -23,7 +23,7 @@ module Vkt7Driver
             valueType = self.getTemperatureValueType(requestParameter)
             return nil if digitsType.nil? || valueType.nil?
             measureType = Vkt7MeasureElementType::TTypeM
-            return ParameterInfo.new(requestParameter, measureType, digitsType, valueType)
+            return ParameterInfo.new(measureParameter, requestParameter, measureType, digitsType, valueType)
         end
 
         # Get parameter info by measure parameter and device info

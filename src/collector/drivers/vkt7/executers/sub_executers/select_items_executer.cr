@@ -2,7 +2,7 @@ module Vkt7Driver
   # Select items in Vkt7
   class SelectItemsExecuter < BaseExecuter(Bool)
     # Parameters to get data
-    @requests = Set(ElementRequest).new
+    getter requests = Set(ElementRequest).new
 
     @dataType : Vkt7DataType
 

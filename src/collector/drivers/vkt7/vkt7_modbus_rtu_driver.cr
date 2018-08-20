@@ -28,15 +28,19 @@ module Vkt7Driver
       case deviceInfo
       when PipeDeviceInfo
         valueReader = ValueReader.new(deviceInfo, protocol)
-        tasks.each do |task|          
+        tasks.each do |task|
           valueReader.addParameter(task.parameter)
         end
 
         valueReader.execute do |value|
-          # notifyTaskEvent(TaskDataResponseEvent.new(
-          #   action.taskId,
-          #   value
-          # ))
+          tasks.each do |task|
+            if task.parameter == value.measureParameter                   
+              notifyTaskEvent(TaskDataResponseEvent.new(
+                task.taskId,
+                value.value
+              ))
+            end
+          end
         end
       end
     end

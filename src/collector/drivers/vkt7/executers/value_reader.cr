@@ -1,10 +1,56 @@
 require "./common/base_executer"
 
 module Vkt7Driver
+  struct ValueResponse
+    # Measure parameter of response
+    getter measureParameter : MeasureParameter
+
+    # Value from device
+    getter value : Float64
+
+    def initialize(@measureParameter, @value : Float64)      
+    end
+  end
+
   # Read time
-  class ValueReader < CommonExecuter(Float64)
+  class ValueReader < CommonExecuter(ValueResponse)
     # Requests
     @parameters = Set(MeasureParameter).new
+
+    # Read values from device
+    private def readValues(params : Array(ParameterInfoWithData), currentType : CurrentType, &block : ValueResponse -> Void) : Void
+      dataType = case currentType
+      when CurrentType::Current
+        Vkt7DataType::CurrentValue
+      when
+        Vkt7DataType::TotalValue
+      else
+        raise NorthwindException.new("Wrong current value type")
+      end
+
+      itemSelector = SelectItemsExecuter.new(@deviceInfo, @protocol, dataType.not_nil!)
+      dataReader = ItemValueReader.new(@deviceInfo, @protocol, @serverVersion)
+      
+      params.each do |item|
+        element = ElementRequest.new(item.valueType, item.elementSize)
+        itemSelector.addItemType(element)
+        dataReader.addItemType(element)
+      end          
+
+      itemSelector.execute
+
+      dataReader.execute do |value|                        
+        params.each do |param|
+          if param.valueType == value.element
+            data = value.data
+            case data
+            when Float64
+              yield ValueResponse.new(param.measureParameter, data)
+            end            
+          end
+        end        
+      end
+    end
 
     # Add parameter for reading
     def addParameter(parameter : MeasureParameter) : Void
@@ -12,7 +58,7 @@ module Vkt7Driver
     end
 
     # Execute and iterate values in block
-    def postExecute(&block : Float64 -> Void) : Void
+    def postExecute(&block : ValueResponse -> Void) : Void
       devInfo = @deviceInfo
       case devInfo
       when PipeDeviceInfo
@@ -22,22 +68,26 @@ module Vkt7Driver
           infoReader.addItemType(x)
         end
 
-        # TODO switch current and total
         currentInfoItems = Array(ParameterInfoWithData).new
+        totalInfoItems = Array(ParameterInfoWithData).new
         infoReader.execute do |infoData|
-          pp infoData
-          currentInfoItems.push(infoData)
+          case MeasureParameterHelper.getCurrentType(infoData.measureParameter)
+          when CurrentType::Current
+            currentInfoItems.push(infoData)
+          when CurrentType::Total
+            totalInfoItems.push(infoData)
+          end
         end
 
-        # # TODO current and total
-        # itemSelector = SelectItemsExecuter.new(@deviceInfo, @protocol, Vkt7DataType::CurrentValue)
-        # currentInfoItems.each do |item|
-        #   element = ElementRequest.new(item.valueType, item.digits.to_u16)
-        #   itemSelector.addItemType(element)
-        # end
+        # Read current
+        if !currentInfoItems.empty?
+          readValues(currentInfoItems, CurrentType::Current, &block)
+        end
 
-        # itemSelector.execute do |_|
-        # end
+        # Read total
+        if !totalInfoItems.empty?
+          readValues(totalInfoItems, CurrentType::Total, &block)
+        end
       else
         raise NorthwindException.new("Unsupported device type")
       end

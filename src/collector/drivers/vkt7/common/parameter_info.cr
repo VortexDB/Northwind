@@ -1,6 +1,9 @@
 module Vkt7Driver
     # Info about request parameter
     class ParameterInfo
+        # Collector Measure parameter
+        getter measureParameter : MeasureParameter
+
         # Request parameter
         getter requestParameter : RequestParameter
 
@@ -13,7 +16,11 @@ module Vkt7Driver
         # Value type for request
         getter valueType : Vkt7DataElementType        
 
-        def initialize(@requestParameter, @measureType, @digitsType, @valueType)            
+        def initialize(@measureParameter, 
+            @requestParameter, 
+            @measureType, 
+            @digitsType, 
+            @valueType)
         end
     end
 
@@ -28,14 +35,15 @@ module Vkt7Driver
         # Scaler for data
         getter scaler : Float64
         
-        def initialize(requestParameter, 
+        def initialize(measureParameter,
+            requestParameter, 
             measureType, 
             digitsType, 
             valueType,
             @digits,
             @elementSize,
             @scaler)
-            super(requestParameter, measureType, digitsType, valueType)
+            super(measureParameter, requestParameter, measureType, digitsType, valueType)
         end
     end
 end

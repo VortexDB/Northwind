@@ -73,33 +73,23 @@ module Collector
       case task.actionInfo.state
       when Device::StateType::DateTime
         time = event.value
-        @database.writeTime(device.dataSource,
+        case time
+        when Time
+          @database.writeTime(device.dataSource,
           parameter, nil, time)
+        end              
       end
     end
 
     # Process data event from driver
-    private def processDataEvent(event : TaskDataEvent, allTasks : Hash(Int32, ScriptTaskInfo)) : Void
-      # Get device
-      # Send to someone to write data for parameter
-      taskInfo = allTasks[event.taskId]?
-      return if taskInfo.nil?
-
-      if !taskInfo.task.is_a?(CollectorDataTask)
-        puts "Task must be CollectorDataTask for task ID: #{taskInfo.task.taskId}"
-        return
-      end
-
-      taskData = taskInfo.task.as(CollectorDataTask)
-      return if taskData.nil?
-
+    private def processDataEvent(device : CollectorDevice, task : CollectorDataTask, event : TaskDataResponseEvent) : Void
       # TODO: remove
       parameter = EntityParameter.new(2_i64)
       values = event.value
 
       case values
       when Float64
-        @database.writeValue(taskInfo.device.dataSource,
+        @database.writeValue(device.dataSource,
           parameter, nil, values)
       when Array(TimedDataValue)
         # TODO: profile data
@@ -120,7 +110,10 @@ module Collector
       when CollectorActionTask
         processActionEvent(taskInfo.device, task, event)
       when CollectorDataTask
-
+        case event
+        when TaskDataResponseEvent
+          processDataEvent(taskInfo.device, task, event)
+        end        
       end
     end
 
