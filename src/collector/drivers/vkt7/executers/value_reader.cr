@@ -8,53 +8,44 @@ module Vkt7Driver
     # Value from device
     getter value : Float64
 
-    def initialize(@measureParameter, @value : Float64)      
+    def initialize(@measureParameter, @value : Float64)
     end
   end
 
   # Read time
-  class ValueReader < CommonExecuter(ValueResponse)
-    # Requests
-    @parameters = Set(MeasureParameter).new
-
+  class ValueReader < CommonValueExecuter(ValueResponse)
     # Read values from device
     private def readValues(params : Array(ParameterInfoWithData), currentType : CurrentType, &block : ValueResponse -> Void) : Void
       dataType = case currentType
-      when CurrentType::Current
-        Vkt7DataType::CurrentValue
-      when
-        Vkt7DataType::TotalValue
-      else
-        raise NorthwindException.new("Wrong current value type")
-      end
+                 when CurrentType::Current
+                   Vkt7DataType::CurrentValue
+                 when Vkt7DataType::TotalValue
+                 else
+                   raise NorthwindException.new("Wrong current value type")
+                 end
 
       itemSelector = SelectItemsExecuter.new(@deviceInfo, @protocol, dataType.not_nil!)
       dataReader = ItemValueReader.new(@deviceInfo, @protocol, @serverVersion)
-      
+
       params.each do |item|
         element = ElementRequest.new(item.valueType, item.elementSize)
         itemSelector.addItemType(element)
         dataReader.addItemType(element)
-      end          
+      end
 
       itemSelector.execute
 
-      dataReader.execute do |value|                        
+      dataReader.execute do |value|
         params.each do |param|
           if param.valueType == value.element
             data = value.data
             case data
             when Float64
               yield ValueResponse.new(param.measureParameter, data)
-            end            
+            end
           end
-        end        
+        end
       end
-    end
-
-    # Add parameter for reading
-    def addParameter(parameter : MeasureParameter) : Void
-      @parameters.add(parameter)
     end
 
     # Execute and iterate values in block

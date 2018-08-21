@@ -1,4 +1,4 @@
-module Vkt7Driver  
+module Vkt7Driver
   # Base executer
   abstract class BaseExecuter(TResponseType) < CollectorDriverExecuter(MeterDeviceInfo, ModbusRtuProtocol, TResponseType)
   end
@@ -6,7 +6,7 @@ module Vkt7Driver
   # Common executer with start session
   abstract class CommonExecuter(TResponseType) < BaseExecuter(TResponseType)
     VERSION_ZERO = 0
-    VERSION_ONE = 1
+    VERSION_ONE  = 1
 
     # Version of VKT-7
     @serverVersion : UInt8 = 0
@@ -20,6 +20,17 @@ module Vkt7Driver
         @serverVersion = version
         postExecute(&block)
       end
+    end
+  end
+
+  # Common executer to read values: current or profile
+  abstract class CommonValueExecuter(TResponseType) < CommonExecuter(TResponseType)
+    # Requests
+    @parameters = Set(MeasureParameter).new
+
+    # Add parameter for reading
+    def addParameter(parameter : MeasureParameter) : Void
+      @parameters.add(parameter)
     end
   end
 end
