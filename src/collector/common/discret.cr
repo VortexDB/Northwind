@@ -19,4 +19,14 @@ class Discret
 
     def initialize(@discretType, @discretValue)        
     end
+
+    # Calc hash
+    def hash
+        discretType.hash ^ discretValue
+    end
+
+    # Equal objects
+    def ==(other : Discret)
+        return (discretType == other.discretType) && (discretValue == other.discretValue)
+    end
 end

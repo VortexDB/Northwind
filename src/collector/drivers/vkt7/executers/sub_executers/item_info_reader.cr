@@ -45,7 +45,7 @@ module Vkt7Driver
       end
 
       # Select items
-      itemSelector = SelectItemsExecuter.new(@deviceInfo, @protocol, Vkt7DataType::Property)
+      itemSelector = SelectItemsExecuter.new(@deviceInfo, @protocol, Vkt7SystemDataType::Property)
       elementRequests.each do |x|
         itemSelector.addItemType(x)
       end

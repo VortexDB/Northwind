@@ -34,7 +34,7 @@ module Vkt7Driver
 
         valueReader.execute do |value|
           tasks.each do |task|
-            if task.parameter == value.measureParameter                   
+            if task.parameter == value.measureParameter
               notifyTaskEvent(TaskDataResponseEvent.new(
                 task.taskId,
                 value.value
@@ -42,6 +42,18 @@ module Vkt7Driver
             end
           end
         end
+      end
+    end
+
+    # Process read archive
+    def executeArchive(tasks : Array(CollectorDataTask)) : Void
+      case deviceInfo
+      when PipeDeviceInfo
+        tasks.group_by { |x| MeasureParameterHelper.getProfileType(x.parameter) }.each do |group|
+          
+        end
+
+        # profileReader = ProfileReader.new
       end
     end
   end

@@ -15,16 +15,8 @@ module Vkt7Driver
   # Read time
   class ValueReader < CommonValueExecuter(ValueResponse)
     # Read values from device
-    private def readValues(params : Array(ParameterInfoWithData), currentType : CurrentType, &block : ValueResponse -> Void) : Void
-      dataType = case currentType
-                 when CurrentType::Current
-                   Vkt7DataType::CurrentValue
-                 when Vkt7DataType::TotalValue
-                 else
-                   raise NorthwindException.new("Wrong current value type")
-                 end
-
-      itemSelector = SelectItemsExecuter.new(@deviceInfo, @protocol, dataType.not_nil!)
+    private def readValues(params : Array(ParameterInfoWithData), currentType : Vkt7CurrentDataType, &block : ValueResponse -> Void) : Void
+      itemSelector = SelectItemsExecuter.new(@deviceInfo, @protocol, currentType)
       dataReader = ItemValueReader.new(@deviceInfo, @protocol, @serverVersion)
 
       params.each do |item|
@@ -63,21 +55,21 @@ module Vkt7Driver
         totalInfoItems = Array(ParameterInfoWithData).new
         infoReader.execute do |infoData|
           case MeasureParameterHelper.getCurrentType(infoData.measureParameter)
-          when CurrentType::Current
+          when Vkt7CurrentDataType::CurrentValue
             currentInfoItems.push(infoData)
-          when CurrentType::Total
+          when Vkt7CurrentDataType::TotalValue
             totalInfoItems.push(infoData)
           end
         end
 
         # Read current
         if !currentInfoItems.empty?
-          readValues(currentInfoItems, CurrentType::Current, &block)
+          readValues(currentInfoItems, Vkt7CurrentDataType::CurrentValue, &block)
         end
 
         # Read total
         if !totalInfoItems.empty?
-          readValues(totalInfoItems, CurrentType::Total, &block)
+          readValues(totalInfoItems, Vkt7CurrentDataType::TotalValue, &block)
         end
       else
         raise NorthwindException.new("Unsupported device type")

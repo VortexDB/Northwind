@@ -31,6 +31,6 @@ module Vkt7Driver
     # Add parameter for reading
     def addParameter(parameter : MeasureParameter) : Void
       @parameters.add(parameter)
-    end
+    end    
   end
 end

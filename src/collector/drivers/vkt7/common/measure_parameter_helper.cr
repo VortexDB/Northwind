@@ -1,18 +1,26 @@
 module Vkt7Driver
-  # Type of current data : Current, Total
-  enum CurrentType
-    Current,
-    Total
-  end
-
   # Helper to measure parameter
   class MeasureParameterHelper
     # Get parameter current type
-    def self.getCurrentType(param : MeasureParameter) : CurrentType
+    def self.getCurrentType(param : MeasureParameter) : Vkt7CurrentDataType
       case param.measureType
       when MeasureType::TEMPERATURE
-        return CurrentType::Current
+        return Vkt7CurrentDataType::CurrentValue
       end
+      raise NorthwindException.new("Unsupported parameter")
+    end
+
+    # Get profile type
+    def self.getProfileType(param : MeasureParameter) : Vkt7ProfileDataType
+      case param.discret.discretType
+      when DiscretType::Hour
+        return Vkt7ProfileDataType::HourProfile
+      when DiscretType::Day
+        return Vkt7ProfileDataType::DayProfile
+      when DiscretType::Month
+        Vkt7ProfileDataType::MonthProfile
+      end
+
       raise NorthwindException.new("Unsupported parameter")
     end
   end
