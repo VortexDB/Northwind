@@ -3,8 +3,10 @@ require "./common/base_executer"
 module Vkt7Driver
   # Read profile from device
   class ProfileReader < CommonValueExecuter(Float64)
+    # Profile type
+    getter profileType : Vkt7ProfileDataType
 
-    def initialize(deviceInfo : MeterDeviceInfo, protocol : ModbusRtuProtocol, @profileType : UInt8)
+    def initialize(deviceInfo : MeterDeviceInfo, protocol : ModbusRtuProtocol, @profileType : Vkt7ProfileDataType)
       super(deviceInfo, protocol)
     end
 
@@ -24,7 +26,7 @@ module Vkt7Driver
           itemsInfo.push(infoData)
         end
 
-        itemSelector = SelectItemsExecuter.new(@deviceInfo, @protocol, dataType.not_nil!)
+        itemSelector = SelectItemsExecuter.new(@deviceInfo, @protocol, @profileType)
         itemSelector.execute
       end
     end

@@ -49,11 +49,12 @@ module Vkt7Driver
     def executeArchive(tasks : Array(CollectorDataTask)) : Void
       case deviceInfo
       when PipeDeviceInfo
-        tasks.group_by { |x| MeasureParameterHelper.getProfileType(x.parameter) }.each do |group|
-          
-        end
-
-        # profileReader = ProfileReader.new
+        tasks.group_by { |x| MeasureParameterHelper.getProfileType(x.parameter) }.each do |profileType, tasks|
+          profileReader = ProfileReader.new(deviceInfo, protocol, profileType)
+          profileReader.execute do |value|
+            
+          end
+        end        
       end
     end
   end
