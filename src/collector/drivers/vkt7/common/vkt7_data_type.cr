@@ -20,4 +20,21 @@ module Vkt7Driver
   enum Vkt7SystemDataType
     Property     = 6
   end
+
+  # Helper for profile data type
+  class ProfileDataTypeHelper
+    # Get period for profile data type
+    def self.incDate(dateTime : Time, profileType : Vkt7ProfileDataType) : Time
+      case profileType
+      when Vkt7ProfileDataType::HourProfile 
+        return dateTime + 1.hours
+      when Vkt7ProfileDataType::DayProfile
+        return dateTime + 1.days
+      when Vkt7ProfileDataType::MonthProfile, Vkt7ProfileDataType::TotalProfile
+        return dateTime + 1.months
+      end
+
+      raise NorthwindException.new("Unknown profile type")
+    end
+  end
 end

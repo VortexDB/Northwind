@@ -50,9 +50,15 @@ module Vkt7Driver
       case deviceInfo
       when PipeDeviceInfo
         tasks.group_by { |x| MeasureParameterHelper.getProfileType(x.parameter) }.each do |profileType, tasks|
-          profileReader = ProfileReader.new(deviceInfo, protocol, profileType)
+          # Get request min and max date
+          startDate = (tasks.min_by? { |x| x.interval.startDate }).try &.interval.startDate
+          endDate = (tasks.max_by? { |x| x.interval.endDate }).try &.interval.endDate
+          # TODO: done task
+          next if (startDate.nil?) || (endDate.nil?)
+
+          profileReader = ProfileReader.new(deviceInfo, protocol, startDate, endDate, profileType)
           profileReader.execute do |value|
-            
+
           end
         end        
       end
