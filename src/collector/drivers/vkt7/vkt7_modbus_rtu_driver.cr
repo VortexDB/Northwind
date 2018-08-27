@@ -57,10 +57,17 @@ module Vkt7Driver
           next if (startDate.nil?) || (endDate.nil?)
 
           profileReader = ProfileReader.new(deviceInfo, protocol, startDate, endDate, profileType)
-          profileReader.execute do |value|
-            
+          profileReader.execute do |responseValue|
+            tasks.each do |task|
+              if task.parameter == responseValue.measureParameter
+                notifyTaskEvent(TaskDataResponseEvent.new(
+                  task.taskId,
+                  TimedDataValue.new(responseValue.value, responseValue.dateTime)
+                ))
+              end
+            end
           end
-        end        
+        end
       end
     end
   end

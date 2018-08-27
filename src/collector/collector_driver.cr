@@ -53,7 +53,7 @@ module Collector
     # Value
     getter value : DataValue
 
-    def initialize(@dateTime, @value)
+    def initialize(@value, @dateTime)
     end
   end
 

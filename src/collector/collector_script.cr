@@ -85,14 +85,19 @@ module Collector
     private def processDataEvent(device : CollectorDevice, task : CollectorDataTask, event : TaskDataResponseEvent) : Void
       # TODO: remove
       parameter = EntityParameter.new(2_i64)
-      values = event.value
+      data = event.value
 
-      case values
+      case data
       when Float64
         @database.writeValue(device.dataSource,
-          parameter, nil, values)
-      when Array(TimedDataValue)
-        # TODO: profile data
+          parameter, nil, data)
+      when TimedDataValue
+        value = data.value
+        case value
+        when Float64
+          @database.writeValue(device.dataSource,
+          parameter, data.dateTime, value)
+        end        
       else
       end
     end
