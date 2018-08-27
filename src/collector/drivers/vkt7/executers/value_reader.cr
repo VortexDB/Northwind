@@ -8,7 +8,7 @@ module Vkt7Driver
     # Value from device
     getter value : Float64
 
-    def initialize(@measureParameter, @value : Float64)
+    def initialize(@measureParameter, @value)
     end
   end
 

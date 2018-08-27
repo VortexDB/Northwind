@@ -1,8 +1,22 @@
 require "./common/base_executer"
 
 module Vkt7Driver
+  struct ProfileValueResponse
+    # Measure parameter of response
+    getter measureParameter : MeasureParameter
+
+    # Value from device
+    getter value : Float64
+
+    # Value time
+    getter dateTime : Time
+
+    def initialize(@measureParameter, @value, @dateTime)
+    end
+  end
+
   # Read profile from device
-  class ProfileReader < CommonValueExecuter(Float64)
+  class ProfileReader < CommonValueExecuter(ProfileValueResponse)
     # Profile type
     getter profileType : Vkt7ProfileDataType
 
@@ -11,9 +25,9 @@ module Vkt7Driver
 
     # End datetime
     getter endDate : Time
-    
+
     # Read values from device
-    private def readValues(params : Array(ParameterInfoWithData), requestDate : Time, &block : Float64 -> Void) : Void
+    private def readValues(params : Array(ParameterInfoWithData), requestDate : Time, &block : ProfileValueResponse -> Void) : Void
       network = @deviceInfo.networkNumber.to_u8
 
       # Write date to read
@@ -25,6 +39,25 @@ module Vkt7Driver
       binary.write_bytes(requestDate.hour.to_u8)          # Hour
       response = @protocol.sendRequestWithResponse(PresetMultipleRegistersRequest.new(
         network, Vkt7StartAddress::WriteElementTypes, 0_u16, binary.to_slice))
+
+      # Read values
+      dataReader = ItemValueReader.new(@deviceInfo, @protocol, @serverVersion)
+      params.each do |item|
+        element = ElementRequest.new(item.valueType, item.elementSize)
+        dataReader.addItemType(element)
+      end
+
+      dataReader.execute do |value|
+        params.each do |param|
+          if param.valueType == value.element
+            data = value.data
+            case data
+            when Float64
+              yield ProfileValueResponse.new(param.measureParameter, data, requestDate)
+            end
+          end
+        end
+      end
     end
 
     def initialize(deviceInfo : MeterDeviceInfo,
@@ -36,7 +69,7 @@ module Vkt7Driver
     end
 
     # Execute and iterate values in block
-    def postExecute(&block : Float64 -> Void) : Void      
+    def postExecute(&block : ProfileValueResponse -> Void) : Void
       devInfo = @deviceInfo
       case devInfo
       when PipeDeviceInfo

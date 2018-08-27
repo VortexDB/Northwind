@@ -58,7 +58,7 @@ module Vkt7Driver
 
           profileReader = ProfileReader.new(deviceInfo, protocol, startDate, endDate, profileType)
           profileReader.execute do |value|
-
+            
           end
         end        
       end
