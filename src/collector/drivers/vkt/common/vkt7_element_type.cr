@@ -1,4 +1,4 @@
-module Vkt7Driver
+module VktDriver
   alias Vkt7ElementType = Vkt7MeasureElementType | Vkt7FractionElementType | Vkt7DataElementType
 
   # Element measure type

@@ -1,4 +1,4 @@
-module Vkt7Driver
+module VktDriver
     # Modbus start address for Vkt7
     class Vkt7StartAddress
         # Address for start session

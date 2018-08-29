@@ -1,4 +1,4 @@
-module Vkt7Driver
+module VktDriver
     module Vkt7Model
         # Return temperature digits type
         def self.getTemperatureDigitsType(requestParameter : RequestParameter) : Vkt7FractionElementType?

@@ -1,6 +1,6 @@
 require "./common/base_executer"
 
-module Vkt7Driver
+module VktDriver
   # Read time
   class TimeReader < CommonExecuter(Time)
     # Send request and read

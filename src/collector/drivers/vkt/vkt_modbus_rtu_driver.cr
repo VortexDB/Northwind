@@ -1,12 +1,13 @@
-module Vkt7Driver
+module VktDriver
   include Collector
   include ModbusProtocol::ModbusRtu
 
-  # Driver for VKT-7 heat meter
+  # Driver for VKT-7 and VKG-3
   class Vkt7ModbusRtuDriver < CollectorMeterDriver
     include CollectorDriverProtocol(ModbusRtuProtocol)
 
     registerDevice("Vkt7")
+    registerDevice("Vkg3")
 
     # Process read action. Virtual
     def executeReadAction(action : CollectorActionTask) : Void

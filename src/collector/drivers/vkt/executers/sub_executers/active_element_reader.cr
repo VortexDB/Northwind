@@ -1,4 +1,4 @@
-module Vkt7Driver
+module VktDriver
   struct ActiveElementInfo
     # Element type
     getter elementType : Vkt7DataElementType

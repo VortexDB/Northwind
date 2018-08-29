@@ -1,4 +1,4 @@
-module Vkt7Driver
+module VktDriver
   # Data quality
   enum Vkt7DataQuality
     OPC_QUALITY_GOOD           = 0xC0,

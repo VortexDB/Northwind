@@ -1,6 +1,6 @@
 require "./common/base_executer"
 
-module Vkt7Driver
+module VktDriver
   struct ProfileValueResponse
     # Measure parameter of response
     getter measureParameter : MeasureParameter

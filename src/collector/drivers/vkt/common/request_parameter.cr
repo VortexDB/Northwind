@@ -1,4 +1,4 @@
-module Vkt7Driver
+module VktDriver
     # Request parameter for Vkt7 driver
     struct RequestParameter
         # Number of device pipe

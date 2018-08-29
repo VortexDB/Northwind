@@ -1,4 +1,4 @@
-module Vkt7Driver
+module VktDriver
     # Request for element
     struct ElementRequest
         # Item type : Vkt7MeasureElementType, Vkt7FractionElementType, Vkt7DataElementType

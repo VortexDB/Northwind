@@ -1,4 +1,4 @@
-module Vkt7Driver
+module VktDriver
   # Select items in Vkt7
   class SelectItemsExecuter < BaseExecuter(Bool)
     # Parameters to get data

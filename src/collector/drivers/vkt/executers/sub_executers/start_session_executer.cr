@@ -1,4 +1,4 @@
-module Vkt7Driver
+module VktDriver
   # Start session and return version of device
   class StartSessionExecuter < BaseExecuter(UInt8)
     # Position of version byte

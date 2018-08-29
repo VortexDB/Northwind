@@ -1,4 +1,4 @@
-module Vkt7Driver
+module VktDriver
   # Helper to measure parameter
   class MeasureParameterHelper
     # Get parameter current type

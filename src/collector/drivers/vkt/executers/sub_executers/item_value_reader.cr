@@ -1,4 +1,4 @@
-module Vkt7Driver
+module VktDriver
     # Read Vkt7 item value
     class ItemValueReader < BaseExecuter(Vkt7ElementData)
         # All elements

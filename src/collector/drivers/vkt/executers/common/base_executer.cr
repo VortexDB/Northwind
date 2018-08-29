@@ -1,4 +1,4 @@
-module Vkt7Driver
+module VktDriver
   # Base executer
   abstract class BaseExecuter(TResponseType) < CollectorDriverExecuter(MeterDeviceInfo, ModbusRtuProtocol, TResponseType)
   end

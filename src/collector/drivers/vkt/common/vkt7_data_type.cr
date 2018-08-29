@@ -1,4 +1,4 @@
-module Vkt7Driver
+module VktDriver
   # Sum of data types
   alias Vkt7DataType = Vkt7CurrentDataType | Vkt7ProfileDataType | Vkt7SystemDataType
 

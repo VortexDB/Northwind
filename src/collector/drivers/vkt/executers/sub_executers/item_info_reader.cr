@@ -1,4 +1,4 @@
-module Vkt7Driver
+module VktDriver
   # Read Vkt7 item info
   class ItemInfoReader < BaseExecuter(ParameterInfoWithData)
     # Size of digits element

@@ -1,4 +1,4 @@
-module Vkt7Driver
+module VktDriver
     # Info about request parameter
     class ParameterInfo
         # Collector Measure parameter
