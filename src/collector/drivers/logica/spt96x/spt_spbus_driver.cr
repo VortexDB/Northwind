@@ -1,4 +1,4 @@
-require "../../protocols/**"
+require "../../../protocols/**"
 
 module Spt96xDriver
   include Collector

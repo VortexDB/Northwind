@@ -3,7 +3,7 @@ module VktDriver
   include ModbusProtocol::ModbusRtu
 
   # Driver for VKT-7 and VKG-3
-  class Vkt7ModbusRtuDriver < CollectorMeterDriver
+  class VktModbusRtuDriver < CollectorMeterDriver
     include CollectorDriverProtocol(ModbusRtuProtocol)
 
     registerDevice("Vkt7")
