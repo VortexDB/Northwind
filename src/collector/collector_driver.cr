@@ -35,6 +35,18 @@ module Collector
     end
   end
 
+  # Abstract meter device model with all device information needed for driver
+  abstract class BaseDeviceModel
+    # Device information
+    getter deviceInfo : DeviceInfo
+
+    # Protocol information
+    getter protocol : Protocol
+
+    def initialize(@deviceInfo, @protocol)      
+    end
+  end
+
   # Base event
   abstract class CollectorDriverEvent
   end
@@ -141,20 +153,9 @@ module Collector
   end  
 
   # Base driver for meter
-  abstract class CollectorMeterDriver < CollectorDriver
-    # Current collector device
-    @currentDevice : CollectorDevice?
-
-    # Current device info
-    @deviceInfo : DeviceInfo?
-
-    # Sure current DeviceInfo
-    def deviceInfo
-      if @deviceInfo.nil?
-        @deviceInfo = getDeviceInfo(@currentDevice.not_nil!)
-      end
-      @deviceInfo.not_nil!
-    end
+  abstract class CollectorMeterDriver < CollectorDriver    
+    # Device model
+    @baseDeviceModel : BaseDeviceModel?
 
     # Get device info from device    
     protected def getDeviceInfo(device : CollectorDevice) : DeviceInfo
@@ -210,7 +211,7 @@ module Collector
 
     # Execute device task
     def appendTask(deviceTasks : CollectorDeviceTasks) : Void
-      @currentDevice = deviceTasks.device
+      @baseDeviceModel = getDeviceModel(deviceTasks.device)
 
       actions = deviceTasks.tasks.compact_map do |x|
         x if x.is_a?(CollectorActionTask)
