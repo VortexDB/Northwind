@@ -8,13 +8,13 @@ module VktDriver
         getter requestParameter : RequestParameter
 
         # Measure type
-        getter measureType : Vkt7MeasureElementType
+        getter measureType : Int32
 
         # Fraction type
-        getter digitsType : Vkt7FractionElementType
+        getter digitsType : Int32
 
         # Value type for request
-        getter valueType : Vkt7DataElementType        
+        getter valueType : Int32        
 
         def initialize(@measureParameter, 
             @requestParameter, 

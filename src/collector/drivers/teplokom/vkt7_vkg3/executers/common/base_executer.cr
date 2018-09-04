@@ -11,6 +11,13 @@ module VktDriver
     # Version of VKT-7
     @serverVersion : UInt8 = 0
 
+    # Vkt meter model
+    getter meterModel : VktModel
+
+    def initialize(deviceInfo : MeterDeviceInfo, protocol : ModbusRtuProtocol, @meterModel : VktModel)      
+      super(deviceInfo, protocol)
+    end
+
     # To implement
     abstract def postExecute(&block : TResponseType -> Void) : Void
 

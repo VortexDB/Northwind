@@ -28,7 +28,7 @@ module VktDriver
     def executeCurrentValues(tasks : Array(CollectorDataTask)) : Void
       case deviceInfo
       when PipeDeviceInfo
-        valueReader = ValueReader.new(deviceInfo, protocol)
+        valueReader = ValueReader.new(deviceInfo, protocol, meterModel)
         tasks.each do |task|
           valueReader.addParameter(task.parameter)
         end

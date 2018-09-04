@@ -2,7 +2,7 @@ module VktDriver
     # Request for element
     struct ElementRequest
         # Item type : Vkt7MeasureElementType, Vkt7FractionElementType, Vkt7DataElementType
-        getter itemType : Vkt7ElementType
+        getter itemType : Int32
 
         # Size of element
         getter size : UInt16
