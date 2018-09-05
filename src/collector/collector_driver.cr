@@ -35,15 +35,31 @@ module Collector
     end
   end
 
-  # Abstract meter device model with all device information needed for driver
-  abstract class BaseDeviceModel
+  # Abstract execution context for transfering it between driver and executers
+  abstract class BaseExecutionContext
     # Device information
-    getter deviceInfo : DeviceInfo
+    getter baseDeviceInfo : TDeviceInfo
 
     # Protocol information
-    getter protocol : Protocol
+    getter baseProtocol : TProtocol
 
-    def initialize(@deviceInfo, @protocol)      
+    def initialize(@deviceInfo, @protocol)
+    end
+  end
+
+  abstract class ExecutionContext(TDeviceInfo, TProtocol) < BaseExecutionContext
+    # Device information
+    def deviceInfo : TDeviceInfo
+      baseDeviceInfo.as(TDeviceInfo)
+    end
+
+    # Protocol information
+    def protocol : TProtocol
+      baseProtocol.as(TDeviceInfo)
+    end
+
+    def initialize(deviceInfo, protocol)
+      super(deviceInfo, protocol)
     end
   end
 
@@ -110,8 +126,19 @@ module Collector
       class_getter protocol = TProtocolType.new
       def protocol : TProtocolType
         @@protocol
+      end     
+      
+      # Override base protocol
+      def baseProtocol : Protocol
+        @@protocol
       end
     end
+  end
+
+  # Driver executer context mixin
+  module CollectorDriverExecuterContext(TExecuterContext)
+    # Return executer context
+    abstract def executerContext : TExecuterContext    
   end
 
   # Base collector drver
@@ -154,22 +181,11 @@ module Collector
 
   # Base driver for meter
   abstract class CollectorMeterDriver < CollectorDriver    
-    # Device model
-    @baseDeviceModel : BaseDeviceModel?
+    # Collector device
+    getter device : CollectorDevice?
 
-    # Get device info from device    
-    protected def getDeviceInfo(device : CollectorDevice) : DeviceInfo
-      case device.dataSource
-      # TODO: common meter
-      when MeterDataSource
-        return MeterDeviceInfo.new
-      when PipeDataSource
-        # TODO: pipe number, group number
-        return PipeDeviceInfo.new(1, 1)
-      else
-        raise NorthwindException.new("Unknown data source")
-      end
-    end
+    # Protocol for working with device
+    abstract def baseProtocol : Protocol
 
     # Execute actions
     private def executeActions(tasks : Array(CollectorActionTask)) : Void
@@ -183,7 +199,7 @@ module Collector
           raise NorthwindException.new("Unknown action")
         end
       end
-    end
+    end    
 
     # Execute before all task execution for device
     def executeBefore() : Void
@@ -211,7 +227,7 @@ module Collector
 
     # Execute device task
     def appendTask(deviceTasks : CollectorDeviceTasks) : Void
-      @baseDeviceModel = getDeviceModel(deviceTasks.device)
+      @device = deviceTasks.device
 
       actions = deviceTasks.tasks.compact_map do |x|
         x if x.is_a?(CollectorActionTask)

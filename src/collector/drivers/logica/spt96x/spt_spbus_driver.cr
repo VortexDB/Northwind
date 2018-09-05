@@ -11,9 +11,6 @@ module Spt96xDriver
     registerDevice("Spt96x")
     registerDevice("Spt76x")
 
-    def initialize
-    end
-    
     # TODO: refactor
 
     # # Prepare and execute read action

@@ -1,3 +1,5 @@
+require "./common/vkt_executer_context"
+
 module VktDriver
   include Collector
   include ModbusProtocol::ModbusRtu
@@ -5,6 +7,7 @@ module VktDriver
   # Driver for VKT-7 and VKG-3
   class VktModbusRtuDriver < CollectorMeterDriver
     include CollectorDriverProtocol(ModbusRtuProtocol)
+    include CollectorDriverExecuterContext(VktExecuterContext)
 
     registerDevice("Vkt7")
     registerDevice("Vkg3")
@@ -13,7 +16,7 @@ module VktDriver
     def executeReadAction(action : CollectorActionTask) : Void
       case action.actionInfo.state
       when StateType::DateTime
-        TimeReader.new(deviceInfo, protocol) do |time|
+        TimeReader.new(executerContext) do |time|
           notifyTaskEvent(ReadTimeResponseEvent.new(
             action.taskId,
             time
