@@ -1,7 +1,5 @@
 require "benchmark"
-require "./database/**"
-require "./utils/**"
-require "./collector/**"
+
 
 collector = Collector::CollectorWorker.new
 collector.start
