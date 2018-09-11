@@ -1,0 +1,22 @@
+name: collector
+version: 0.1.0
+
+authors:
+  - Grabli66 <grabli66@gmail.com>
+
+description: |
+  Collecting system for smart meters
+
+dependencies:
+  collector_common:
+    path: ../collector_common
+
+targets:
+  northwind:
+    main: src/collector.cr
+
+# development_dependencies:
+#   webmock:
+#     github: manastech/webmock.cr
+
+license: LGPLv3

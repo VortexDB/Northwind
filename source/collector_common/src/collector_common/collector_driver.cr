@@ -36,32 +36,16 @@ module Collector
   end
 
   # Abstract execution context for transfering it between driver and executers
-  abstract class BaseExecutionContext
+  class ExecutionContext
     # Device information
-    getter baseDeviceInfo : TDeviceInfo
+    getter deviceInfo : DeviceInfo
 
     # Protocol information
-    getter baseProtocol : TProtocol
+    getter protocol : Protocol
 
     def initialize(@deviceInfo, @protocol)
     end
-  end
-
-  abstract class ExecutionContext(TDeviceInfo, TProtocol) < BaseExecutionContext
-    # Device information
-    def deviceInfo : TDeviceInfo
-      baseDeviceInfo.as(TDeviceInfo)
-    end
-
-    # Protocol information
-    def protocol : TProtocol
-      baseProtocol.as(TDeviceInfo)
-    end
-
-    def initialize(deviceInfo, protocol)
-      super(deviceInfo, protocol)
-    end
-  end
+  end  
 
   # Base event
   abstract class CollectorDriverEvent
@@ -144,22 +128,18 @@ module Collector
   # Base collector drver
   abstract class CollectorDriver
     # Device types
-    class_property deviceTypes = Set(String).new
-
-    macro registerDevice(deviceType)
-      @@deviceTypes.add({{ deviceType }})
-
-      CollectorDriverFactory.register(protocol.class, {{ deviceType }}, {{ @type }})
-    end
+    class_property deviceTypes = Set(String).new    
 
     # Add tasks for device
     # For override
     abstract def appendTask(deviceTasks : CollectorDeviceTasks) : Void
 
+    # Listen block sure value
     def listenBlock!
       @listenBlock.not_nil!
     end
 
+    # Listen for driver event
     def listen(&@listenBlock : CollectorDriverEvent -> Void) : Void
     end
 

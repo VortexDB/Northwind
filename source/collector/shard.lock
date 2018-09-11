@@ -1,0 +1,6 @@
+version: 1.0
+shards:
+  collector_common:
+    path: ../collector_common
+    version: 0.1.1
+

@@ -1,3 +1,5 @@
+require "./database/*"
+
 module Collector
   # Info about completion
   class ScriptCompleteInfo
