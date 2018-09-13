@@ -9,7 +9,7 @@ description: |
 
 dependencies:
   collector_common:
-    path: ../collector_common
+    path: modules/collector_common
 
 targets:
   northwind:

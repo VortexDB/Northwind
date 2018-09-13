@@ -1,1 +1,0 @@
-crystal build --progress -o ./bin/collector ./src/northwind.cr

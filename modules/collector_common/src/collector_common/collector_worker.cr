@@ -32,7 +32,6 @@ module Collector
 
     # Start collector
     def start : Void
-      init
       work
     end
 

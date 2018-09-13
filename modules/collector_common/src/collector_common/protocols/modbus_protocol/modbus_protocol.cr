@@ -2,6 +2,6 @@ module ModbusProtocol
   include Collector
   
   # Base modbus protocol
-  abstract class ModbusProtocol < Protocol
+  abstract class ModbusProtocol < ResponseRequestProtocol
   end
 end

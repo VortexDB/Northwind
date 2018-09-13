@@ -6,9 +6,6 @@ module ModbusProtocol::ModbusRtu
 
   # Modbus RTU protocol
   class ModbusRtuProtocol < ModbusProtocol
-    include ProtocolChannel(BinaryTransportChannel)
-    include ResponseRequestProtocol(ModbusRtuRequest, ModbusRtuResponse) 
-
     HEADER_SIZE = 2 # Network + FunctionId
     MIN_PACKET_SIZE = HEADER_SIZE + 2 # Network + FunctionId + Crc16    
 
@@ -28,7 +25,7 @@ module ModbusProtocol::ModbusRtu
     end
 
     # Send applied data and wait request
-    def sendRequestWithResponse(request : ModbusRtuRequest) : ModbusRtuResponse
+    def sendRequestWithResponse(request : ProtocolRequest) : ProtocolResponse
       frame = request.getData
       begin
         fullFrame = IO::Memory.new
