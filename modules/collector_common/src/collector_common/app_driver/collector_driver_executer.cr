@@ -1,13 +1,14 @@
 module Collector
     # Executer that works in the context of driver
     abstract class CollectorDriverExecuter(TResponse)
-        # Information about device
-        getter deviceInfo : DeviceInfo
+        # Execution context
+        getter executionContext : ExecutionContext
 
-        # Protocol
-        getter protocol : TransportProtocol        
+        def initialize(@executionContext : ExecutionContext)
+        end
 
-        def initialize(@deviceInfo, @protocol)
+        def initialize(@executionContext : ExecutionContext, &block : TResponse -> Void)
+            execute(&block)
         end
 
         # Execute and return some response

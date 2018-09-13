@@ -1,4 +1,25 @@
 module VktDriver
+    # Model for VKT-7 meter
+    class Vkt7Model < VktModel
+        def initialize(deviceInfo)
+            super(deviceInfo)
+        end
+
+        # Get parameter info by measure parameter and device info
+        def getParameterInfo(measureParameter : MeasureParameter) : ParameterInfo
+            # requestParameter = RequestParameter.new(device.pipeNumber, device.groupNumber)
+            
+            # res : ParameterInfo?
+            # case measureParameter.measureType
+            # when MeasureType::TEMPERATURE
+            #     res = self.getTemperatureInfo(measureParameter, requestParameter)
+            # end
+
+            # return res || raise NorthwindException.new("Unsupported parameter")
+            raise NorthwindException.new("Unsupported parameter")
+        end
+    end
+
     # class Vkt7Model < VktModel
     #     # Return temperature digits type
     #     private def getTemperatureDigitsType(requestParameter : RequestParameter) : Vkt7FractionElementType?
@@ -24,19 +45,6 @@ module VktDriver
     #         return nil if digitsType.nil? || valueType.nil?
     #         measureType = Vkt7MeasureElementType::TTypeM
     #         return ParameterInfo.new(measureParameter, requestParameter, measureType, digitsType, valueType)
-    #     end
-
-    #     # Get parameter info by measure parameter and device info
-    #     def getParameterInfo(measureParameter : MeasureParameter, device : PipeDeviceInfo) : ParameterInfo
-    #         requestParameter = RequestParameter.new(device.pipeNumber, device.groupNumber)
-            
-    #         res : ParameterInfo?
-    #         case measureParameter.measureType
-    #         when MeasureType::TEMPERATURE
-    #             res = self.getTemperatureInfo(measureParameter, requestParameter)
-    #         end
-
-    #         return res || raise NorthwindException.new("Unsupported parameter")
-    #     end
+    #     end        
     # end
 end

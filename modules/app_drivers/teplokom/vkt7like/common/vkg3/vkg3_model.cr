@@ -1,5 +1,5 @@
 module VktDriver
-    # class Vkt7Model < VktModel
+    # class Vkg3Model < VktModel
     #     # Return parameter info
     #     def getParameterInfo(measureParameter : MeasureParameter, device : PipeDeviceInfo) : ParameterInfo
 

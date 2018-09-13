@@ -4,7 +4,19 @@ module VktDriver
   include Collector
 
   # Driver for VKT-7 and VKG-3
-  class VktModbusRtuDriver < CollectorMeterDriver    
+  class VktModbusRtuDriver < CollectorMeterDriver
+    # Return meter model
+    private def getMeterModel(deviceInfo : DeviceInfo)
+      return Vkt7Model.new(deviceInfo)
+    end
+
+    # Return execution context    
+    def getExecutionContext(device : CollectorDevice) : ExecutionContext
+      deviceInfo = getDeviceInfo(device)
+      meterModel = getMeterModel(deviceInfo)
+      return VktExecuterContext.new(deviceInfo, protocol, meterModel)
+    end
+
     # Process read action
     def executeReadAction(action : CollectorActionTask) : Void
       case action.actionInfo.state

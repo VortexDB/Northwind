@@ -3,8 +3,8 @@ module VktDriver
   class TimeReader < CommonExecuter(Time)
     # Send request and read
     def postExecute(&block : Time -> _) : Void
-      network = @deviceInfo.networkNumber.to_u8
-      response = @protocol.sendRequestWithResponse(ReadHoldingRegistersRequest.new(network, Vkt7StartAddress::TimeAddress, 0_u16))
+      network = vktModel.networkNumber.to_u8
+      response = modbusProtocol.sendRequestWithResponse(ReadHoldingRegistersRequest.new(network, VktStartAddress::TimeAddress, 0_u16))
       if network != response.network
         raise NorthwindException.new("Request network address not equals response network address")
       end

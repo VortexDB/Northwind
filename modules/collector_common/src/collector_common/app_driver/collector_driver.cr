@@ -149,7 +149,7 @@ module Collector
   # Base driver for meter
   abstract class CollectorMeterDriver < CollectorDriver
     # Execution context
-    getter executionContext : ExecutionContext?
+    getter! executionContext : ExecutionContext?    
 
     # Execute actions
     private def executeActions(tasks : Array(CollectorActionTask)) : Void
@@ -166,11 +166,13 @@ module Collector
     end
 
     # Return execution context
-    private def getExecutionContext(device : CollectorDevice) : ExecutionContext
+    # Can be overrided to create own concretic context
+    protected def getExecutionContext(device : CollectorDevice) : ExecutionContext
       return ExecutionContext.new(getDeviceInfo(device), protocol)
     end
 
     # Return device info from device
+    # Can be overrided for creating own device info
     protected def getDeviceInfo(device : CollectorDevice) : DeviceInfo
       # TODO: Get this information from database
       case device.dataSource
