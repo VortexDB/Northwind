@@ -42,7 +42,7 @@ module ModbusProtocol::ModbusRtu
         crc = ModbusRtuCrcHelper.calcCrc(payloadBytes)
         fullFrame.write_bytes(crc, IO::ByteFormat::BigEndian)
         
-        channel!.write(fullFrame.to_slice)  
+        channel.write(fullFrame.to_slice)  
 
         buffer = IO::Memory.new
         fullSize = 0
@@ -55,7 +55,7 @@ module ModbusProtocol::ModbusRtu
         loop do
           begin
             # Try get packet by length
-            data = channel!.read
+            data = channel.read
             fullSize = fullSize + data.size
             buffer.write(data)
             if !lengthRead && fullSize >= HEADER_SIZE              

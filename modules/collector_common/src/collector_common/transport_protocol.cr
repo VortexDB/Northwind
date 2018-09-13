@@ -9,6 +9,9 @@ module Collector
 
   # Abstract protocol
   abstract class TransportProtocol
+    # Channel for sending data
+    property! channel : TransportChannel?    
+
     # Calc hash
     def hash
       self.class.name.hash
@@ -21,7 +24,7 @@ module Collector
   end
 
   # Abstract protocol
-  abstract class ResponseRequestProtocol
+  abstract class ResponseRequestProtocol < TransportProtocol
     # Send applied request
     # And yields response
     abstract def sendRequestWithResponse(request : ProtocolRequest) : ProtocolResponse
