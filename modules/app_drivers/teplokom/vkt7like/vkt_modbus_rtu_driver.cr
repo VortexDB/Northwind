@@ -1,7 +1,26 @@
-require "./common/vkt_executer_context"
+require "collector_common"
 
 module VktDriver
-  # include Collector
+  include Collector
+
+  # Driver for VKT-7 and VKG-3
+  class VktModbusRtuDriver < CollectorMeterDriver    
+    # Process read action
+    def executeReadAction(action : CollectorActionTask) : Void
+      case action.actionInfo.state
+      when StateType::DateTime
+        TimeReader.new(executionContext) do |time|
+          notifyTaskEvent(ReadTimeResponseEvent.new(
+            action.taskId,
+            time
+          ))
+        end
+      else
+        raise NorthwindException.new("Unknown read action")
+      end
+    end
+  end
+
   # include ModbusProtocol::ModbusRtu
 
   # # Driver for VKT-7 and VKG-3
