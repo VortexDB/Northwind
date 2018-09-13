@@ -1,21 +1,15 @@
-name: collector
+name: app_drivers
 version: 0.1.0
 
 authors:
   - Grabli66 <grabli66@gmail.com>
 
 description: |
-  Collecting system for smart meters
+  Collector applied drivers
 
 dependencies:
   collector_common:
-    path: modules/collector_common
-  app_drivers:
-    path: modules/app_drivers
-
-targets:
-  northwind:
-    main: src/collector.cr
+    path: ../collector_common
 
 # development_dependencies:
 #   webmock:
