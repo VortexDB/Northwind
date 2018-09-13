@@ -6,8 +6,11 @@ module VktDriver
     # Vkt meter model
     getter meterModel : VktModel
 
-    def initialize(deviceInfo, protocol, @meterModel)
-      super(deviceInfo, protocol)
+    # Modbus protocol
+    getter modbusProtocol : ModbusProtocol::ModbusProtocol    
+
+    def initialize(deviceInfo, @modbusProtocol, @meterModel)
+      super(deviceInfo, modbusProtocol)
     end
   end
 end

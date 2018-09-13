@@ -1,30 +1,33 @@
-module VktDriver
-  include ModbusProtocol::ModbusRtu
-
+module VktDriver  
   # Base executer
   abstract class BaseExecuter(TResponse) < CollectorDriverExecuter(TResponse)
+    # Context for vkt executer
+    getter vktExecuterContext : VktExecuterContext
+
     # Return modbus rtu protocol
-    def modbusProtocol : ModbusRtuProtocol
-      return executionContext.protocol.as(ModbusRtuProtocol)
+    def modbusProtocol : ModbusProtocol::ModbusProtocol
+      return vktExecuterContext.modbusProtocol
     end
 
     # Return model for vkt7 device
     def vktModel : VktModel
-      return executionContext.as(VktExecuterContext).meterModel
+      return vktExecuterContext.meterModel
     end
 
-    def initialize(executionContext : VktExecuterContext)
-      super(executionContext)
+    def initialize(@vktExecuterContext)
+      super(@vktExecuterContext)
     end
 
-    def initialize(@executionContext : ExecutionContext, &block : TResponse -> Void)
-      super(executionContext, &block)
+    def initialize(@vktExecuterContext, &block : TResponse -> Void)
+      super(@vktExecuterContext, &block)
     end
   end
 
   # Common executer with start session
   abstract class CommonExecuter(TResponse) < BaseExecuter(TResponse)
+    # VKT firmware version 0
     VERSION_ZERO = 0
+    # VKT firmware version 1
     VERSION_ONE  = 1
 
     # Version of VKT-7
@@ -34,7 +37,7 @@ module VktDriver
       super(executionContext)
     end
 
-    def initialize(@executionContext : ExecutionContext, &block : TResponse -> Void)
+    def initialize(@executionContext : VktExecuterContext, &block : TResponse -> Void)
       super(executionContext, &block)
     end
 
@@ -43,7 +46,7 @@ module VktDriver
 
     # Start session and execute other
     def execute(&block : TResponse -> Void) : Void
-      StartSessionExecuter.new(executionContext) do |version|
+      StartSessionExecuter.new(vktExecuterContext) do |version|
         @serverVersion = version
         postExecute(&block)
       end

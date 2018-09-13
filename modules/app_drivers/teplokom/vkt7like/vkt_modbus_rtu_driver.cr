@@ -2,26 +2,40 @@ require "collector_common"
 
 module VktDriver
   include Collector
+  include ModbusProtocol::ModbusRtu
 
   # Driver for VKT-7 and VKG-3
   class VktModbusRtuDriver < CollectorMeterDriver
+    # Modbus protocol
+    getter modbusProtocol : ModbusRtuProtocol
+
+    # return Vkt execution context
+    private def vktExecutionContext : VktExecuterContext
+      return executionContext.as(VktExecuterContext)
+    end
+
     # Return meter model
     private def getMeterModel(deviceInfo : DeviceInfo)
       return Vkt7Model.new(deviceInfo)
+    end
+
+    def initialize
+      @modbusProtocol = ModbusRtuProtocol.new
+      super(modbusProtocol)
     end
 
     # Return execution context    
     def getExecutionContext(device : CollectorDevice) : ExecutionContext
       deviceInfo = getDeviceInfo(device)
       meterModel = getMeterModel(deviceInfo)
-      return VktExecuterContext.new(deviceInfo, protocol, meterModel)
+      return VktExecuterContext.new(deviceInfo, modbusProtocol, meterModel)
     end
 
     # Process read action
     def executeReadAction(action : CollectorActionTask) : Void
       case action.actionInfo.state
       when StateType::DateTime
-        TimeReader.new(executionContext) do |time|
+        TimeReader.new(vktExecutionContext) do |time|
           notifyTaskEvent(ReadTimeResponseEvent.new(
             action.taskId,
             time
