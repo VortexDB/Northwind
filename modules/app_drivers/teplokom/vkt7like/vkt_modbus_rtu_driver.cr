@@ -6,25 +6,17 @@ module VktDriver
 
   # Driver for VKT-7 and VKG-3
   class VktModbusRtuDriver < CollectorMeterDriver
-    # Modbus protocol
-    getter modbusProtocol : ModbusRtuProtocol
-
-    # return Vkt execution context
-    private def vktExecutionContext : VktExecuterContext
-      return executionContext.as(VktExecuterContext)
-    end
+    include DriverProtocolMixin(ModbusRtuProtocol)
+    include DriverExecutionContextMixin(VktExecuterContext)
+    registerDevice(Vkt7Meter)
+    registerDevice(Vkg3Meter)
 
     # Return meter model
     private def getMeterModel(deviceInfo : DeviceInfo)
       return Vkt7Model.new(deviceInfo)
     end
 
-    def initialize
-      @modbusProtocol = ModbusRtuProtocol.new
-      super(modbusProtocol)
-    end
-
-    # Return execution context    
+    # Override execution context    
     def getExecutionContext(device : CollectorDevice) : ExecutionContext
       deviceInfo = getDeviceInfo(device)
       meterModel = getMeterModel(deviceInfo)
