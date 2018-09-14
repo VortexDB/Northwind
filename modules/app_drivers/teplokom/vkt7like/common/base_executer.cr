@@ -31,15 +31,7 @@ module VktDriver
     VERSION_ONE  = 1
 
     # Version of VKT-7
-    @serverVersion : UInt8 = 0
-
-    def initialize(executionContext : VktExecuterContext)
-      super(executionContext)
-    end
-
-    def initialize(@executionContext : VktExecuterContext, &block : TResponse -> Void)
-      super(executionContext, &block)
-    end
+    @serverVersion : UInt8 = 0    
 
     # To implement
     abstract def postExecute(&block : TResponse -> Void) : Void
