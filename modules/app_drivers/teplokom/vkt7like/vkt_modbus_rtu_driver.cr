@@ -1,4 +1,5 @@
 require "collector_common"
+require "./common/vkt_executer_context"
 
 module VktDriver
   include Collector
@@ -20,19 +21,19 @@ module VktDriver
     def getExecutionContext(device : CollectorDevice) : ExecutionContext
       deviceInfo = getDeviceInfo(device)
       meterModel = getMeterModel(deviceInfo)
-      return VktExecuterContext.new(deviceInfo, modbusProtocol, meterModel)
+      return VktExecuterContext.new(deviceInfo, protocol.as(ModbusRtuProtocol), meterModel)
     end
 
     # Process read action
     def executeReadAction(action : CollectorActionTask) : Void
       case action.actionInfo.state
       when StateType::DateTime
-        TimeReader.new(vktExecutionContext) do |time|
-          notifyTaskEvent(ReadTimeResponseEvent.new(
-            action.taskId,
-            time
-          ))
-        end
+        # TimeReader.new(vktExecutionContext) do |time|
+        #   notifyTaskEvent(ReadTimeResponseEvent.new(
+        #     action.taskId,
+        #     time
+        #   ))
+        # end
       else
         raise NorthwindException.new("Unknown read action")
       end

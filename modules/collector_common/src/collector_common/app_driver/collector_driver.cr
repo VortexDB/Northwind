@@ -112,6 +112,10 @@ module Collector
 
   # Base collector drver
   abstract class CollectorDriver
+    # Macro that registers driver for device
+    macro registerDevice(deviceClass)
+    end
+
     # Driver protocol
     getter protocol : TransportProtocol
 
@@ -148,8 +152,8 @@ module Collector
 
   # Base driver for meter
   abstract class CollectorMeterDriver < CollectorDriver
-    # Execution context
-    getter! executionContext : ExecutionContext?    
+    # # Execution context
+    # getter! executionContext : ExecutionContext?    
 
     # Execute actions
     private def executeActions(tasks : Array(CollectorActionTask)) : Void
@@ -167,9 +171,9 @@ module Collector
 
     # Return execution context
     # Can be overrided to create own concretic context
-    protected def getExecutionContext(device : CollectorDevice) : ExecutionContext
-      return ExecutionContext.new(getDeviceInfo(device), protocol)
-    end
+    # protected def getExecutionContext(device : CollectorDevice) : ExecutionContext
+    #   return ExecutionContext.new(getDeviceInfo(device), protocol)
+    # end
 
     # Return device info from device
     # Can be overrided for creating own device info
@@ -211,7 +215,7 @@ module Collector
 
     # Execute device task
     def appendTask(deviceTasks : CollectorDeviceTasks) : Void
-      @executionContext = getExecutionContext(deviceTasks.device)
+      #@executionContext = getExecutionContext(deviceTasks.device)
 
       actions = deviceTasks.tasks.compact_map do |x|
         x if x.is_a?(CollectorActionTask)

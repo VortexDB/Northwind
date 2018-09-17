@@ -1,6 +1,10 @@
 module Collector
   include Database
 
+  # Key for hashmap that contains CollectorDriver-s
+  class CollectorDriverKey
+  end
+
   # Collects data from devices
   class CollectorWorker
     # TODO: remove
@@ -50,7 +54,7 @@ module Collector
     end
 
     # Register driver
-    def registerDriver(driver : CollectorDriver) : Void
+    def registerDriver(driver : CollectorDriver.class) : Void
     end
   end
 end
