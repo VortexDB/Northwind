@@ -12,17 +12,17 @@ module VktDriver
     registerDevice(Vkt7Meter)
     registerDevice(Vkg3Meter)
 
-    # Return meter model
-    private def getMeterModel(deviceInfo : DeviceInfo)
-      return Vkt7Model.new(deviceInfo)
-    end
+    # # Return meter model
+    # private def getMeterModel(deviceInfo : DeviceInfo)
+    #   return Vkt7Model.new(deviceInfo)
+    # end
 
-    # Override execution context    
-    def getExecutionContext(device : CollectorDevice) : ExecutionContext
-      deviceInfo = getDeviceInfo(device)
-      meterModel = getMeterModel(deviceInfo)
-      return VktExecuterContext.new(deviceInfo, protocol.as(ModbusRtuProtocol), meterModel)
-    end
+    # # Override execution context    
+    # def getExecutionContext(device : CollectorDevice) : ExecutionContext
+    #   deviceInfo = getDeviceInfo(device)
+    #   meterModel = getMeterModel(deviceInfo)
+    #   return VktExecuterContext.new(deviceInfo, protocol.as(ModbusRtuProtocol), meterModel)
+    # end
 
     # Process read action
     def executeReadAction(action : CollectorActionTask) : Void

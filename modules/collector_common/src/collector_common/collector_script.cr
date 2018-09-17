@@ -224,7 +224,12 @@ module Collector
               channel.open
 
               routeDevices.group_by { |x| x.driver }.each do |driver, driverDevices|
-                driver.protocol.channel = channel
+                # Set channel to protocol if driver with protocol
+                protDriver = driver
+                case protDriver
+                when DriverProtocolMixin
+                  driver.protocol.channel = channel
+                end
                 collectByDriver(driver, driverDevices)
               end
 
