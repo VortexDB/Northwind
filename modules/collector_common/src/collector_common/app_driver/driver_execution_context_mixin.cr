@@ -1,17 +1,14 @@
 module Collector
     # Mixin that adds execution context to driver
+    # Works only with CollecterMeterDriver
     module DriverExecutionContextMixin(TExecutionContext)
-        # Context for driver executers
-        @executionContext : TExecutionContext?
-
-        def executionContext : TExecutionContext
-            if @executionContext == nil
-            end
-
-            return
+        # Return current execution eontext for device
+        # TODO: cache
+        def executionContext : TExecutionContext            
+            return getExecutionContext
         end
 
         # Return execution context
-        abstract def createExecutionContext : TExecutionContext        
+        abstract def getExecutionContext : TExecutionContext
     end
 end

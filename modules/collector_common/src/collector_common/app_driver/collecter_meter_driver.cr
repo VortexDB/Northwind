@@ -3,8 +3,8 @@ require "./collector_driver"
 module Collector
   # Base driver for smart meters
   abstract class CollectorMeterDriver < CollectorDriver
-    # # Execution context
-    # getter! executionContext : ExecutionContext?
+    # Current device info
+    getter! deviceInfo : MeterDeviceInfo?
 
     # Execute actions
     private def executeActions(tasks : Array(CollectorActionTask)) : Void
@@ -20,15 +20,9 @@ module Collector
       end
     end
 
-    # Return execution context
-    # Can be overrided to create own concretic context
-    # protected def getExecutionContext(device : CollectorDevice) : ExecutionContext
-    #   return ExecutionContext.new(getDeviceInfo(device), protocol)
-    # end
-
     # Return device info from device
     # Can be overrided for creating own device info
-    protected def getDeviceInfo(device : CollectorDevice) : DeviceInfo
+    protected def getDeviceInfo(device : CollectorDevice) : MeterDeviceInfo
       # TODO: Get this information from database
       case device.dataSource
       when PipeDataSource
@@ -66,7 +60,7 @@ module Collector
 
     # Execute device task
     def appendTask(deviceTasks : CollectorDeviceTasks) : Void
-      # @executionContext = getExecutionContext(deviceTasks.device)
+      deviceInfo = getDeviceInfo(deviceTasks.device)
 
       actions = deviceTasks.tasks.compact_map do |x|
         x if x.is_a?(CollectorActionTask)

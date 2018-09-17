@@ -12,28 +12,27 @@ module VktDriver
     registerDevice(Vkt7Meter)
     registerDevice(Vkg3Meter)
 
-    # # Return meter model
-    # private def getMeterModel(deviceInfo : DeviceInfo)
-    #   return Vkt7Model.new(deviceInfo)
-    # end
+    # Return meter model
+    private def getMeterModel(deviceInfo : DeviceInfo)
+      return Vkt7Model.new(deviceInfo)
+    end
 
-    # # Override execution context    
-    # def getExecutionContext(device : CollectorDevice) : ExecutionContext
-    #   deviceInfo = getDeviceInfo(device)
-    #   meterModel = getMeterModel(deviceInfo)
-    #   return VktExecuterContext.new(deviceInfo, protocol.as(ModbusRtuProtocol), meterModel)
-    # end
+    # Override execution context
+    def getExecutionContext : ExecutionContext
+      meterModel = getMeterModel(deviceInfo)
+      return VktExecuterContext.new(deviceInfo, protocol, meterModel)
+    end
 
     # Process read action
     def executeReadAction(action : CollectorActionTask) : Void
       case action.actionInfo.state
       when StateType::DateTime
-        # TimeReader.new(vktExecutionContext) do |time|
-        #   notifyTaskEvent(ReadTimeResponseEvent.new(
-        #     action.taskId,
-        #     time
-        #   ))
-        # end
+        TimeReader.new(executionContext) do |time|
+          notifyTaskEvent(ReadTimeResponseEvent.new(
+            action.taskId,
+            time
+          ))
+        end
       else
         raise NorthwindException.new("Unknown read action")
       end
