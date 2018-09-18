@@ -24,9 +24,9 @@ module VktDriver
     end
 
     # Process read action
-    def executeReadAction(action : CollectorActionTask) : Void
-      case action.actionInfo.state
-      when StateType::DateTime
+    def executeAction(action : CollectorActionTask) : Void
+      case action.actionInfo.action
+      when StateAction::ReadDateTime
         TimeReader.new(executionContext) do |time|
           notifyTaskEvent(ReadTimeResponseEvent.new(
             action.taskId,

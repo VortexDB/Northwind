@@ -53,6 +53,11 @@ module Collector
       end
     end
 
+    # Create new script and return it
+    def newScript(name : String, schedule : Schedule) : CollectorScript
+      script = CollectorScript.new(name, schedule, @database)
+    end
+
     # Register driver
     def registerDriver(driver : CollectorDriver.class) : Void
     end

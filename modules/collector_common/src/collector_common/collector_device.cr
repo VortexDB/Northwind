@@ -2,7 +2,7 @@ module Collector
   # Device that uses collector
   class CollectorDevice
     # Driver to collect data
-    getter driver : CollectorDriver
+    property driver : CollectorDriver?
 
     # Device route for connection
     # TODO: routes
@@ -19,11 +19,13 @@ module Collector
     getter dataSource : Database::EntityDataSource
 
     def initialize(
-      @deviceType,
+      deviceType,
       @protocolType,
       @route,
-      @driver,      
+      #@driver,      
       @dataSource)
+
+      @deviceType = deviceType.to_s
     end
   end
 end

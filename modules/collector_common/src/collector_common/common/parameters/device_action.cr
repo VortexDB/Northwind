@@ -1,24 +1,18 @@
 module Device
-  # State type to read/write
-  enum StateType
-    DateTime
-  end
-
   # Action for a state
   enum StateAction
-    Read,
-    Write
+    # Read date time
+    ReadDateTime,
+    # Write date time
+    WriteDateTime
   end
 
   # Action with state
-  class DeviceAction
-    # State
-    getter state : StateType
-
+  class DeviceAction    
     # Action
     getter action : StateAction
 
-    def initialize(@state, @action)
+    def initialize(@action)
     end
   end
 end

@@ -9,14 +9,7 @@ module Collector
     # Execute actions
     private def executeActions(tasks : Array(CollectorActionTask)) : Void
       tasks.each do |task|
-        case task.actionInfo.action
-        when StateAction::Read
-          executeReadAction(task)
-        when StateAction::Write
-          executeWriteAction(task)
-        else
-          raise NorthwindException.new("Unknown action")
-        end
+        executeAction(task)
       end
     end
 
@@ -42,12 +35,8 @@ module Collector
     def executeAfter : Void
     end
 
-    # Process read action. Virtual
-    def executeReadAction(action : CollectorActionTask) : Void
-    end
-
-    # Process write action. Virtual
-    def executeWriteAction(action : CollectorActionTask) : Void
+    # Process execute action. Virtual
+    def executeAction(action : CollectorActionTask) : Void
     end
 
     # Process read current values. Virtual

@@ -72,8 +72,8 @@ module Collector
     private def processActionEvent(device : CollectorDevice, task : CollectorActionTask, event : DriverTaskResponseEvent) : Void      
       parameter = EntityParameter.new(2_i64)
       
-      case task.actionInfo.state
-      when Device::StateType::DateTime
+      case task.actionInfo.action
+      when Device::StateAction::ReadDateTime
         time = event.value
         case time
         when Time
@@ -225,12 +225,13 @@ module Collector
 
               routeDevices.group_by { |x| x.driver }.each do |driver, driverDevices|
                 # Set channel to protocol if driver with protocol
-                protDriver = driver
-                case protDriver
-                when DriverProtocolMixin
-                  driver.protocol.channel = channel
+                if protDriver = driver                
+                  case protDriver
+                  when DriverProtocolMixin
+                    protDriver.protocol.channel = channel
+                  end
+                  collectByDriver(protDriver, driverDevices)
                 end
-                collectByDriver(driver, driverDevices)
               end
 
               channel.close

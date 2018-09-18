@@ -4,6 +4,17 @@ require "app_drivers"
 
 collector = Collector::CollectorWorker.new
 collector.registerDriver(VktDriver::VktModbusRtuDriver)
+
+offset = Time::Span.new(seconds: 0, nanoseconds: 0)
+period = Time::Span.new(seconds: 10 * 1, nanoseconds: 0)
+script = collector.newScript("Collect values", PeriodicSchedule.new(offset, period))
+
+route = Collector::TcpClientRoute.new("192.168.0.196", 25301)
+device = Collector::CollectorDevice.new(Database::Vkt7Meter, "ModbusRtuProtocol", route, Database::PipeDataSource.new(2_i64))
+dateAction = Collector::DeviceAction.new(Collector::StateAction::ReadDateTime)
+script.addDevice(device)
+script.addAction(dateAction)
+
 collector.start
 
 loop do
@@ -12,7 +23,7 @@ end
 
 # # TODO: load devices, routes from database
 # # driver = CollectorDriverFactory.get("Vkt7", "ModbusRtuProtocol")
-# route = TcpClientRoute.new("192.168.0.196", 25301)
+
 # # @devices.add(CollectorDevice.new("Vkt7", "ModbusRtuProtocol", route, driver, PipeDataSource.new(2_i64)))
 
 # # driver1 = CollectorDriverFactory.get("Spt96x", SpbusProtocol::SpbusProtocol)
