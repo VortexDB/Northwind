@@ -37,6 +37,9 @@ module Collector
     # Guards from driver hangs
     DRIVER_SILENCE_TIMEOUT = 1 * 60
 
+    # Collector context
+    @collectorWorker : CollectorWorkerContext
+
     # For working with data
     @database : Database::DatabaseClient
 
@@ -225,11 +228,8 @@ module Collector
 
               routeDevices.group_by { |x| x.driver }.each do |driver, driverDevices|
                 # Set channel to protocol if driver with protocol
-                if protDriver = driver                
-                  case protDriver
-                  when DriverProtocolMixin
-                    protDriver.protocol.channel = channel
-                  end
+                if protDriver = driver
+                  protDriver.protocol.channel = channel
                   collectByDriver(protDriver, driverDevices)
                 end
               end
@@ -250,7 +250,7 @@ module Collector
       Future.waitAll(futures)
     end
 
-    def initialize(@name, @schedule, @database)
+    def initialize(@name, @schedule, @collectorWorker, @database)
       @devices = Set(CollectorDevice).new
       @parameters = Set(MeasureParameter).new
       @actions = Set(DeviceAction).new

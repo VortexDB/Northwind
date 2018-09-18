@@ -3,10 +3,29 @@ module Collector
 
   # Key for hashmap that contains CollectorDriver-s
   class CollectorDriverKey
+    # Device name
+    getter device : String
+
+    # Protocol name
+    getter protocol : String
+
+    def initialize(@device, @protocol)
+    end
+
+    # Calc hash
+    def hash
+      device.hash ^ protocol.hash
+    end
+  end  
+
+  # Context of collector to transfer it to collector scripts
+  abstract class CollectorWorkerContext
+    # Get collector driver for device
+    abstract def getDriver(device : CollectorDevice) : CollectorDriver
   end
 
   # Collects data from devices
-  class CollectorWorker
+  class CollectorWorker < CollectorWorkerContext
     # TODO: remove
     @database : DatabaseClient
 
@@ -53,13 +72,29 @@ module Collector
       end
     end
 
+    # Return driver for device
+    def getDriver(device : CollectorDevice) : CollectorDriver
+      key = CollectorDriverKey.new(device.deviceType, device.protocolType)
+      pp key
+      return @drivers[key]?
+    end
+
     # Create new script and return it
     def newScript(name : String, schedule : Schedule) : CollectorScript
-      script = CollectorScript.new(name, schedule, @database)
+      script = CollectorScript.new(name, schedule, self, @database)
+      @scripts.push(script)
+      return script
     end
 
     # Register driver
     def registerDriver(driver : CollectorDriver.class) : Void
+      devs = driver.registeredDevices
+      locDriver = driver
+      devs.each do |dev|
+        protocol = locDriver.protocol.class.name
+        driverKey = CollectorDriverKey.new(dev, protocol)
+        @drivers[driverKey] = driver.new
+      end
     end
   end
 end

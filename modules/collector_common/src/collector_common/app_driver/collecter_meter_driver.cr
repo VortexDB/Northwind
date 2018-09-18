@@ -2,7 +2,7 @@ require "./collector_driver"
 
 module Collector
   # Base driver for smart meters
-  abstract class CollectorMeterDriver < CollectorDriver
+  abstract class CollectorMeterDriver < CollectorDriver    
     # Current device info
     getter! deviceInfo : MeterDeviceInfo?
 

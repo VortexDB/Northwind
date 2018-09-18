@@ -100,8 +100,20 @@ module Collector
   
   # Base collector drver
   abstract class CollectorDriver
+    # Registered devices for driver
+    class_property registeredDevices = Array(String).new
+
     # Macro that registers driver for device
     macro registerDevice(deviceClass)
+      self.registeredDevices.push({{ deviceClass.stringify }})
+    end
+
+    # Register protocol for driver
+    macro registerProtocol(protocolClass)
+      class_getter protocol = {{ protocolClass }}.new
+      def protocol : {{ protocolClass }}
+        self.protocol
+      end
     end
 
     # Add tasks for device

@@ -6,11 +6,11 @@ module VktDriver
   include ModbusProtocol::ModbusRtu
 
   # Driver for VKT-7 and VKG-3
-  class VktModbusRtuDriver < CollectorMeterDriver
-    include DriverProtocolMixin(ModbusRtuProtocol)
-    include DriverExecutionContextMixin(VktExecuterContext)
+  class VktModbusRtuDriver < CollectorMeterDriver        
+    registerProtocol(ModbusRtuProtocol)
     registerDevice(Vkt7Meter)
     registerDevice(Vkg3Meter)
+    include DriverExecutionContextMixin(VktExecuterContext)
 
     # Return meter model
     private def getMeterModel(deviceInfo : DeviceInfo)
