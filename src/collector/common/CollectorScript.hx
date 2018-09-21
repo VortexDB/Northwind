@@ -1,5 +1,6 @@
 package collector.common;
 
+import core.collections.HashSet;
 using core.utils.StringHelper;
 
 /**
@@ -48,5 +49,7 @@ class CollectorScript {
 	/**
 	 * Start execute script
 	 */
-	public function start() {}
+	public function start() {
+
+	}
 }
