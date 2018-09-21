@@ -1,5 +1,7 @@
 package collector.common;
 
+import core.time.schedule.ISchedule;
+import haxe.Timer;
 import core.collections.HashSet;
 using core.utils.StringHelper;
 
@@ -13,6 +15,11 @@ class CollectorScript {
 	public final name:String;
 
 	/**
+	 * Schedule to get time of launch
+	 */
+	public final schedule:ISchedule;
+
+	/**
 	 * Devices to collect data
 	 */
 	public final devices:HashSet<CollectorDevice>;
@@ -21,8 +28,10 @@ class CollectorScript {
 	 * Constructor
 	 * @param name
 	 */
-	public function new(name:String) {
+	public function new(name:String, schedule: ISchedule) {
 		this.name = name;
+		this.devices = new HashSet<CollectorDevice>();
+		this.schedule = schedule;
 	}
 
 	/**
@@ -47,9 +56,16 @@ class CollectorScript {
 	}
 
 	/**
+	 * Add collector device
+	 */
+	public function addDevice(device:CollectorDevice) {
+		devices.add(device);
+	}
+
+	/**
 	 * Start execute script
 	 */
 	public function start() {
-
+		
 	}
 }

@@ -1,11 +1,17 @@
 package collector.common;
 
+import haxe.MainLoop;
 using core.utils.StringHelper;
 
 /**
  * Information about device for internal use in collector
  */
 class CollectorDevice {
+	/**
+	 * Serial number of device
+	 */
+	public final serial:String;
+
 	/**
 	 * Type of device(meter type)
 	 */
@@ -19,9 +25,10 @@ class CollectorDevice {
 	/**
 	 * Constructor
 	 */
-	public function new(deviceType:String, protocolType:String) {
+	public function new(serial:String, deviceType:String, protocolType:String) {
+		this.serial = serial;
 		this.deviceType = deviceType;
-		this.protocolType = protocolType;
+		this.protocolType = protocolType;		
 	}
 
 	/**
