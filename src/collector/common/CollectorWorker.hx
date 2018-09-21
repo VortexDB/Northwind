@@ -39,16 +39,17 @@ class CollectorWorker {
 	 * @return CollectorScript
 	 */
 	public function newScript(name:String, schedule:ISchedule):CollectorScript {
-        var script = new CollectorScript(name, schedule);
-        scripts.add(script);
-        return script;
-    }
+		var script = new CollectorScript(name, schedule);
+		scripts.add(script);
+		return script;
+	}
 
 	/**
 	 * Start collector
 	 */
 	public function start() {
-		isWorking = true while (isWorking) {
+		isWorking = true;
+		while (isWorking) {
 			for (script in scripts) {
 				script.start();
 			}

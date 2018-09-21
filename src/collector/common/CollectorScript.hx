@@ -1,7 +1,8 @@
 package collector.common;
 
-import core.time.schedule.ISchedule;
 import haxe.Timer;
+import core.time.TimeSpan;
+import core.time.schedule.ISchedule;
 import core.collections.HashSet;
 using core.utils.StringHelper;
 
@@ -66,6 +67,7 @@ class CollectorScript {
 	 * Start execute script
 	 */
 	public function start() {
-		
+		var span = schedule.nextStart();
+		var seconds = span.totalMilliseconds;
 	}
 }
