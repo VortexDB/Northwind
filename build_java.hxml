@@ -1,0 +1,5 @@
+-cp src
+-main collector.Collector
+-java out/java
+-lib core
+-dce full

@@ -1,3 +1,0 @@
-module ModbusProtocol::ModbusTcp
-
-end

@@ -1,2 +1,0 @@
-# require "./logica/**"
-require "./teplokom/**"
