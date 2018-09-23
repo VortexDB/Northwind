@@ -2,6 +2,8 @@ package collector.common;
 
 import haxe.Log;
 import haxe.Timer;
+import collector.common.parameters.MeasureParameter;
+import collector.common.parameters.DeviceAction;
 import core.time.TimeSpan;
 import core.time.schedule.ISchedule;
 import core.collections.HashSet;
