@@ -1,15 +1,22 @@
 package collector.common;
 
+import haxe.Log;
 import haxe.Timer;
 import core.time.TimeSpan;
 import core.time.schedule.ISchedule;
 import core.collections.HashSet;
+
 using core.utils.StringHelper;
 
 /**
  * Collects data from app layer drivers
  */
 class CollectorScript {
+	/**
+	 * Default deep in days
+	 */
+	public static inline var DEFAULT_DEEP = 3;
+
 	/**
 	 * Name of script
 	 */
@@ -21,15 +28,55 @@ class CollectorScript {
 	public final schedule:ISchedule;
 
 	/**
+	 * Deep of data to collect in days
+	 */
+	public final deep:Int;
+
+	/**
 	 * Devices to collect data
 	 */
 	public final devices:HashSet<CollectorDevice>;
 
 	/**
+	 * Measure parameters to collect
+	 */
+	public final parameters:HashSet<MeasureParameter>;
+
+	/**
+	 * Actions on devices
+	 */
+	public final actions:HashSet<DeviceAction>;
+
+	/**
+	 * Waiting for start and start collect
+	 */
+	private function startSchedule() {
+		var span = schedule.nextStart();
+		var ms = Math.floor(span.totalMilliseconds);
+		Timer.delay(() -> {
+			startCollect();
+			// Launch again
+			startSchedule();
+		}, ms);
+	}
+
+	/**
+	 * Start collect from device
+	 */
+	private function startCollect() {
+		Log.trace("Start collect");
+		Log.trace('Device count: ${devices.length}');
+		Log.trace('Parameters: ${parameters.size}');
+      	Log.trace('Actions: ${actions.size}');
+      	Log.trace('Deep: ${deep}');
+	}
+
+	/**
 	 * Constructor
 	 * @param name
 	 */
-	public function new(name:String, schedule: ISchedule) {
+	public function new(name:String, schedule:ISchedule, deep:Int = DEFAULT_DEEP) {
+		this.deep = deep;
 		this.name = name;
 		this.devices = new HashSet<CollectorDevice>();
 		this.schedule = schedule;
@@ -67,7 +114,6 @@ class CollectorScript {
 	 * Start execute script
 	 */
 	public function start() {
-		var span = schedule.nextStart();
-		var seconds = span.totalMilliseconds;
+		startSchedule();
 	}
 }

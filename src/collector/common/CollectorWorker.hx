@@ -1,5 +1,6 @@
 package collector.common;
 
+import haxe.Log;
 import core.time.schedule.ISchedule;
 import core.async.Future;
 import core.collections.HashSet;
@@ -49,10 +50,12 @@ class CollectorWorker {
 	 */
 	public function start() {
 		isWorking = true;
-		while (isWorking) {
+		Log.trace("Starting scripts");
+		Log.trace('Script count: ${scripts.length}');
+		//while (isWorking) {
 			for (script in scripts) {
 				script.start();
 			}
-		}
+		//}
 	}
 }
