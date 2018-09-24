@@ -6,6 +6,7 @@ import collector.common.protocols.modbus.rtu.ModbusRtuProtocol;
 /**
  * Driver for Vkt7 like driver
  */
+@:keep
 class Vkt7likeDriver extends CollectorMeterDriver {
     /**
      * Constructor

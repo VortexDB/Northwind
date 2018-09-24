@@ -5,6 +5,7 @@ import collector.common.protocols.modbus.ModbusProtocol;
 /**
  * Modbus Rtu protocol
  */
+@:keep
 class ModbusRtuProtocol extends ModbusProtocol {
     /**
      * Constructor

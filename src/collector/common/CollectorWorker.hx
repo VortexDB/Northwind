@@ -95,7 +95,8 @@ class CollectorWorker {
 	 * @param driver - class of CollectorDriver
 	 */
 	public function registerDriver(driver:Class<Dynamic>) {
-		var driverInstance = cast(Type.createEmptyInstance(driver), CollectorDriver);
+		var driverInstance = cast(Type.createInstance(driver, []), CollectorDriver);
+		trace(driverInstance.deviceTypes);
 		//var driverKey = new DriverMapKey();
 	}
 
