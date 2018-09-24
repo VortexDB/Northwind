@@ -1,5 +1,7 @@
 package collector.common;
 
+using core.utils.StringHelper;
+
 /**
  * Base route information to make connection for device
  */
@@ -29,4 +31,25 @@ class TcpClientRoute extends DeviceRoute {
         this.hostOrIp = hostOrIp;
         this.port = port;
     }
+
+    /**
+	 * Calc hash
+	 * @return Int
+	 */
+	public function hashCode():Int {
+		return hostOrIp.hashCode() ^ port;
+	}
+
+	/**
+	 * Compare objects
+	 * @param other
+	 * @return Bool
+	 */
+	public function equals(other:Dynamic):Bool {
+		if (Std.is(other, TcpClientRoute)) {
+			return hashCode() == cast(other, TcpClientRoute).hashCode();
+		}
+
+		return false;
+	}
 }

@@ -73,9 +73,19 @@ class CollectorScript {
 		Log.trace('Actions: ${actions.length}');
 		Log.trace('Deep: ${deep}');
 
-		var rr = devices.groupdBy((e) -> {
-			e.
+		var routeDeviceGroups = devices.groupdBy((e) -> {
+			return e.route;
 		});
+
+		for (route in routeDeviceGroups.keys()) {
+			// Get channel
+			// Open channel if it's a ClientChannel
+
+			var routeDevices = routeDeviceGroups[route];
+			// Get driver by deviceType and protocolType
+
+			// Close channel if it's a ClientChannel
+		}
 	}
 
 	/**
