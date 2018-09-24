@@ -1,42 +1,24 @@
 package collector.common.appdriver;
 
-using core.utils.StringHelper;
-
 /**
  * Collects data from devices
  */
 class CollectorDriver {
 	/**
-	 * Name of script
+	 * Devices that can be processed by driver
 	 */
-	public final name:String;
+	public final deviceTypes:Array<String>;
+
+	/**
+	 * Transport protocol
+	 */
+	public final protocol:TransportProtocol;
 
 	/**
 	 * Constructor
-	 * @param name
 	 */
-	public function new(name:String) {
-		this.name = name;
-	}
-
-	/**
-	 * Calc hash
-	 * @return Int
-	 */
-	public function hashCode():Int {
-		return name.hashCode();
-	}
-
-	/**
-	 * Compare objects
-	 * @param other
-	 * @return Bool
-	 */
-	public function equals(other:Dynamic):Bool {
-		if (Std.is(other, CollectorDriver)) {
-			return name == cast(other, CollectorDriver).name;
-		}
-
-		return false;
+	public function new(deviceTypes:Array<String>, protocol:TransportProtocol) {
+		this.deviceTypes = deviceTypes;
+		this.protocol = protocol;
 	}
 }
