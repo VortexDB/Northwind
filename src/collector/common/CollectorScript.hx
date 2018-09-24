@@ -1,5 +1,6 @@
 package collector.common;
 
+import collector.common.CollectorWorker.DriverMapKey;
 import haxe.Log;
 import haxe.Timer;
 import collector.common.parameters.MeasureParameter;
@@ -18,6 +19,11 @@ class CollectorScript {
 	 * Default deep in days
 	 */
 	public static inline var DEFAULT_DEEP = 3;
+
+	/**
+	 * Owner of script
+	 */
+	private final owner:CollectorWorker;
 
 	/**
 	 * Name of script
@@ -67,7 +73,7 @@ class CollectorScript {
 	/**
 	 * Start collect from device
 	 */
-	private function startCollect() {		
+	private function startCollect() {
 		Log.trace('Device count: ${devices.length}');
 		Log.trace('Parameters: ${parameters.length}');
 		Log.trace('Actions: ${actions.length}');
@@ -82,6 +88,11 @@ class CollectorScript {
 			// Open channel if it's a ClientChannel
 
 			var routeDevices = routeDeviceGroups[route];
+			for (device in routeDevices) {
+				var driverKey = new DriverMapKey(device.deviceType, device.protocolType);
+				var driver = owner.getDriver(driverKey);
+				trace(driver);
+			}
 			// Get driver by deviceType and protocolType
 
 			// Close channel if it's a ClientChannel
@@ -92,7 +103,8 @@ class CollectorScript {
 	 * Constructor
 	 * @param name
 	 */
-	public function new(name:String, schedule:ISchedule, deep:Int = DEFAULT_DEEP) {
+	public function new(owner:CollectorWorker, name:String, schedule:ISchedule, deep:Int = DEFAULT_DEEP) {
+		this.owner = owner;
 		this.deep = deep;
 		this.name = name;
 		this.parameters = new HashSet<MeasureParameter>();

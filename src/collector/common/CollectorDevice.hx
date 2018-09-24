@@ -1,6 +1,5 @@
 package collector.common;
 
-import haxe.MainLoop;
 using core.utils.StringHelper;
 
 /**

@@ -1,6 +1,7 @@
 package collector.common;
 
 import haxe.Log;
+import haxe.ds.HashMap;
 import core.time.schedule.ISchedule;
 import core.collections.HashSet;
 import collector.common.appdriver.CollectorDriver;
@@ -77,14 +78,14 @@ class CollectorWorker {
 	/**
 	 * Known drivers that can collect data
 	 */
-	private final drivers:Map<DriverMapKey, CollectorDriver>;
+	private final drivers:HashMap<DriverMapKey, CollectorDriver>;
 
 	/**
 	 * Constructor
 	 */
 	public function new() {
 		scripts = new HashSet<CollectorScript>();
-		drivers = new Map<DriverMapKey, CollectorDriver>();
+		drivers = new HashMap<DriverMapKey, CollectorDriver>();
 		isWorking = false;
 	}
 
@@ -93,7 +94,7 @@ class CollectorWorker {
 	 * @return CollectorScript
 	 */
 	public function newScript(name:String, schedule:ISchedule):CollectorScript {
-		var script = new CollectorScript(name, schedule);
+		var script = new CollectorScript(this, name, schedule);
 		scripts.add(script);
 		return script;
 	}
@@ -109,8 +110,16 @@ class CollectorWorker {
 			var nameItems = className.split(".");
 			var protocol = nameItems[nameItems.length - 1];
 			var driverKey = new DriverMapKey(devType, protocol);
-			drivers[driverKey] = driverInstance;
+			drivers.set(driverKey, driverInstance);
 		}
+	}
+
+	/**
+	 * Get driver by it's key
+	 * @param driverKey 
+	 */
+	public function getDriver(driverKey:DriverMapKey) {
+		return drivers.get(driverKey);
 	}
 
 	/**

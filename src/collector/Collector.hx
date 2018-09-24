@@ -1,8 +1,10 @@
 package collector;
 
+import collector.common.DeviceRoute.TcpClientRoute;
 import core.time.schedule.PeriodicSchedule;
 import core.time.TimeSpan;
 import collector.common.CollectorWorker;
+import collector.common.CollectorDevice;
 
 import collector.appdrivers.teplokom.vkt7like.Vkt7likeDriver;
 
@@ -20,7 +22,8 @@ class Collector {
 		var schedule = new PeriodicSchedule(
 			new TimeSpan({seconds:10})
 		);
-		worker.newScript("Collect data", schedule);
+		var script = worker.newScript("Collect data", schedule);
+		script.addDevice(new CollectorDevice("2313", "Vkt7", "ModbusRtuProtocol", new TcpClientRoute("localhost", 26301)));
 		worker.start();
 	}
 }
