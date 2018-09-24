@@ -50,6 +50,14 @@ class DriverMapKey {
 
 		return false;
 	}
+
+	/**
+	 * Convert to string
+	 * @return String
+	 */
+	public function toString():String {
+		return 'DeviceType: ${deviceType} ProtocolType: ${protocolType}';
+	}
 }
 
 /**
@@ -96,8 +104,13 @@ class CollectorWorker {
 	 */
 	public function registerDriver(driver:Class<Dynamic>) {
 		var driverInstance = cast(Type.createInstance(driver, []), CollectorDriver);
-		trace(driverInstance.deviceTypes);
-		//var driverKey = new DriverMapKey();
+		for (devType in driverInstance.deviceTypes) {
+			var className = Type.getClassName(Type.getClass(driverInstance.protocol));
+			var nameItems = className.split(".");
+			var protocol = nameItems[nameItems.length - 1];
+			var driverKey = new DriverMapKey(devType, protocol);
+			drivers[driverKey] = driverInstance;
+		}
 	}
 
 	/**
