@@ -23,12 +23,18 @@ class CollectorDevice {
 	public final protocolType:String;
 
 	/**
+	 * Some route to connecto to device
+	 */
+	public final route:DeviceRoute;
+
+	/**
 	 * Constructor
 	 */
-	public function new(serial:String, deviceType:String, protocolType:String) {
+	public function new(serial:String, deviceType:String, protocolType:String, route:DeviceRoute) {
 		this.serial = serial;
 		this.deviceType = deviceType;
 		this.protocolType = protocolType;		
+		this.route = route;
 	}
 
 	/**
