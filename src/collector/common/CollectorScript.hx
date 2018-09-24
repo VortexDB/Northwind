@@ -54,6 +54,8 @@ class CollectorScript {
 	 */
 	private function startSchedule() {
 		var span = schedule.nextStart();
+		Log.trace('Script: ${name}');
+		Log.trace('Next start: ${span}');
 		var ms = Math.floor(span.totalMilliseconds);
 		Timer.delay(() -> {
 			startCollect();
@@ -65,8 +67,7 @@ class CollectorScript {
 	/**
 	 * Start collect from device
 	 */
-	private function startCollect() {
-		Log.trace("Start collect");
+	private function startCollect() {		
 		Log.trace('Device count: ${devices.length}');
 		Log.trace('Parameters: ${parameters.length}');
 		Log.trace('Actions: ${actions.length}');
