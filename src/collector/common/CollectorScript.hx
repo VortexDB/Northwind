@@ -69,8 +69,8 @@ class CollectorScript {
 		Log.trace("Start collect");
 		Log.trace('Device count: ${devices.length}');
 		Log.trace('Parameters: ${parameters.length}');
-      	Log.trace('Actions: ${actions.length}');
-      	Log.trace('Deep: ${deep}');
+		Log.trace('Actions: ${actions.length}');
+		Log.trace('Deep: ${deep}');
 	}
 
 	/**

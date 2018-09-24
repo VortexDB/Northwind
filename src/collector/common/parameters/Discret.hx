@@ -1,6 +1,8 @@
 package collector.common.parameters;
 
-// Discret type
+/**
+ * Discret type
+ */
 enum DiscretType {
 	None;
 	Second;
