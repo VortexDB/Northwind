@@ -1,5 +1,7 @@
 package collector.common.appdriver;
 
+import collector.common.task.CollectorDeviceTasks;
+
 /**
  * Collects data from devices
  */
@@ -21,4 +23,11 @@ class CollectorDriver {
 		this.deviceTypes = deviceTypes;
 		this.protocol = protocol;
 	}
+
+	/**
+	 * Add tasks for device
+	 * For override
+	 * @param deviceTasks
+	 */
+	public function appendTask(deviceTasks:CollectorDeviceTasks):Void {}
 }
