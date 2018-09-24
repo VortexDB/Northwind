@@ -21,4 +21,25 @@ class MeasureParameter {
 		this.measureType = measureType;
 		this.discret = discret;
 	}
+
+	/**
+	 * Calc hash
+	 * @return Int
+	 */
+	public function hashCode():Int {
+		return measureType.hashCode() ^ discret.hashCode();
+	}
+
+	/**
+	 * Compare objects
+	 * @param other
+	 * @return Bool
+	 */
+	public function equals(other:Dynamic):Bool {
+		if (Std.is(other, MeasureParameter)) {
+			return hashCode() == cast(other, MeasureParameter).hashCode();
+		}
+
+		return false;
+	}
 }

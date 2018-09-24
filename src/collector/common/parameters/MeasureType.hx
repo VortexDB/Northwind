@@ -1,5 +1,7 @@
 package collector.common.parameters;
 
+using core.utils.StringHelper;
+
 /**
  * Basic measure type like energy, pressure, temperatur
  */
@@ -35,5 +37,26 @@ class MeasureType {
 	public function new(name:String, baseMeasure:BaseMeasureType) {
 		this.name = name;
 		this.baseMeasure = baseMeasure;
+	}
+
+	/**
+	 * Calc hash
+	 * @return Int
+	 */
+	public function hashCode():Int {
+		return name.hashCode();
+	}
+
+	/**
+	 * Compare objects
+	 * @param other
+	 * @return Bool
+	 */
+	public function equals(other:Dynamic):Bool {
+		if (Std.is(other, MeasureType)) {
+			return name == cast(other, MeasureType).name;
+		}
+
+		return false;
 	}
 }
