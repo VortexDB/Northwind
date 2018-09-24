@@ -80,6 +80,8 @@ class CollectorScript {
 	public function new(name:String, schedule:ISchedule, deep:Int = DEFAULT_DEEP) {
 		this.deep = deep;
 		this.name = name;
+		this.parameters = new HashSet<MeasureParameter>();
+		this.actions = new HashSet<DeviceAction>();
 		this.devices = new HashSet<CollectorDevice>();
 		this.schedule = schedule;
 	}
