@@ -23,7 +23,7 @@ class Collector {
 			new TimeSpan({seconds:10})
 		);
 		var script = worker.newScript("Collect data", schedule);
-		script.addDevice(new CollectorDevice("2313", "Vkt7", "ModbusRtuProtocol", new TcpClientRoute("localhost", 26301)));
+		script.addDevice(new CollectorDevice("2313", "Vkt7", "ModbusRtuProtocol", new TcpClientRoute("localhost", 26301)));		
 		worker.start();
 	}
 }

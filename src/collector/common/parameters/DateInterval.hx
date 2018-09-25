@@ -14,7 +14,7 @@ class DateInterval {
     /**
      * End date
      */
-    public final endDate : DateTime
+    public final endDate : DateTime;
     
     /**
      * Constructor

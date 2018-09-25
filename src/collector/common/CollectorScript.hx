@@ -1,5 +1,7 @@
 package collector.common;
 
+import collector.common.task.CollectorDeviceTasks;
+import collector.common.task.CollectorDataTask;
 import collector.common.task.CollectorTask;
 import core.time.TimeSpan;
 import core.time.DateTime;
@@ -18,6 +20,7 @@ import collector.common.parameters.DeviceAction;
 import collector.common.channel.TransportChannel;
 import collector.common.channel.ClientTransportChannel;
 import collector.common.parameters.DateInterval;
+import collector.common.task.CollectorActionTask;
 
 /**
  * Collects data from app layer drivers
@@ -150,9 +153,15 @@ class CollectorScript {
 
 		for (device in devices) {
 			for (action in actions) {
-				tasks.push(new CollectorActionTask(action))
+				tasks.push(new CollectorActionTask(action));
 			}
-		}
+
+			for(parameter in parameters) {
+				tasks.push(new CollectorDataTask(parameter, interval));
+			}
+
+			driver.appendTask(new CollectorDeviceTasks(device, tasks));
+		}		
 	}
 
 	/**
@@ -195,6 +204,22 @@ class CollectorScript {
 	 */
 	public function addDevice(device:CollectorDevice) {
 		devices.add(device);
+	}
+
+	/**
+	 * Add device action
+	 * @param action
+	 */
+	public function addAction(action:DeviceAction) {
+		actions.add(action);
+	}
+
+	/**
+	 * Add measure parameter
+	 * @param action
+	 */
+	public function addParameter(parameter:MeasureParameter) {
+		parameters.add(parameter);
 	}
 
 	/**
