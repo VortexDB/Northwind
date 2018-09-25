@@ -25,7 +25,7 @@ class CollectorDriverExecuter<TContext:ExecutionContext, TResult> {
     public function execute(call:(TResult) -> Void): Void { throw "Not implemented"; }
 
     /**
-     * 
+     * Execute one iteration and get result
      * @param call 
      * @return -> Void)
      */

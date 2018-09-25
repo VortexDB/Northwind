@@ -34,7 +34,7 @@ class Vkt7likeDriver extends CollectorMeterDriver implements IDriverWithExecutio
 			switch (taskAction.action.actionType) {
 				case ActionType.ReadDateTime:
 					var reader = new TimeReader(executionContext);
-				    reader.execute();
+				    var dateTime = reader.executeOne();
 				default:
 			}
 		}
