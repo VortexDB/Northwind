@@ -4,6 +4,7 @@ import collector.common.parameters.Discret.DiscretType;
 import collector.common.task.CollectorDataTask;
 import collector.common.task.CollectorDeviceTasks;
 import collector.common.task.CollectorActionTask;
+import collector.common.appdriver.deviceinfo.*;
 
 using core.utils.IterableHelper;
 

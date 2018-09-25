@@ -2,6 +2,7 @@ package collector.common.appdriver;
 
 import collector.common.task.CollectorDeviceTasks;
 import collector.common.protocol.TransportProtocol;
+import collector.common.appdriver.event.CollectorDriverEvent;
 
 /**
  * Collects data from devices
@@ -23,6 +24,13 @@ class CollectorDriver {
 	public function new(deviceTypes:Array<String>, protocol:TransportProtocol) {
 		this.deviceTypes = deviceTypes;
 		this.protocol = protocol;
+	}
+
+	/**
+	 * Notify about some event on taks
+	 */
+	public function notifyTaskEvent(event:CollectorDriverEvent) {
+
 	}
 
 	/**

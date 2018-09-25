@@ -1,4 +1,4 @@
-package collector.common.appdriver;
+package collector.common.appdriver.deviceinfo;
 
 /**
  * Info about pipe

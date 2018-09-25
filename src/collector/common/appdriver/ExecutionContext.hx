@@ -1,5 +1,7 @@
 package collector.common.appdriver;
 
+import collector.common.appdriver.deviceinfo.DeviceInfo;
+
 import collector.common.protocol.TransportProtocol;
 /**
  * Abstract execution context for transfering it between driver and executers
