@@ -12,6 +12,7 @@ import collector.common.CollectorWorker.DriverMapKey;
 import collector.common.parameters.MeasureParameter;
 import collector.common.parameters.DeviceAction;
 import collector.common.channel.TransportChannel;
+import collector.common.channel.ClientTransportChannel;
 
 /**
  * Collects data from app layer drivers
@@ -96,7 +97,10 @@ class CollectorScript {
 		for (route in routeDeviceGroups.keys()) {
 			// Get channel
 			var channel = getChannelByRoute(route);
+			var clientChannel:ClientTransportChannel = cast channel;
 			// Open channel if it's a ClientChannel
+			if (clientChannel != null)
+				clientChannel.open(1000);
 
 			var routeDevices = routeDeviceGroups[route];
 			for (device in routeDevices) {
@@ -104,9 +108,10 @@ class CollectorScript {
 				var driver = owner.getDriver(driverKey);
 				trace(driver);
 			}
-			// Get driver by deviceType and protocolType
 
 			// Close channel if it's a ClientChannel
+			if (clientChannel != null)
+				clientChannel.close();
 		}
 	}
 

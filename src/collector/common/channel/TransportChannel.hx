@@ -18,7 +18,7 @@ class TransportChannel {
 	}
 
 	/**
-	 * Open channel
+	 * Open channel with timeout in milliseconds
 	 */
 	public function open(timeout:Int):Void {
 		throw "Not implemented";
