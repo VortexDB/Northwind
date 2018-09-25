@@ -1,10 +1,11 @@
 package collector.common;
 
+import collector.common.appdriver.CollectorDriver;
 import haxe.Log;
 import haxe.Timer;
-
 import core.time.schedule.ISchedule;
 import core.collections.HashSet;
+
 using core.utils.StringHelper;
 using core.utils.IterableHelper;
 
@@ -60,7 +61,7 @@ class CollectorScript {
 
 	/**
 	 * Get channel for route
-	 * @param route 
+	 * @param route
 	 */
 	private function getChannelByRoute(route:DeviceRoute):TransportChannel {
 		return null;
@@ -79,7 +80,7 @@ class CollectorScript {
 			// Launch again
 			startSchedule();
 		}, ms);
-	}
+	}	
 
 	/**
 	 * Start collect from device
@@ -103,16 +104,38 @@ class CollectorScript {
 				clientChannel.open(1000);
 
 			var routeDevices = routeDeviceGroups[route];
+			// For grouping by driver key
+			var driverKeys = new Array<DriverMapKey>();
+
 			for (device in routeDevices) {
 				var driverKey = new DriverMapKey(device.deviceType, device.protocolType);
-				var driver = owner.getDriver(driverKey);
-				trace(driver);
+				driverKeys.push(driverKey);
+			}
+
+			var driverKeyGroups = driverKeys.groupdBy((e) -> {
+				return e.hashCode();
+			});
+
+			for (driverKey in driverKeyGroups) {
+				var first = driverKey[0];
+				var driver = owner.getDriver(first);
+				driver.protocol.channel = channel;
+				collectByDriver(driver, routeDevices);
 			}
 
 			// Close channel if it's a ClientChannel
 			if (clientChannel != null)
 				clientChannel.close();
 		}
+	}
+
+	/**
+	 * Collect data by driver
+	 * @param driver 
+	 * @param devices 
+	 */
+	private function collectByDriver(driver:CollectorDriver, devices:Array<CollectorDevice>) {
+		
 	}
 
 	/**
