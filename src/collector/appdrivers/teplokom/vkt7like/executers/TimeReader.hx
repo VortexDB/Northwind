@@ -9,10 +9,19 @@ import collector.appdrivers.teplokom.vkt7like.common.VktExecuterContext;
  * Read time
  */
 class TimeReader extends CollectorDriverExecuter<VktExecuterContext, DateTime> {
-    /**
-     * Constructor
-     */
-    public function new(executionContext:VktExecuterContext) {
-        super(executionContext);
-    }
+	/**
+	 * Constructor
+	 */
+	public function new(executionContext:VktExecuterContext) {
+		super(executionContext);
+	}
+
+	/**
+	 * Execute one iteration and get result
+	 * @param call
+	 * @return -> Void)
+	 */
+	public override function executeOne():DateTime {
+		return DateTime.now();
+	}
 }

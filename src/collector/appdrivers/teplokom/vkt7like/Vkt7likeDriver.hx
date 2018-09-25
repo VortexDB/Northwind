@@ -1,11 +1,13 @@
 package collector.appdrivers.teplokom.vkt7like;
 
+import core.time.DateTime;
 import collector.appdrivers.teplokom.vkt7like.common.VktExecuterContext;
 import collector.common.appdriver.IDriverWithExecutionContext;
 import collector.common.task.CollectorActionTask;
 import collector.common.appdriver.CollectorMeterDriver;
 import collector.protocols.modbus.rtu.ModbusRtuProtocol;
 import collector.common.parameters.DeviceAction;
+import collector.common.appdriver.event.ReadTimeResponseEvent;
 import collector.appdrivers.teplokom.vkt7like.executers.TimeReader;
 
 /**
@@ -35,6 +37,7 @@ class Vkt7likeDriver extends CollectorMeterDriver implements IDriverWithExecutio
 				case ActionType.ReadDateTime:
 					var reader = new TimeReader(executionContext);
 				    var dateTime = reader.executeOne();
+					notifyTaskEvent(new ReadTimeResponseEvent(taskAction.taskId, dateTime));
 				default:
 			}
 		}
