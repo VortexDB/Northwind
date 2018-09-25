@@ -83,7 +83,10 @@ class CollectorScript {
 		Log.trace('Next start: ${span}');
 		var ms = Math.floor(span.totalMilliseconds);
 		Timer.delay(() -> {
+			var stamp = Timer.stamp();
 			startCollect();
+			stamp = Timer.stamp() - stamp;
+			Log.trace('Executed: ${stamp} seconds');
 			// Launch again
 			startSchedule();
 		}, ms);

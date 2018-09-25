@@ -32,8 +32,6 @@ class CollectorDriver {
 	 * Notify about some event on taks
 	 */
 	public function notifyTaskEvent(event:CollectorDriverEvent) {
-		var d : ReadTimeResponseEvent = cast event;
-		trace(d.value);
 	}
 
 	/**
