@@ -56,6 +56,14 @@ class CollectorScript {
 	public final actions:HashSet<DeviceAction>;
 
 	/**
+	 * Get channel for route
+	 * @param route 
+	 */
+	private function getChannelByRoute(route:DeviceRoute):TransportChannel {
+		return null;
+	}
+
+	/**
 	 * Waiting for start and start collect
 	 */
 	private function startSchedule() {
@@ -85,6 +93,7 @@ class CollectorScript {
 
 		for (route in routeDeviceGroups.keys()) {
 			// Get channel
+			var channel = getChannelByRoute(route);
 			// Open channel if it's a ClientChannel
 
 			var routeDevices = routeDeviceGroups[route];
