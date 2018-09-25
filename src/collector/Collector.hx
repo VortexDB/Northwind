@@ -1,6 +1,5 @@
 package collector;
 
-import collector.common.parameters.DeviceAction;
 import collector.common.DeviceRoute.TcpClientRoute;
 import core.time.schedule.PeriodicSchedule;
 import core.time.TimeSpan;
