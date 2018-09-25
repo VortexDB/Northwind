@@ -1,5 +1,6 @@
 package collector;
 
+import collector.common.parameters.DeviceAction;
 import collector.common.DeviceRoute.TcpClientRoute;
 import core.time.schedule.PeriodicSchedule;
 import core.time.TimeSpan;
@@ -24,6 +25,7 @@ class Collector {
 		);
 		var script = worker.newScript("Collect data", schedule);
 		script.addDevice(new CollectorDevice("2313", "Vkt7", "ModbusRtuProtocol", new TcpClientRoute("localhost", 26301)));		
+		script.addAction(new DeviceAction(StateAction.ReadDateTime));
 		worker.start();
 	}
 }
