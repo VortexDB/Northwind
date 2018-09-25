@@ -49,7 +49,7 @@ class CollectorMeterDriver extends CollectorDriver {
 	 * Process execute actions. Virtual
 	 * @param action
 	 */
-	public function executeActions(action:Array<CollectorActionTask>):Void {}
+	public function executeActions(actions:Array<CollectorActionTask>):Void {}
 
 	/**
 	 * Process read current values. Virtual

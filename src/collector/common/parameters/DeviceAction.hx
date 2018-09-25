@@ -3,7 +3,7 @@ package collector.common.parameters;
 /**
  *  Action for a state
  */
-enum StateAction {
+enum ActionType {
 	/**
 	 * Read date time
 	 */
@@ -22,14 +22,14 @@ class DeviceAction {
 	/**
 	 * Action on device
 	 */
-	public final action:StateAction;
+	public final actionType:ActionType;
 
 	/**
 	 * Constructor
 	 * @param action 
 	 */
-	public function new(action:StateAction) {
-		this.action = action;
+	public function new(actionType:ActionType) {
+		this.actionType = actionType;
 	}
 
     /**
@@ -37,7 +37,7 @@ class DeviceAction {
 	 * @return Int
 	 */
 	public function hashCode():Int {
-		return action.getIndex();
+		return actionType.getIndex();
 	}
 
 	/**
