@@ -1,6 +1,6 @@
-package collector.common.protocols.modbus.rtu;
+package collector.protocols.modbus.rtu;
 
-import collector.common.protocols.modbus.ModbusProtocol;
+import collector.protocols.modbus.ModbusProtocol;
 
 /**
  * Modbus Rtu protocol

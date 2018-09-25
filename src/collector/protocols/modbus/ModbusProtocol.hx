@@ -1,4 +1,6 @@
-package collector.common.protocols.modbus;
+package collector.protocols.modbus;
+
+import collector.common.protocol.TransportProtocol;
 
 /**
  * Base modbus protocol

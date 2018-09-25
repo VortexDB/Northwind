@@ -1,15 +1,17 @@
 package collector.common;
 
-import collector.common.CollectorWorker.DriverMapKey;
 import haxe.Log;
 import haxe.Timer;
-import collector.common.parameters.MeasureParameter;
-import collector.common.parameters.DeviceAction;
+
 import core.time.schedule.ISchedule;
 import core.collections.HashSet;
-
 using core.utils.StringHelper;
 using core.utils.IterableHelper;
+
+import collector.common.CollectorWorker.DriverMapKey;
+import collector.common.parameters.MeasureParameter;
+import collector.common.parameters.DeviceAction;
+import collector.common.channel.TransportChannel;
 
 /**
  * Collects data from app layer drivers

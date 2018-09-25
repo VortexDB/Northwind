@@ -1,7 +1,7 @@
 package collector.appdrivers.teplokom.vkt7like;
 
 import collector.common.appdriver.CollectorMeterDriver;
-import collector.common.protocols.modbus.rtu.ModbusRtuProtocol;
+import collector.protocols.modbus.rtu.ModbusRtuProtocol;
 
 /**
  * Driver for Vkt7 like driver

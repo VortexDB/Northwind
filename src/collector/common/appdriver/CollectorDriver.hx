@@ -1,6 +1,7 @@
 package collector.common.appdriver;
 
 import collector.common.task.CollectorDeviceTasks;
+import collector.common.protocol.TransportProtocol;
 
 /**
  * Collects data from devices

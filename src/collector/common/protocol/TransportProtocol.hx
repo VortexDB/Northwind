@@ -1,4 +1,4 @@
-package collector.common;
+package collector.common.protocol;
 
 /**
  * Protocol for transporting data to device

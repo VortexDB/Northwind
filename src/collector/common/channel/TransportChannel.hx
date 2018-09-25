@@ -1,4 +1,4 @@
-package collector.common;
+package collector.common.channel;
 
 /**
  * Base transport channel
