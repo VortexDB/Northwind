@@ -1,5 +1,8 @@
 package collector.common;
 
+import collector.common.task.CollectorTask;
+import core.time.TimeSpan;
+import core.time.DateTime;
 import collector.common.appdriver.CollectorDriver;
 import haxe.Log;
 import haxe.Timer;
@@ -14,6 +17,7 @@ import collector.common.parameters.MeasureParameter;
 import collector.common.parameters.DeviceAction;
 import collector.common.channel.TransportChannel;
 import collector.common.channel.ClientTransportChannel;
+import collector.common.parameters.DateInterval;
 
 /**
  * Collects data from app layer drivers
@@ -135,7 +139,20 @@ class CollectorScript {
 	 * @param devices 
 	 */
 	private function collectByDriver(driver:CollectorDriver, devices:Array<CollectorDevice>) {
-		
+		var now = DateTime.now();
+		var startDate = now + new TimeSpan({
+			days: deep
+		});
+		var endTime = now;
+
+		var interval = new DateInterval(startDate, endTime);
+		var tasks = new Array<CollectorTask>();
+
+		for (device in devices) {
+			for (action in actions) {
+				tasks.push(new CollectorActionTask(action))
+			}
+		}
 	}
 
 	/**
