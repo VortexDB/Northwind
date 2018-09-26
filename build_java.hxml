@@ -2,4 +2,5 @@
 -main collector.Collector
 -java out/java
 -lib core
+-java-lib libs/java/jSerialComm-2.1.1.jar
 -dce full
