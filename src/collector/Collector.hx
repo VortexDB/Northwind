@@ -1,10 +1,12 @@
 package collector;
 
-import collector.common.route.DirectSerialRoute;
 import core.time.schedule.PeriodicSchedule;
 import core.time.TimeSpan;
+import core.io.port.Parity;
+
 import collector.common.CollectorWorker;
 import collector.common.CollectorDevice;
+import collector.common.route.DirectSerialRoute;
 import collector.common.parameters.DeviceAction;
 
 import collector.appdrivers.teplokom.vkt7like.Vkt7likeDriver;

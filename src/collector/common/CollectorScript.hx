@@ -10,18 +10,20 @@ import core.collections.HashSet;
 using core.utils.StringHelper;
 using core.utils.IterableHelper;
 
-import collector.common.route.DeviceRoute;
+import collector.common.CollectorWorker.DriverMapKey;
 import collector.common.appdriver.CollectorDriver;
 import collector.common.task.CollectorDeviceTasks;
 import collector.common.task.CollectorDataTask;
 import collector.common.task.CollectorTask;
-import collector.common.CollectorWorker.DriverMapKey;
+import collector.common.task.CollectorActionTask;
 import collector.common.parameters.MeasureParameter;
 import collector.common.parameters.DeviceAction;
+import collector.common.parameters.DateInterval;
+import collector.common.route.DeviceRoute;
+import collector.common.route.DirectSerialRoute;
 import collector.common.channel.TransportChannel;
 import collector.common.channel.ClientTransportChannel;
-import collector.common.parameters.DateInterval;
-import collector.common.task.CollectorActionTask;
+import collector.channels.serial.SerialDirectChannel;
 
 /**
  * Collects data from app layer drivers
@@ -72,6 +74,9 @@ class CollectorScript {
 	 * @param route
 	 */
 	private function getChannelByRoute(route:DeviceRoute):TransportChannel {
+		if ((route is DirectSerialRoute)) {
+			return new SerialDirectChannel(route);
+		}
 		return null;
 	}
 
