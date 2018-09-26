@@ -1,5 +1,7 @@
 package collector.common.channel;
 
+import collector.common.route.DeviceRoute;
+
 /**
  * Base transport channel
  */
@@ -11,7 +13,7 @@ class TransportChannel {
 
 	/**
 	 * Constructor
-	 * @param route 
+	 * @param route
 	 */
 	public function new(route:DeviceRoute) {
 		this.route = route;

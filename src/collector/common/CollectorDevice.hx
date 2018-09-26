@@ -1,5 +1,7 @@
 package collector.common;
 
+import collector.common.route.DeviceRoute;
+
 using core.utils.StringHelper;
 
 /**

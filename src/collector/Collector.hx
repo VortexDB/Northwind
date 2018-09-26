@@ -1,6 +1,6 @@
 package collector;
 
-import collector.common.DeviceRoute.TcpClientRoute;
+import collector.common.route.DirectSerialRoute;
 import core.time.schedule.PeriodicSchedule;
 import core.time.TimeSpan;
 import collector.common.CollectorWorker;
@@ -24,7 +24,11 @@ class Collector {
 			new TimeSpan({seconds:10})
 		);
 		var script = worker.newScript("Collect data", schedule);
-		script.addDevice(new CollectorDevice("2313", "Vkt7", "ModbusRtuProtocol", new TcpClientRoute("localhost", 26301)));		
+		script.addDevice(new CollectorDevice("2313", "Vkt7", "ModbusRtuProtocol", new DirectSerialRoute("COM4", 9600, {
+			dataBits: 8,
+			parity: Parity.None,
+			stopBits: 1
+		})));
 		script.addAction(new DeviceAction(ActionType.ReadDateTime));
 		worker.start();
 	}

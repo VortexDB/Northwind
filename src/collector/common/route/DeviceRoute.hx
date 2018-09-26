@@ -1,6 +1,4 @@
-package collector.common;
-
-using core.utils.StringHelper;
+package collector.common.route;
 
 /**
  * Base route information to make connection for device

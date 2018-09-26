@@ -1,5 +1,7 @@
 package collector.common.route;
 
+using core.utils.StringHelper;
+
 /**
  * Information about tcp client connection
  */

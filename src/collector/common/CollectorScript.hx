@@ -1,11 +1,7 @@
 package collector.common;
 
-import collector.common.task.CollectorDeviceTasks;
-import collector.common.task.CollectorDataTask;
-import collector.common.task.CollectorTask;
 import core.time.TimeSpan;
 import core.time.DateTime;
-import collector.common.appdriver.CollectorDriver;
 import haxe.Log;
 import haxe.Timer;
 import core.time.schedule.ISchedule;
@@ -14,6 +10,11 @@ import core.collections.HashSet;
 using core.utils.StringHelper;
 using core.utils.IterableHelper;
 
+import collector.common.route.DeviceRoute;
+import collector.common.appdriver.CollectorDriver;
+import collector.common.task.CollectorDeviceTasks;
+import collector.common.task.CollectorDataTask;
+import collector.common.task.CollectorTask;
 import collector.common.CollectorWorker.DriverMapKey;
 import collector.common.parameters.MeasureParameter;
 import collector.common.parameters.DeviceAction;
