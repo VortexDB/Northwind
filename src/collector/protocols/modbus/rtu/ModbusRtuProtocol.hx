@@ -1,5 +1,6 @@
 package collector.protocols.modbus.rtu;
 
+import core.async.Future;
 import collector.protocols.modbus.ModbusProtocol;
 
 /**
@@ -7,8 +8,17 @@ import collector.protocols.modbus.ModbusProtocol;
  */
 @:keep
 class ModbusRtuProtocol extends ModbusProtocol {
-    /**
-     * Constructor
-     */
-    public function new() {}
+	/**
+	 * Constructor
+	 */
+	public function new() {}
+
+	/**
+	 * Send request and wait for response
+	 * @param request
+	 * @return ProtocolResponse
+	 */
+	public function sendRequestWithResponse(request:ModbusRtuRequest):Future<ModbusRtuResponse> {
+        return null;
+    }
 }

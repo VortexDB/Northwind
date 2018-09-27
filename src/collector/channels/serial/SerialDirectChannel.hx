@@ -48,7 +48,7 @@ class SerialDirectChannel extends ClientTransportChannel implements IBinaryChann
 	 * @param data
 	 */
 	public function write(data:Bytes):Void {
-		throw "Not implemented";
+		trace(data.toHex());
 	}
 
 	/**
@@ -56,6 +56,7 @@ class SerialDirectChannel extends ClientTransportChannel implements IBinaryChann
 	 * @return Bytes
 	 */
 	public function read():Bytes {
-		throw "Not implemented";
+		trace("READ DATA");
+		return null;
 	}
 }
