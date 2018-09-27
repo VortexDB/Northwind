@@ -18,7 +18,7 @@ class ModbusRtuProtocol extends ModbusProtocol {
 	 * @param request
 	 * @return ProtocolResponse
 	 */
-	public function sendRequestWithResponse(request:ModbusRtuRequest):Future<ModbusRtuResponse> {
+	public function sendRequestWithResponse(request:ModbusRtuRequest):ModbusRtuResponse {
         return null;
     }
 }

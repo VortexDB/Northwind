@@ -22,6 +22,7 @@ class TimeReader extends CollectorDriverExecuter<VktExecuterContext, DateTime> {
 	 * @return -> Void)
 	 */
 	public override function executeOne():DateTime {
+		var response = executionContext.modbusProtocol.sendRequestWithResponse();
 		return DateTime.now();
 	}
 }
