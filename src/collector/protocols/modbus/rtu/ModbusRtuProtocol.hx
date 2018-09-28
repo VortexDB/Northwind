@@ -1,6 +1,8 @@
 package collector.protocols.modbus.rtu;
 
-import core.async.Future;
+import haxe.io.BytesBuffer;
+import haxe.io.Bytes;
+import collector.common.channel.IBinaryChannel;
 import collector.protocols.modbus.ModbusProtocol;
 
 /**
@@ -19,6 +21,10 @@ class ModbusRtuProtocol extends ModbusProtocol {
 	 * @return ProtocolResponse
 	 */
 	public function sendRequestWithResponse(request:ModbusRtuRequest):ModbusRtuResponse {
+		var chan = cast(channel, IBinaryChannel);
+		var pdu = request.getData();
+		var bytes = new BytesBuffer();
+
         return null;
     }
 }

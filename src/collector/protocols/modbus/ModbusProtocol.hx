@@ -1,5 +1,7 @@
 package collector.protocols.modbus;
 
+import haxe.io.Bytes;
+import collector.common.channel.IBinaryChannel;
 import collector.common.protocol.TransportProtocol;
 
 /**
