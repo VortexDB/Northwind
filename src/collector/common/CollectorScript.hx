@@ -1,5 +1,6 @@
 package collector.common;
 
+import collector.common.appdriver.event.CollectorDriverEvent;
 import collector.common.appdriver.CollectorMeterDriver;
 import collector.common.appdriver.ExecutionContext;
 import collector.common.appdriver.IDriverWithExecutionContext;
@@ -149,6 +150,13 @@ class CollectorScript {
 	}
 
 	/**
+	 * Process events from driver
+	 */
+	private function processDriverEvent(driver:CollectorDriver, event: CollectorDriverEvent) {
+		trace("DRIVER EVENT");
+	}
+
+	/**
 	 * Collect data by driver
 	 * @param driver
 	 * @param devices
@@ -162,6 +170,9 @@ class CollectorScript {
 
 		var interval = new DateInterval(startDate, endTime);
 		var tasks = new Array<CollectorTask>();
+
+		// Process driver event
+		driver.onEvent = processDriverEvent;
 
 		for (device in devices) {
 			for (action in actions) {

@@ -1,10 +1,8 @@
 package collector.common.appdriver;
 
-import core.time.DateTime;
 import collector.common.task.CollectorDeviceTasks;
 import collector.common.protocol.TransportProtocol;
 import collector.common.appdriver.event.CollectorDriverEvent;
-import collector.common.appdriver.event.ReadTimeResponseEvent;
 
 /**
  * Collects data from devices
@@ -21,6 +19,11 @@ class CollectorDriver {
 	public final protocol:TransportProtocol;
 
 	/**
+	 * On driver event
+	 */
+	public var onEvent:(CollectorDriver, CollectorDriverEvent) -> Void;
+
+	/**
 	 * Constructor
 	 */
 	public function new(deviceTypes:Array<String>, protocol:TransportProtocol) {
@@ -32,6 +35,8 @@ class CollectorDriver {
 	 * Notify about some event on taks
 	 */
 	public function notifyTaskEvent(event:CollectorDriverEvent) {
+		if (onEvent != null)
+			onEvent(this, event);
 	}
 
 	/**

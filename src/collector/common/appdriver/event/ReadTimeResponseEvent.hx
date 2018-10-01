@@ -14,4 +14,11 @@ class ReadTimeResponseEvent extends SingleValueResponseEvent<DateTime> {
     public function new(taskId:Int, value:DateTime) {
         super(taskId, value);
     }
+
+    /**
+     * Convert to string
+     */
+    public function toString() {
+        return "TODO: convert to string";
+    }
 }
