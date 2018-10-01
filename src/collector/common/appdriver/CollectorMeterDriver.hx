@@ -22,7 +22,8 @@ class CollectorMeterDriver extends CollectorDriver {
 	 * @return MeterDeviceInfo
 	 */
 	public function getDeviceInfo(device:CollectorDevice):MeterDeviceInfo {
-		return null;
+		// TODO: get information from database
+		return new MeterDeviceInfo();
 		//   # TODO: Get this information from database
 		//   case device.dataSource
 		//   when PipeDataSource
