@@ -1,5 +1,6 @@
 package collector.protocols.modbus.rtu.requests;
 
+import core.io.BinaryData;
 import haxe.io.Bytes;
 
 /**
@@ -7,7 +8,7 @@ import haxe.io.Bytes;
  */
 class ReadHoldingRegistersRequest extends ModbusRtuRequest {
 	/**
-	 * Start address to read
+	 * Start address to read. UInt16
 	 */
 	public final address:Int;
 
@@ -40,10 +41,9 @@ class ReadHoldingRegistersRequest extends ModbusRtuRequest {
 	 * Return binary data of request
 	 */
 	override function getData():Bytes {
-		/*res = IO::Memory.new
-			res.write_bytes(address, IO::ByteFormat::BigEndian)
-			res.write_bytes(length, IO::ByteFormat::BigEndian)
-			return res.to_slice */
-		return null;
+		var binary = new BinaryData();
+		binary.addInt16(address);
+		binary.addInt16(length);		
+		return binary.toBytes();
 	}
 }

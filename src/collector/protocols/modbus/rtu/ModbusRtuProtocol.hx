@@ -26,7 +26,7 @@ class ModbusRtuProtocol extends ModbusProtocol {
 		var pdu = request.getData();
 		var fullFrame = new BinaryData();
 		// TODO: remove. It's VKT only
-		fullFrame.addUInt16(0xFFFF);
+		fullFrame.addInt16(0xFFFF);
 
 		var payload = new BinaryData();
 		payload.addByte(request.networkAddress);
@@ -35,7 +35,7 @@ class ModbusRtuProtocol extends ModbusProtocol {
 		fullFrame.addBinaryData(payload);
 
 		var crc = ModbusRtuCrcHelper.calcCrc(payload.toBytes());
-		fullFrame.addUInt16(crc);
+		fullFrame.addInt16(crc);
 
 		chan.write(fullFrame.toBytes());
 
