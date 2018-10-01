@@ -58,6 +58,6 @@ class ModbusRtuCrcHelper {
           uchCRCLo = auchCRCLo[uIndex];
       }
 
-      return ((uchCRCHi << 8) | uchCRCLo)
+      return ((uchCRCHi << 8) | uchCRCLo);
     }
 }
