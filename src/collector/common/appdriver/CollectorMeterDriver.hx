@@ -6,8 +6,6 @@ import collector.common.task.CollectorDeviceTasks;
 import collector.common.task.CollectorActionTask;
 import collector.common.appdriver.deviceinfo.*;
 
-using core.utils.IterableHelper;
-
 /**
  * Driver for smart meters
  */
@@ -15,7 +13,7 @@ class CollectorMeterDriver extends CollectorDriver {
 	/**
 	 * Information of current device
 	 */
-	private var deviceInfo:DeviceInfo;
+	public var deviceInfo:DeviceInfo;
 
 	/**
 	 * Return device info from device
@@ -23,7 +21,7 @@ class CollectorMeterDriver extends CollectorDriver {
 	 * @param device
 	 * @return MeterDeviceInfo
 	 */
-	private function getDeviceInfo(device:CollectorDevice):MeterDeviceInfo {
+	public function getDeviceInfo(device:CollectorDevice):MeterDeviceInfo {
 		return null;
 		//   # TODO: Get this information from database
 		//   case device.dataSource

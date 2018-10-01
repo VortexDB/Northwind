@@ -1,5 +1,8 @@
 package collector.common;
 
+import collector.common.appdriver.CollectorMeterDriver;
+import collector.common.appdriver.ExecutionContext;
+import collector.common.appdriver.IDriverWithExecutionContext;
 import core.time.TimeSpan;
 import core.time.DateTime;
 import haxe.Log;
@@ -96,7 +99,7 @@ class CollectorScript {
 			// Launch again
 			startSchedule();
 		}, ms);
-	}	
+	}
 
 	/**
 	 * Start collect from device
@@ -147,8 +150,8 @@ class CollectorScript {
 
 	/**
 	 * Collect data by driver
-	 * @param driver 
-	 * @param devices 
+	 * @param driver
+	 * @param devices
 	 */
 	private function collectByDriver(driver:CollectorDriver, devices:Array<CollectorDevice>) {
 		var now = DateTime.now();
@@ -165,12 +168,23 @@ class CollectorScript {
 				tasks.push(new CollectorActionTask(action));
 			}
 
-			for(parameter in parameters) {
+			for (parameter in parameters) {
 				tasks.push(new CollectorDataTask(parameter, interval));
 			}
 
+			var meterDriver:CollectorMeterDriver = cast driver;
+			if (meterDriver != null) {
+				// Create device info
+				meterDriver.deviceInfo = meterDriver.getDeviceInfo(device);
+				// Create execution context
+				var driverWithContext:IDriverWithExecutionContext<ExecutionContext> = cast driver;
+				if (driverWithContext != null) {
+					driverWithContext.executionContext = driverWithContext.createExecutionContext(meterDriver.deviceInfo, driver.protocol);
+				}
+			}
+
 			driver.appendTask(new CollectorDeviceTasks(device, tasks));
-		}		
+		}
 	}
 
 	/**

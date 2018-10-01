@@ -1,6 +1,7 @@
 package collector.appdrivers.teplokom.vkt7like;
 
-import core.time.DateTime;
+import collector.common.protocol.TransportProtocol;
+import collector.common.appdriver.deviceinfo.DeviceInfo;
 import collector.appdrivers.teplokom.vkt7like.common.VktExecuterContext;
 import collector.common.appdriver.IDriverWithExecutionContext;
 import collector.common.task.CollectorActionTask;
@@ -25,6 +26,14 @@ class Vkt7likeDriver extends CollectorMeterDriver implements IDriverWithExecutio
 	 */
 	public function new() {
 		super(["Vkt7"], new ModbusRtuProtocol());
+	}
+
+	/**
+	 * Create new execution context
+	 * @return T
+	 */
+	public function createExecutionContext(deviceInfo:DeviceInfo, protocol:TransportProtocol):VktExecuterContext {
+		return null;
 	}
 
 	/**
