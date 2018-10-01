@@ -41,7 +41,9 @@ class SerialDirectChannel extends ClientTransportChannel implements IBinaryChann
 	/**
 	 * Close channel
 	 */
-	public override function close():Void {}
+	public override function close():Void {
+		port.close();
+	}
 
 	/**
 	 * Write bytes

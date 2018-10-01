@@ -1,5 +1,6 @@
 package collector.protocols.modbus.rtu;
 
+import core.io.BinaryData;
 import haxe.io.BytesBuffer;
 import haxe.io.Bytes;
 import collector.common.channel.IBinaryChannel;
@@ -23,7 +24,20 @@ class ModbusRtuProtocol extends ModbusProtocol {
 	public function sendRequestWithResponse(request:ModbusRtuRequest):ModbusRtuResponse {
 		var chan = cast(channel, IBinaryChannel);
 		var pdu = request.getData();
-		var bytes = new BytesBuffer();
+		var fullFrame = new BinaryData();
+		// TODO: remove. It's VKT only
+		fullFrame.addUInt16(0xFFFF);
+
+		var payload = new BinaryData();
+		payload.addByte(request.networkAddress);
+		payload.addByte(request.functionId());
+		payload.addBytes(pdu);
+		fullFrame.addBinaryData(payload);
+
+		var crc = ModbusRtuCrcHelper.calcCrc(payload.toBytes());
+		fullFrame.addUInt16(crc);
+
+		chan.write(fullFrame.toBytes());
 
         return null;
     }
