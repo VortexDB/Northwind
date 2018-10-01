@@ -25,7 +25,7 @@ class Vkt7likeDriver extends CollectorMeterDriver implements IDriverWithExecutio
 	 * Constructor
 	 */
 	public function new() {
-		super(["Vkt7"], new ModbusRtuProtocol());
+		super(["Vkt7", "Vkg3"], new ModbusRtuProtocol());
 	}
 
 	/**
@@ -33,7 +33,7 @@ class Vkt7likeDriver extends CollectorMeterDriver implements IDriverWithExecutio
 	 * @return T
 	 */
 	public function createExecutionContext(deviceInfo:DeviceInfo, protocol:TransportProtocol):VktExecuterContext {
-		return null;
+		return new VktExecuterContext(deviceInfo, protocol);
 	}
 
 	/**

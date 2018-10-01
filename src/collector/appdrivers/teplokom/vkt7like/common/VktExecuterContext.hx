@@ -30,6 +30,7 @@ class VktExecuterContext extends ExecutionContext {
      */
     public function new(deviceInfo:DeviceInfo, protocol:TransportProtocol) {
         super(deviceInfo, protocol);
-        model = new VktModel();
+        // TODO: get from device
+        model = new VktModel(1);
     }
 }
