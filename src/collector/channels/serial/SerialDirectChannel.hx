@@ -51,14 +51,16 @@ class SerialDirectChannel extends ClientTransportChannel implements IBinaryChann
 	 */
 	public function write(data:Bytes):Void {
 		trace(data.toHex());
+		port.write(data);
 	}
 
 	/**
 	 * Read bytes from channel
 	 * @return Bytes
 	 */
-	public function read():Bytes {
-		trace("READ DATA");
-		return null;
+	public function read():Bytes {		
+		var res = port.read();
+		trace(res.toHex());
+		return res;
 	}
 }

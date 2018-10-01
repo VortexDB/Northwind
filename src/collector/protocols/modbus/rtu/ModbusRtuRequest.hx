@@ -12,11 +12,17 @@ class ModbusRtuRequest {
 	 */
 	public final networkAddress:Int;
 
+    /**
+     * Length of packet
+     */
+    public final knownLength : Int;
+
 	/**
 	 * Constructor
 	 */
-	public function new(networkAddress:Int) {
+	public function new(networkAddress:Int, knownLength:Int = -1) {
 		this.networkAddress = networkAddress;
+		this.knownLength = knownLength;
 	}
 
 	/**

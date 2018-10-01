@@ -8,6 +8,11 @@ import haxe.io.Bytes;
  */
 class ReadHoldingRegistersRequest extends ModbusRtuRequest {
 	/**
+	 * Function id
+	 */
+	public static inline final FUNCTION_ID = 0x03;
+
+	/**
 	 * Start address to read. UInt16
 	 */
 	public final address:Int;
@@ -34,7 +39,7 @@ class ReadHoldingRegistersRequest extends ModbusRtuRequest {
      * @return Int
      */
     override function functionId():Int {
-        return 0x03;
+        return FUNCTION_ID;
     }
 
 	/**

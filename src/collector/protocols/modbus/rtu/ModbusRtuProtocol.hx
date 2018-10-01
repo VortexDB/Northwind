@@ -1,16 +1,40 @@
 package collector.protocols.modbus.rtu;
 
 import core.io.BinaryData;
-import haxe.io.BytesBuffer;
-import haxe.io.Bytes;
 import collector.common.channel.IBinaryChannel;
 import collector.protocols.modbus.ModbusProtocol;
+import collector.protocols.modbus.rtu.requests.ReadHoldingRegistersRequest;
+import collector.protocols.modbus.rtu.requests.PresetMultipleRegistersRequest;
 
 /**
  * Modbus Rtu protocol
  */
 @:keep
 class ModbusRtuProtocol extends ModbusProtocol {
+	/**
+	 * Network + FunctionId
+	 */
+	public static inline final HEADER_SIZE = 2;
+
+	/**
+	 * Network + FunctionId + Crc16
+	 */
+	public static inline final MIN_PACKET_SIZE = HEADER_SIZE + 2;
+
+	/**
+	 * Get answer length
+	 */
+	private function getAnswerLength(functionId:Int, buffer:BinaryData):Int {				
+		switch (functionId) {
+			case ReadHoldingRegistersRequest.FUNCTION_ID:
+				return buffer.getByte(3);
+			case PresetMultipleRegistersRequest.FUNCTION_ID:
+				return PresetMultipleRegistersRequest.RESPONSE_LENGTH;
+		}
+
+		return -1;
+	}
+
 	/**
 	 * Constructor
 	 */
@@ -39,6 +63,31 @@ class ModbusRtuProtocol extends ModbusProtocol {
 
 		chan.write(fullFrame.toBytes());
 
-        return null;
-    }
+		var binary = new BinaryData();
+		var network = 0;
+		var fullsize = 0;
+		var functionId:Null<Int> = null;
+		var lengthRead = false;
+		var answerLength = -1;
+
+		while (true) {
+			var data = chan.read();
+			fullsize += data.length;
+			binary.addBytes(data);
+			if (!lengthRead && fullsize >= HEADER_SIZE) {
+				network = binary.getByte(0);
+				functionId = binary.getByte(1);
+			}
+
+			if (functionId != null) {
+				if (request.knownLength > 0) {
+					answerLength = request.knownLength;
+				} else {
+					answerLength = getAnswerLength(functionId, binary);
+				}
+			}
+		}
+
+		return null;
+	}
 }
