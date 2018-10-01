@@ -13,6 +13,11 @@ class ReadHoldingRegistersRequest extends ModbusRtuRequest {
 	public static inline final FUNCTION_ID = 0x03;
 
 	/**
+	 * Position of length byte
+	 */
+	public static inline final LENGTH_POS = 2;
+
+	/**
 	 * Start address to read. UInt16
 	 */
 	public final address:Int;

@@ -1,5 +1,6 @@
 package collector.protocols.modbus.rtu;
 
+import core.utils.exceptions.TimeoutExeption;
 import core.io.BinaryData;
 import collector.common.channel.IBinaryChannel;
 import collector.protocols.modbus.ModbusProtocol;
@@ -24,10 +25,10 @@ class ModbusRtuProtocol extends ModbusProtocol {
 	/**
 	 * Get answer length
 	 */
-	private function getAnswerLength(functionId:Int, buffer:BinaryData):Int {				
+	private function getAnswerLength(functionId:Int, buffer:BinaryData):Int {
 		switch (functionId) {
 			case ReadHoldingRegistersRequest.FUNCTION_ID:
-				return buffer.getByte(3);
+				return buffer.getByte(ReadHoldingRegistersRequest.LENGTH_POS);
 			case PresetMultipleRegistersRequest.FUNCTION_ID:
 				return PresetMultipleRegistersRequest.RESPONSE_LENGTH;
 		}
@@ -65,28 +66,42 @@ class ModbusRtuProtocol extends ModbusProtocol {
 
 		var binary = new BinaryData();
 		var network = 0;
-		var fullsize = 0;
+		var fullSize = 0;
 		var functionId:Null<Int> = null;
 		var lengthRead = false;
 		var answerLength = -1;
 
 		while (true) {
-			var data = chan.read();
-			fullsize += data.length;
-			binary.addBytes(data);
-			if (!lengthRead && fullsize >= HEADER_SIZE) {
-				network = binary.getByte(0);
-				functionId = binary.getByte(1);
-			}
+			try {
+				var data = chan.read();
+				if (data.length < 1)
+					continue;
 
-			if (functionId != null) {
-				if (request.knownLength > 0) {
-					answerLength = request.knownLength;
-				} else {
-					answerLength = getAnswerLength(functionId, binary);
+				fullSize += data.length;
+				binary.addBytes(data);
+				if (!lengthRead && fullSize >= HEADER_SIZE) {
+					network = binary.getByte(0);
+					functionId = binary.getByte(1);
 				}
+
+				if (functionId != null) {
+					if (request.knownLength > 0) {
+						answerLength = request.knownLength;
+					} else {
+						answerLength = getAnswerLength(functionId, binary);
+					}
+				}
+
+				lengthRead = true;
+				if (fullSize - MIN_PACKET_SIZE >= answerLength) {
+					break;
+				}
+			} catch (e:TimeoutException) {
+				break;
 			}
 		}
+
+		trace(binary.toBytes().toHex());
 
 		return null;
 	}
