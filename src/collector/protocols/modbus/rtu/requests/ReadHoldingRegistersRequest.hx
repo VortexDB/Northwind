@@ -23,7 +23,8 @@ class ReadHoldingRegistersRequest extends ModbusRtuRequest {
 	 * @param length 
 	 */
 	public function new(networkAddress, address, length) {
-		super(networkAddress) this.address = address;
+		super(networkAddress); 
+		this.address = address;
 		this.length = length;
 	}
 
