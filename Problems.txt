@@ -1,0 +1,6 @@
+Common:
+1. Not cross-platform
+
+Java:
+1. Sleep in SerialPort
+2. Can't catch TimeoutException in ModbusRtuProtocol
