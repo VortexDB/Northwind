@@ -97,7 +97,8 @@ class ModbusRtuProtocol extends ModbusProtocol {
 				if (fullSize - MIN_PACKET_SIZE >= answerLength) {
 					break;
 				}
-			} catch (e:TimeoutException) {
+				// TODO: catch TimeoutException
+			} catch (e:Dynamic) {
 				break;
 			}
 		}

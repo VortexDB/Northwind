@@ -1,5 +1,6 @@
 package collector.common;
 
+import collector.common.appdriver.event.ReadTimeResponseEvent;
 import collector.common.appdriver.event.CollectorDriverEvent;
 import collector.common.appdriver.CollectorMeterDriver;
 import collector.common.appdriver.ExecutionContext;
@@ -153,7 +154,10 @@ class CollectorScript {
 	 * Process events from driver
 	 */
 	private function processDriverEvent(driver:CollectorDriver, event: CollectorDriverEvent) {
-		trace("DRIVER EVENT");
+		var timeEvent:ReadTimeResponseEvent = cast event;
+		if (timeEvent != null) {
+			trace(timeEvent.value);
+		}
 	}
 
 	/**

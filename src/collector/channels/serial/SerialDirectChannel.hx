@@ -28,7 +28,6 @@ class SerialDirectChannel extends ClientTransportChannel implements IBinaryChann
             throw new NorthwindException("Wrong route type");
         
         port = new SerialPort(serialRoute.portName, serialRoute.speed, serialRoute.byteType);
-        // port.onData = 
     }
 
 	/**
