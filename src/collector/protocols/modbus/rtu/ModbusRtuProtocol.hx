@@ -1,5 +1,6 @@
 package collector.protocols.modbus.rtu;
 
+import collector.common.util.NorthwindException;
 import core.utils.exceptions.TimeoutExeption;
 import core.io.BinaryData;
 import collector.common.channel.IBinaryChannel;
@@ -65,7 +66,7 @@ class ModbusRtuProtocol extends ModbusProtocol {
 		chan.write(fullFrame.toBytes());
 
 		var binary = new BinaryData();
-		var network = 0;
+		var network:Null<Int> = null;
 		var fullSize = 0;
 		var functionId:Null<Int> = null;
 		var lengthRead = false;
@@ -101,8 +102,20 @@ class ModbusRtuProtocol extends ModbusProtocol {
 			}
 		}
 
-		trace(binary.toBytes().toHex());
+		if (binary.length < MIN_PACKET_SIZE)
+			throw new NorthwindException("Bad response");
 
-		return null;
+		if (network == null || functionId == null)
+			throw new NorthwindException("Bad response");
+
+		var crcPos = binary.length - 2;
+		var crcData = binary.slice(0, crcPos);
+		var crc = binary.getInt16(crcPos);
+		var calcCrc = ModbusRtuCrcHelper.calcCrc(crcData.toBytes());
+		if (crc != calcCrc)
+			throw new NorthwindException("Wrong CRC");
+
+		var respData = binary.slice(2, binary.length - MIN_PACKET_SIZE).toBytes();
+		return new ModbusRtuResponse(network, functionId, respData);
 	}
 }
