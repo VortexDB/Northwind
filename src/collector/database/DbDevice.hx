@@ -3,7 +3,7 @@ package collector.database;
 /**
  * Database device entity
  */
-class DbDevice {
+class DbDevice extends DbEntity {
     /**
      * Device model type
      */

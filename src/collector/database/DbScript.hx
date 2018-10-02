@@ -3,7 +3,7 @@ package collector.database;
 /**
  * Database script entity
  */
-class DbDevice {
+class DbScript {
     /**
      * Name of script
      */
@@ -22,5 +22,5 @@ class DbDevice {
     /**
      * Actions to work on device
      */
-    public var actions:Array<DbDeviceAction>
+    public var actions:Array<DbDeviceAction>;
 }

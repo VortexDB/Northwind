@@ -3,6 +3,6 @@ package collector.database;
 /**
  * Database measure parameter
  */
-class DbMeasureParameter {
+class DbMeasureParameter extends DbEntity {
 
 }

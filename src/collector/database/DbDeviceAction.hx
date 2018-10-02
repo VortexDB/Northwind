@@ -3,6 +3,6 @@ package collector.database;
 /**
  * Database device action
  */
-class DbDeviceAction {
-
+class DbDeviceAction extends DbEntity {
+    
 }
