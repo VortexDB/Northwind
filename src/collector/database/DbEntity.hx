@@ -7,7 +7,12 @@ class DbEntity {
     /**
      * Entity id
      */
-    public var id:Int;
+    public final id:Int;
+
+    /**
+     * Entity type to split it from other entities
+     */
+    public final entityType:String;
 
     /**
      * Custom attribute values
@@ -17,7 +22,9 @@ class DbEntity {
     /**
      * Constructor
      */
-    public function new() {
+    public function new(id:Int) {
         attributes = new Map<String, String>();
+        entityType = Type.getClassName(Type.getClass(this));   
+        this.id = id;
     }
 }

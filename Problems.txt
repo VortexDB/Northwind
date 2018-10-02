@@ -1,5 +1,6 @@
 Common:
 1. Not cross-platform
+2. Temporary database solution
 
 Java:
 1. Sleep in SerialPort
