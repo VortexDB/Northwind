@@ -15,12 +15,12 @@ class DbScript {
     public var deep:Int;
 
     /**
-     * Parameters to collect data
+     * Ids of Parameters to collect data
      */
-    public var parameters:Array<DbMeasureParameter>;
+    public var parameters:Array<Int>;
 
     /**
-     * Actions to work on device
+     * Ids of Actions to work on device
      */
-    public var actions:Array<DbDeviceAction>;
+    public var actions:Array<Int>;
 }
