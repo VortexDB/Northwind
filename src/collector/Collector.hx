@@ -1,5 +1,6 @@
 package collector;
 
+import collector.database.Database;
 import core.time.schedule.PeriodicSchedule;
 import core.time.TimeSpan;
 import core.io.port.Parity;
@@ -19,6 +20,9 @@ class Collector {
 	 * Entry point
 	 */
 	public static function main() {
+		// Prepare database
+		Database.instance.open();
+
 		var worker = new CollectorWorker();
 		worker.registerDriver(Vkt7likeDriver);
 
