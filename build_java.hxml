@@ -3,4 +3,6 @@
 -java out/java
 -lib core
 -java-lib libs/java/jSerialComm-2.1.1.jar
+-java-lib libs/java/sqlite-jdbc-3.25.2.jar
+-lib jsonmod
 -dce full

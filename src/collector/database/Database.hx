@@ -1,5 +1,6 @@
 package collector.database;
 
+import haxe.Log;
 import sys.FileSystem;
 import haxe.io.Bytes;
 import haxe.crypto.Base64;
@@ -18,7 +19,7 @@ class Database {
 	/**
 	 * Delimiter between attribute name and value
 	 */
-	public static inline final VALUE_DELIMITER = "=";
+	public static inline final VALUE_DELIMITER = "::";
 
 	/**
 	 * Interface to connect to database
@@ -26,14 +27,20 @@ class Database {
 	private var connection:Connection;
 
 	/**
+	 * Current entity id
+	 */
+	private var currentId = 0;
+
+	/**
 	 * Instance of database
 	 */
-	public static final instance:Database = new Database();	
+	public static final instance:Database = new Database();
 
 	/**
 	 * Create database structure
 	 */
 	private function createDatabase(connection:Connection) {
+		Log.trace("Creating database");
 		connection.request("CREATE TABLE entities(
             id integer PRIMARY KEY,
             entityType TEXT NOT NULL,
@@ -47,7 +54,7 @@ class Database {
 		if (connection != null)
 			return;
 
-		var needCreate = FileSystem.exists("northwind.db");
+		var needCreate = !FileSystem.exists("northwind.db");
 		connection = Sqlite.open("northwind.db");
 
 		if (needCreate)
@@ -57,25 +64,13 @@ class Database {
 	/**
 	 * Create entity of type and from content
 	 * Content:
-	 * AttributeName1=AttributeValue1(Base64)|AttributeName2=AttributeValue2(Base64)
 	 * Where | - ATTRIBUTE_DELIMITER
 	 */
 	private function decodeEntity<T:DbEntity>(type:Class<T>, id:Int, content:String):T {
-		var inst:T = cast Type.createInstance(type, [id]);
-		if (inst == null)
-			return null;
+		//var entity = serializer.unserialize(Bytes.ofString(content), type);
+		// entity.id = id;
 
-		var items = content.split(ATTRIBUTE_DELIMITER);
-		for (item in items) {
-			var nameValue = item.split(VALUE_DELIMITER);
-			if (nameValue.length != 2)
-				continue;
-
-			var name = nameValue[0];
-			var value = Base64.decode(nameValue[1]).toString();
-			inst.attributes[name] = value;
-		}
-		return inst;
+		return null;
 	}
 
 	/**
@@ -83,19 +78,45 @@ class Database {
 	 * @param entity
 	 */
 	private function encodeEntity(entity:DbEntity):String {
-		var buffer = new StringBuf();
-		for (key in entity.attributes.keys()) {
-			var value = entity.attributes[key];
-			var base64Value = Base64.encode(Bytes.ofString(value));
-			buffer.add('${key}${VALUE_DELIMITER}${base64Value}');
-		}
-		return buffer.toString();
+		return null;
+	}
+
+	/**
+	 * Return next id of entity
+	 */
+	private function getNextId():Int {
+		currentId += 1;
+		return currentId;
 	}
 
 	/**
 	 * Private constructor
 	 */
 	private function new() {
+		// TODO: remove. hxbit bug
+	}
+
+	/**
+	 * Create new entity
+	 */
+	public function createEntity<T:DbEntity>(type:Class<T>):T {
+		var instance:T = cast Type.createEmptyInstance(type);
+		instance.id = getNextId();
+		instance.entityType = Type.getClassName(type);
+		return instance;
+	}
+
+	/**
+	 * Save entity to database
+	 */
+	public function saveEntity<T:DbEntity>(entity:T) {
+		var content = encodeEntity(entity);
+
+		connection.request
+			('INSERT INTO entities (id, entityType, content)
+		VALUES(${entity.id}, \'${entity.entityType}\', \'${content}\')
+		ON CONFLICT(id)
+		DO UPDATE SET content=\'${content}\';');
 	}
 
 	/**
@@ -105,8 +126,8 @@ class Database {
 	 */
 	public function getEntity<T:DbEntity>(id:Int, type:Class<T>):T {
 		var typeName = Type.getClassName(type);
-		var resp = connection.request('select id, content from entities where id=${id} and entityType=${typeName}');
-		if (resp.length < 1)
+		var resp = connection.request('select id, content from entities where id=${id} and entityType=\'${typeName}\'');
+		if (!resp.hasNext())
 			return null;
 
 		var data = resp.next();
@@ -122,8 +143,8 @@ class Database {
 	 */
 	public function getEntities<T:DbEntity>(type:Class<T>):Array<T> {
 		var typeName = Type.getClassName(type);
-		var resp = connection.request('select id, content from entities where entityType=${typeName}');
-		if (resp.length < 1)
+		var resp = connection.request('select id, content from entities where entityType=\'${typeName}\'');
+		if (!resp.hasNext())
 			return null;
 
 		var res = new Array<T>();

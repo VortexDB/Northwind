@@ -3,28 +3,31 @@ package collector.database;
 /**
  * Database entity
  */
+@:keep
+@:rtti
 class DbEntity {
     /**
      * Entity id
      */
-    public final id:Int;
+    @jsonIgnore
+    public var id:Int;
 
     /**
      * Entity type to split it from other entities
      */
-    public final entityType:String;
-
-    /**
-     * Custom attribute values
-     */
-    public var attributes:Map<String, String>;
+    @jsonIgnore
+    public var entityType:String;
 
     /**
      * Constructor
      */
-    public function new(id:Int) {
-        attributes = new Map<String, String>();
-        entityType = Type.getClassName(Type.getClass(this));   
-        this.id = id;
-    }
+    public function new() {}
+
+    /**
+     * Convert to string
+     * @return String
+     */
+    /*public function toString():String {
+        return 'Id: ${id} EntityType: ${entityType}';
+    }*/
 }
