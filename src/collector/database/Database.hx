@@ -1,26 +1,18 @@
 package collector.database;
 
+import haxe.Serializer;
+import haxe.Unserializer;
 import haxe.Log;
-import sys.FileSystem;
 import haxe.io.Bytes;
 import haxe.crypto.Base64;
 import sys.db.Sqlite;
 import sys.db.Connection;
+import sys.FileSystem;
 
 /**
  * For storing data
  */
 class Database {
-	/**
-	 * Delimiter for attributes in content column
-	 */
-	public static inline final ATTRIBUTE_DELIMITER = "|";
-
-	/**
-	 * Delimiter between attribute name and value
-	 */
-	public static inline final VALUE_DELIMITER = "::";
-
 	/**
 	 * Interface to connect to database
 	 */
@@ -67,10 +59,8 @@ class Database {
 	 * Where | - ATTRIBUTE_DELIMITER
 	 */
 	private function decodeEntity<T:DbEntity>(type:Class<T>, id:Int, content:String):T {
-		//var entity = serializer.unserialize(Bytes.ofString(content), type);
-		// entity.id = id;
-
-		return null;
+		var res:T = Unserializer.run(content);
+		return res;
 	}
 
 	/**
@@ -78,7 +68,7 @@ class Database {
 	 * @param entity
 	 */
 	private function encodeEntity(entity:DbEntity):String {
-		return null;
+		return Serializer.run(entity);
 	}
 
 	/**
@@ -93,7 +83,6 @@ class Database {
 	 * Private constructor
 	 */
 	private function new() {
-		// TODO: remove. hxbit bug
 	}
 
 	/**
@@ -127,10 +116,11 @@ class Database {
 	public function getEntity<T:DbEntity>(id:Int, type:Class<T>):T {
 		var typeName = Type.getClassName(type);
 		var resp = connection.request('select id, content from entities where id=${id} and entityType=\'${typeName}\'');
-		if (!resp.hasNext())
+		
+		var data = resp.next();
+		if (data == null)
 			return null;
 
-		var data = resp.next();
 		var id = data.id;
 		var content = data.content;
 		var ints = decodeEntity(type, id, content);
@@ -144,8 +134,8 @@ class Database {
 	public function getEntities<T:DbEntity>(type:Class<T>):Array<T> {
 		var typeName = Type.getClassName(type);
 		var resp = connection.request('select id, content from entities where entityType=\'${typeName}\'');
-		if (!resp.hasNext())
-			return null;
+		// if (!resp.hasNext())
+		// 	return null;
 
 		var res = new Array<T>();
 		for (data in resp) {

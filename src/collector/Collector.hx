@@ -1,6 +1,5 @@
 package collector;
 
-import jsonmod.Json;
 import collector.database.Database;
 import collector.database.DbDevice;
 import core.time.schedule.PeriodicSchedule;
@@ -24,19 +23,24 @@ class Collector {
 	public static function main() {
 		// Prepare database
 		Database.instance.open();
-		var device = Database.instance.createEntity(DbDevice);
-		device.modelType = "Vkt7";
-		device.protocolType = "ModbusRtuProtocol";
-		//Database.instance.saveEntity(device);
-		// var device = Type.createEmptyInstance(DbDevice);
-		// device = Database.instance.getEntity(1, DbDevice);
+		var devices = Database.instance.getEntities(DbDevice);
+		for (dev in devices) {
+			trace(dev);
+		}
+		// trace(device);
 
-		var str = jsonmod.Json.encode(device);
-		var dev = jsonmod.Json.parseTyped(str, DbDevice);
-		trace(dev.protocolType);
+		// var device = Database.instance.createEntity(DbDevice);
+		// device.modelType = "Vkt7";
+		// device.protocolType = "ModbusRtuProtocol";
+		// Database.instance.saveEntity(device);
+
+		// device = Database.instance.createEntity(DbDevice);
+		// device.modelType = "Vkt7";
+		// device.protocolType = "ModbusRtuProtocol";
+		// Database.instance.saveEntity(device);
 		
-
-
+		
+		//trace(dev.protocolType);
 
 		// var worker = new CollectorWorker();
 		// worker.registerDriver(Vkt7likeDriver);

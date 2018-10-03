@@ -3,31 +3,28 @@ package collector.database;
 /**
  * Database entity
  */
-@:keep
-@:rtti
+@:keepSub
 class DbEntity {
-    /**
-     * Entity id
-     */
-    @jsonIgnore
-    public var id:Int;
+	/**
+	 * Entity id
+	 */
+	public var id:Int;
 
-    /**
-     * Entity type to split it from other entities
-     */
-    @jsonIgnore
-    public var entityType:String;
+	/**
+	 * Entity type to split it from other entities
+	 */
+	public var entityType:String;
 
-    /**
-     * Constructor
-     */
-    public function new() {}
+	/**
+	 * Constructor
+	 */
+	public function new() {}
 
-    /**
-     * Convert to string
-     * @return String
-     */
-    /*public function toString():String {
-        return 'Id: ${id} EntityType: ${entityType}';
-    }*/
+	/**
+	 * Convert to string
+	 * @return String
+	 */
+	public function toString():String {
+		return 'Id: ${id} EntityType: ${entityType}';
+	}
 }
