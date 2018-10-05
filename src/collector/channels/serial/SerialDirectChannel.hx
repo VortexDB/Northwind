@@ -56,8 +56,8 @@ class SerialDirectChannel extends ClientTransportChannel implements IBinaryChann
 	 * Read bytes from channel
 	 * @return Bytes
 	 */
-	public function read():Bytes {		
-		var res = port.read();
+	public function read(?timeout:Int):Bytes {		
+		var res = port.read(timeout);
 		return res;
 	}
 }

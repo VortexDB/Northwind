@@ -14,6 +14,11 @@ import collector.protocols.modbus.rtu.requests.PresetMultipleRegistersRequest;
 @:keep
 class ModbusRtuProtocol extends ModbusProtocol {
 	/**
+	 * Read timeout in milliseconds
+	 */
+	public static inline final READ_TIMEOUT = 1000;
+
+	/**
 	 * Network + FunctionId
 	 */
 	public static inline final HEADER_SIZE = 2;
@@ -74,7 +79,7 @@ class ModbusRtuProtocol extends ModbusProtocol {
 
 		while (true) {
 			try {
-				var data = chan.read();
+				var data = chan.read(READ_TIMEOUT);
 				if (data.length < 1)
 					continue;
 

@@ -12,8 +12,8 @@ interface IBinaryChannel {
     function write(data:Bytes):Void;
 
     /**
-     * Read bytes from channel
+     * Read bytes from channel with timeout in milliseconds
      * @return Bytes
      */
-    function read():Bytes;
+    function read(?timeout:Int):Bytes;
 }
