@@ -198,7 +198,11 @@ class CollectorScript {
 				}
 			}
 
-			driver.appendTask(new CollectorDeviceTasks(device, tasks));
+			try {
+				driver.appendTask(new CollectorDeviceTasks(device, tasks));
+			} catch(e:Dynamic) {
+				trace(e);
+			}
 		}
 	}
 
