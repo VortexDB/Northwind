@@ -22,11 +22,11 @@ class Collector {
 	 */
 	public static function main() {
 		// Prepare database
-		Database.instance.open();
-		var devices = Database.instance.getEntities(DbDevice);
-		for (dev in devices) {
-			trace(dev);
-		}
+		// Database.instance.open();
+		// var devices = Database.instance.getEntities(DbDevice);
+		// for (dev in devices) {
+		// 	trace(dev);
+		// }
 		// trace(device);
 
 		// var device = Database.instance.createEntity(DbDevice);
@@ -42,19 +42,19 @@ class Collector {
 		
 		//trace(dev.protocolType);
 
-		// var worker = new CollectorWorker();
-		// worker.registerDriver(Vkt7likeDriver);
+		var worker = new CollectorWorker();
+		worker.registerDriver(Vkt7likeDriver);
 
-		// var schedule = new PeriodicSchedule(
-		// 	new TimeSpan({seconds:10})
-		// );
-		// var script = worker.newScript("Collect data", schedule);
-		// script.addDevice(new CollectorDevice("2313", "Vkt7", "ModbusRtuProtocol", new DirectSerialRoute("COM4", 9600, {
-		// 	dataBits: 8,
-		// 	parity: Parity.None,
-		// 	stopBits: 1
-		// })));
-		// script.addAction(new DeviceAction(ActionType.ReadDateTime));
-		// worker.start();
+		var schedule = new PeriodicSchedule(
+			new TimeSpan({seconds:10})
+		);
+		var script = worker.newScript("Collect data", schedule);
+		script.addDevice(new CollectorDevice("2313", "Vkt7", "ModbusRtuProtocol", new DirectSerialRoute("COM4", 9600, {
+			dataBits: 8,
+			parity: Parity.None,
+			stopBits: 1
+		})));
+		script.addAction(new DeviceAction(ActionType.ReadDateTime));
+		worker.start();
 	}
 }

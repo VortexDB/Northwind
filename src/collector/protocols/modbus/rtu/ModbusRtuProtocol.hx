@@ -80,25 +80,32 @@ class ModbusRtuProtocol extends ModbusProtocol {
 
 				fullSize += data.length;
 				binary.addBytes(data);
-				if (!lengthRead && fullSize >= HEADER_SIZE) {
+				if (!lengthRead && fullSize > HEADER_SIZE) {
 					network = binary.getByte(0);
 					functionId = binary.getByte(1);
-				}
 
-				if (functionId != null) {
-					if (request.knownLength > 0) {
-						answerLength = request.knownLength;
-					} else {
-						answerLength = getAnswerLength(functionId, binary);
+					if (functionId != null) {
+						if (request.knownLength > 0) {
+							answerLength = request.knownLength;
+						} else {
+							answerLength = getAnswerLength(functionId, binary);
+						}
 					}
+
+					lengthRead = true;
 				}
 
-				lengthRead = true;
-				if (fullSize - MIN_PACKET_SIZE >= answerLength) {
+				if (answerLength < 1)
+					continue;
+
+				if (fullSize - MIN_PACKET_SIZE > answerLength) {
 					break;
 				}
-				// TODO: catch TimeoutException
 			} catch (e:Dynamic) {
+				if ((e is TimeoutException)) {
+					if (binary.length < 1)
+						throw new NorthwindException("Device not responds");
+				}
 				break;
 			}
 		}
