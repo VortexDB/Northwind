@@ -48,7 +48,10 @@ class Database {
 
 		var needCreate = !FileSystem.exists("northwind.db");
 		connection = Sqlite.open("northwind.db");
-
+		var resp = connection.request("select count(*) as itemcount from  entities");
+		var data = resp.next();
+		currentId = data.itemcount;
+		
 		if (needCreate)
 			createDatabase(connection);
 	}
@@ -58,9 +61,8 @@ class Database {
 	 * Content:
 	 * Where | - ATTRIBUTE_DELIMITER
 	 */
-	private function decodeEntity<T:DbEntity>(type:Class<T>, id:Int, content:String):T {
-		var res:T = Unserializer.run(content);
-		return res;
+	private function decodeEntity(id:Int, content:String):Dynamic {
+		return Unserializer.run(content);
 	}
 
 	/**
@@ -82,8 +84,7 @@ class Database {
 	/**
 	 * Private constructor
 	 */
-	private function new() {
-	}
+	private function new() {}
 
 	/**
 	 * Create new entity
@@ -109,41 +110,59 @@ class Database {
 	}
 
 	/**
-	 * Get entity by id and type
+	 * Get entity by id
 	 * @param type
 	 * @return Array<T>
 	 */
-	public function getEntity<T:DbEntity>(id:Int, type:Class<T>):T {
-		var typeName = Type.getClassName(type);
-		var resp = connection.request('select id, content from entities where id=${id} and entityType=\'${typeName}\'');
-		
+	public function getById(id:Int):Dynamic {
+		var resp = connection.request('select id, content from entities where id=${id}');
+
 		var data = resp.next();
 		if (data == null)
 			return null;
 
 		var id = data.id;
 		var content = data.content;
-		var ints = decodeEntity(type, id, content);
+		var ints = decodeEntity(id, content);
 		return ints;
 	}
 
 	/**
-	 * Get all entity by type
+	 * Get entities by id
+	 * @param type
+	 * @return Array<T>
+	 */
+	public function getByIds(ids:Array<Int>):Dynamic {
+		if (ids.length < 1)
+			return null;
+
+		var arr = new Array<Dynamic>();
+		for (id in ids) {
+			var it = getById(id);
+			if (it != null)
+				arr.push(it);
+		}
+
+		return arr;
+	}
+
+	/**
+	 * Get all entities by type
 	 * @param type
 	 */
-	public function getEntities<T:DbEntity>(type:Class<T>):Array<T> {
+	public function getByType<T:DbEntity>(type:Class<T>):Array<T> {
 		var typeName = Type.getClassName(type);
 		var resp = connection.request('select id, content from entities where entityType=\'${typeName}\'');
-		// if (!resp.hasNext())
-		// 	return null;
 
 		var res = new Array<T>();
 		for (data in resp) {
 			var id = data.id;
 			var content = data.content;
-			res.push(decodeEntity(type, id, content));
+			var it = cast decodeEntity(id, content);
+			if (it != null)
+				res.push(it);
 		}
 
 		return res;
-	}
+	}	
 }

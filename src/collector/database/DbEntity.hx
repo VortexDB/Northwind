@@ -18,7 +18,7 @@ class DbEntity {
 	/**
 	 * Constructor
 	 */
-	public function new() {}
+	private function new() {}
 
 	/**
 	 * Convert to string
