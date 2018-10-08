@@ -140,6 +140,10 @@ class CollectorScript {
 			for (driverKey in driverKeyGroups) {
 				var first = driverKey[0];
 				var driver = owner.getDriver(first);
+				if (driver == null) {
+					Log.trace('Driver for device ${first.deviceType} not found');
+					continue;
+				}
 				driver.protocol.channel = channel;
 				collectByDriver(driver, routeDevices);
 			}

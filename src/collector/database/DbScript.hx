@@ -15,6 +15,11 @@ class DbScript {
     public var deep:Int;
 
     /**
+     * Devices ids
+     */
+    public var devices:Array<Int>;
+
+    /**
      * Ids of Parameters to collect data
      */
     public var parameters:Array<Int>;

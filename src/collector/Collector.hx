@@ -1,5 +1,6 @@
 package collector;
 
+import collector.common.route.DeviceRoute;
 import collector.database.DbSerialRoute;
 import collector.database.Database;
 import collector.database.DbDevice;
@@ -23,35 +24,36 @@ class Collector {
 		// Prepare database
 		Database.instance.open();
 
-		// var worker = new CollectorWorker();
-		// worker.registerDriver(Vkt7likeDriver);
+		var worker = new CollectorWorker();
+		worker.registerDriver(Vkt7likeDriver);
 
-		// var schedule = new PeriodicSchedule(new TimeSpan({seconds: 10}));
-		// var script = worker.newScript("Collect data", schedule);
+		var schedule = new PeriodicSchedule(new TimeSpan({seconds: 10}));
+		var script = worker.newScript("Collect data", schedule);
 
-		// var devices = Database.instance.getEntities(DbDevice);
-		// for (device in devices) {
-		// 	//new CollectorDevice()			
-		// }
+		var devices = Database.instance.getByType(DbDevice);
+		for (device in devices) {
+			if (device.routes == null || device.routes.length < 1)
+				continue;
 
-		var dev:DbDevice = Database.instance.getById(1);
-		var route = Database.instance.getById(dev.routes[0]);
-		trace(route);
-		// var route = Database.instance.createEntity(DbSerialRoute);
-		// route.port = "COM4";
-		// route.speed = 115200;
-		// route.byteType = "8N1";
-		// Database.instance.saveEntity(route);
+			var routeId = device.routes[0];
+			var route = Database.instance.getById(routeId);
+			if (route == null)
+				continue;
+			
+			var devRoute:DeviceRoute = null;
 
-		// dev.routes = [route.id];
-		// Database.instance.saveEntity(dev);
+			var directSerialRoute:DbSerialRoute = cast route;
+			if (directSerialRoute != null) {
+				devRoute = new DirectSerialRoute(directSerialRoute.port, directSerialRoute.speed, directSerialRoute.byteType);
+			}
 
-		// script.addDevice(new CollectorDevice("2313", "Vkt7", "ModbusRtuProtocol", new DirectSerialRoute("COM4", 9600, {
-		// 	dataBits: 8,
-		// 	parity: Parity.None,
-		// 	stopBits: 1
-		// })));
-		// script.addAction(new DeviceAction(ActionType.ReadDateTime));
-		// worker.start();
+			if (devRoute == null)
+				continue;
+			
+			var colDevice = new CollectorDevice(device.serial, device.modelType, device.protocolType, devRoute);
+			script.addDevice(colDevice);
+		}
+					
+		worker.start();
 	}
 }
