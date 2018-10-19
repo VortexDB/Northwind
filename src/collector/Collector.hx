@@ -43,7 +43,7 @@ class Collector {
 			var devRoute:DeviceRoute = null;
 
 			var directSerialRoute:DbSerialRoute = cast route;
-			if (directSerialRoute != null) {
+			if (directSerialRoute != null) {				
 				devRoute = new DirectSerialRoute(directSerialRoute.port, directSerialRoute.speed, directSerialRoute.byteType);
 			}
 
@@ -53,6 +53,8 @@ class Collector {
 			var colDevice = new CollectorDevice(device.serial, device.modelType, device.protocolType, devRoute);
 			script.addDevice(colDevice);
 		}
+
+		script.addAction(new DeviceAction(ActionType.ReadDateTime));
 					
 		worker.start();
 	}

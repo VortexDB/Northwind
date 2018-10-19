@@ -72,7 +72,7 @@ class ModbusRtuProtocol extends ModbusProtocol {
 
 		var crc = ModbusRtuCrcHelper.calcCrc(payload.toBytes());
 		fullFrame.addInt16(crc);
-
+		
 		chan.write(fullFrame.toBytes());
 
 		var binary = new BinaryData();
@@ -90,7 +90,7 @@ class ModbusRtuProtocol extends ModbusProtocol {
 			-> {
 				if (data.length < 1)
 					return;
-
+				
 				fullSize += data.length;
 				binary.addBytes(data);
 				if (!lengthRead && fullSize > HEADER_SIZE) {

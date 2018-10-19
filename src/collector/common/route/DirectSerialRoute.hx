@@ -29,4 +29,11 @@ class DirectSerialRoute extends DeviceRoute {
         this.speed = speed;
         this.byteType = byteType;
     }
+
+    /**
+     * Convert to string
+     */
+    public function toString() {
+        return 'Port: ${portName} Speed: ${speed} ByteType: ${byteType}';
+    }
 }
