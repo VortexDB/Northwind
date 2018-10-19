@@ -1,5 +1,8 @@
 package collector.protocols.modbus.rtu;
 
+import core.async.stream.StreamController;
+import core.time.TimeSpan;
+import core.async.future.Future;
 import collector.common.util.NorthwindException;
 import core.utils.exceptions.TimeoutExeption;
 import core.io.BinaryData;
@@ -52,8 +55,10 @@ class ModbusRtuProtocol extends ModbusProtocol {
 	 * @param request
 	 * @return ProtocolResponse
 	 */
-	public function sendRequestWithResponse(request:ModbusRtuRequest):ModbusRtuResponse {
+	public function sendRequestWithResponse(request:ModbusRtuRequest):Future<ModbusRtuResponse> {
 		var chan = cast(channel, IBinaryChannel);
+
+		// Send data to device
 		var pdu = request.getData();
 		var fullFrame = new BinaryData();
 		// TODO: remove. It's VKT only
@@ -77,11 +82,14 @@ class ModbusRtuProtocol extends ModbusProtocol {
 		var lengthRead = false;
 		var answerLength = -1;
 
-		while (true) {
-			try {
-				var data = chan.read(READ_TIMEOUT);
+		var completer = new CompletionFuture<ModbusRtuResponse>();
+		var packCompleter = new CompletionFuture<Bool>();
+
+		// Read from channel
+		chan.onData.timeout(TimeSpan.fromMSeconds(READ_TIMEOUT)).listen((data)
+			-> {
 				if (data.length < 1)
-					continue;
+					return;
 
 				fullSize += data.length;
 				binary.addBytes(data);
@@ -101,34 +109,44 @@ class ModbusRtuProtocol extends ModbusProtocol {
 				}
 
 				if (answerLength < 1)
-					continue;
+					return;
 
 				if (fullSize - MIN_PACKET_SIZE > answerLength) {
-					break;
+					packCompleter.complete(true);
 				}
-			} catch (e:Dynamic) {
-				if ((e is TimeoutException)) {
-					if (binary.length < 1)
-						throw new NorthwindException("Device not responds");
+			},
+			(ex)
+			-> {
+				if ((ex is TimeoutException)) {
+					if (binary.length < 1) {
+						completer.throwError(new NorthwindException("Device not responds"));
+					} else {
+						packCompleter.complete(true);
+					}
 				}
-				break;
-			}
-		}
+			});
 
-		if (binary.length < MIN_PACKET_SIZE)
-			throw new NorthwindException("Bad response");
+		packCompleter.onSuccess((_)
+			-> {
+				if (binary.length < MIN_PACKET_SIZE)
+					throw new NorthwindException("Bad response");
 
-		if (network == null || functionId == null)
-			throw new NorthwindException("Bad response");
+				if (network == null || functionId == null)
+					throw new NorthwindException("Bad response");
 
-		var crcPos = binary.length - 2;
-		var crcData = binary.slice(0, crcPos);
-		var crc = binary.getInt16(crcPos);
-		var calcCrc = ModbusRtuCrcHelper.calcCrc(crcData.toBytes());
-		if (crc != calcCrc)
-			throw new NorthwindException("Wrong CRC");
+				var crcPos = binary.length - 2;
+				var crcData = binary.slice(0, crcPos);
+				var crc = binary.getInt16(crcPos);
+				var calcCrc = ModbusRtuCrcHelper.calcCrc(crcData);
+				if (crc != calcCrc)
+					throw new NorthwindException("Wrong CRC");
 
-		var respData = binary.slice(2, binary.length - MIN_PACKET_SIZE).toBytes();
-		return new ModbusRtuResponse(network, functionId, respData);
+				var respData = binary.slice(2, binary.length - MIN_PACKET_SIZE);
+				completer.complete(new ModbusRtuResponse(network, functionId, respData));
+			}).onError((ex) -> {
+			completer.throwError(ex);
+		});
+
+		return completer;
 	}
 }

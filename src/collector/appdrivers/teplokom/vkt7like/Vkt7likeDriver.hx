@@ -16,10 +16,10 @@ import collector.appdrivers.teplokom.vkt7like.executers.TimeReader;
  */
 @:keep
 class Vkt7likeDriver extends CollectorMeterDriver implements IDriverWithExecutionContext<VktExecuterContext> {
-    /**
-     * Execution context
-     */
-    public var executionContext:VktExecuterContext;
+	/**
+	 * Execution context
+	 */
+	public var executionContext:VktExecuterContext;
 
 	/**
 	 * Constructor
@@ -45,8 +45,9 @@ class Vkt7likeDriver extends CollectorMeterDriver implements IDriverWithExecutio
 			switch (taskAction.action.actionType) {
 				case ActionType.ReadDateTime:
 					var reader = new TimeReader(executionContext);
-				    var dateTime = reader.executeOne();
-					notifyTaskEvent(new ReadTimeResponseEvent(taskAction.taskId, dateTime));
+					reader.executeOne().onSuccess((dateTime) -> {
+						notifyTaskEvent(new ReadTimeResponseEvent(taskAction.taskId, dateTime));
+					});
 				default:
 			}
 		}

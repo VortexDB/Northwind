@@ -1,6 +1,8 @@
 package collector.common.appdriver;
 
+import core.async.future.Future;
 import collector.common.appdriver.ExecutionContext;
+
 /**
  * Executer that works in the context of driver
  */
@@ -22,12 +24,12 @@ class CollectorDriverExecuter<TContext:ExecutionContext, TResult> {
      * @param call 
      * @return -> Void)
      */
-    public function execute(call:(TResult) -> Void): Void { throw "Not implemented"; }
+    public function execute(call:(TResult) -> Void): Future<Void> { throw "Not implemented"; }
 
     /**
      * Execute one iteration and get result
      * @param call 
      * @return -> Void)
      */
-    public function executeOne(): TResult { throw "Not implemented"; }
+    public function executeOne(): Future<TResult> { throw "Not implemented"; }
 }

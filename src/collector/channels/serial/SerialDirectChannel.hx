@@ -1,5 +1,7 @@
 package collector.channels.serial;
 
+import core.async.stream.StreamController;
+import core.async.stream.Stream;
 import core.io.port.SerialPort;
 import haxe.io.Bytes;
 import collector.common.util.NorthwindException;
@@ -17,6 +19,16 @@ class SerialDirectChannel extends ClientTransportChannel implements IBinaryChann
      */
     private final port:SerialPort;
 
+	/**
+	 * Controller for data stream
+	 */
+	private final dataController:StreamController<Bytes>;
+
+	/**
+     * Data stream
+     */
+    public var onData:Stream<Bytes>;
+
     /**
      * Constructor
      * @param route 
@@ -27,6 +39,8 @@ class SerialDirectChannel extends ClientTransportChannel implements IBinaryChann
         if (serialRoute == null)
             throw new NorthwindException("Wrong route type");
         
+		this.dataController = new StreamController<Bytes>();
+		this.onData = this.dataController.stream;
         port = new SerialPort(serialRoute.portName, serialRoute.speed, serialRoute.byteType);
     }
 
@@ -50,14 +64,5 @@ class SerialDirectChannel extends ClientTransportChannel implements IBinaryChann
 	 */
 	public function write(data:Bytes):Void {
 		port.write(data);
-	}
-
-	/**
-	 * Read bytes from channel
-	 * @return Bytes
-	 */
-	public function read(?timeout:Int):Bytes {		
-		var res = port.read(timeout);
-		return res;
 	}
 }
