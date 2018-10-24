@@ -1,5 +1,6 @@
 package collector.common;
 
+import core.async.future.Future;
 import collector.common.appdriver.event.ReadTimeResponseEvent;
 import collector.common.appdriver.event.CollectorDriverEvent;
 import collector.common.appdriver.CollectorMeterDriver;
@@ -93,20 +94,26 @@ class CollectorScript {
 		Log.trace('Script: ${name}');
 		Log.trace('Next start: ${span}');
 		var ms = Math.floor(span.totalMilliseconds);
-		Timer.delay(() -> {
-			var stamp = Timer.stamp();
-			startCollect();
-			stamp = Timer.stamp() - stamp;
-			Log.trace('Executed: ${stamp} seconds');
-			// Launch again
-			startSchedule();
-		}, ms);
+		Timer.delay(()
+			-> {
+				var stamp = Timer.stamp();
+				startCollect().onSuccess((_)
+					-> {
+						stamp = Timer.stamp() - stamp;
+						Log.trace('Executed: ${stamp} seconds');
+						// Launch again
+						startSchedule();
+					}).onError((ex) -> {
+					trace(ex);
+				});
+			},
+			ms);
 	}
 
 	/**
 	 * Start collect from device
 	 */
-	private function startCollect() {
+	private function startCollect():Future<Bool> {
 		Log.trace('Device count: ${devices.length}');
 		Log.trace('Parameters: ${parameters.length}');
 		Log.trace('Actions: ${actions.length}');
@@ -152,12 +159,14 @@ class CollectorScript {
 			if (clientChannel != null)
 				clientChannel.close();
 		}
+
+		return null;
 	}
 
 	/**
 	 * Process events from driver
 	 */
-	private function processDriverEvent(driver:CollectorDriver, event: CollectorDriverEvent) {
+	private function processDriverEvent(driver:CollectorDriver, event:CollectorDriverEvent) {
 		var timeEvent:ReadTimeResponseEvent = cast event;
 		if (timeEvent != null) {
 			trace(timeEvent.value);
@@ -169,23 +178,23 @@ class CollectorScript {
 	 * @param driver
 	 * @param devices
 	 */
-	private function collectByDriver(driver:CollectorDriver, devices:Array<CollectorDevice>) {
+	private function collectByDriver(driver:CollectorDriver, devices:Array<CollectorDevice>):Future<Bool> {
 		var now = DateTime.now();
 		var startDate = now + new TimeSpan({
 			days: deep
 		});
 		var endTime = now;
 
-		var interval = new DateInterval(startDate, endTime);		
+		var interval = new DateInterval(startDate, endTime);
 
 		// Process driver event
 		driver.onEvent.listen((ev) -> {
-			 processDriverEvent(driver, ev);
+			processDriverEvent(driver, ev);
 		});
-		
-		for (device in devices) {			
+
+		for (device in devices) {
 			var tasks = new Array<CollectorTask>();
-			
+
 			for (action in actions) {
 				tasks.push(new CollectorActionTask(action));
 			}
@@ -207,10 +216,12 @@ class CollectorScript {
 
 			try {
 				driver.appendTask(new CollectorDeviceTasks(device, tasks));
-			} catch(e:Dynamic) {
+			} catch (e:Dynamic) {
 				trace(e);
 			}
 		}
+
+		return null;
 	}
 
 	/**
