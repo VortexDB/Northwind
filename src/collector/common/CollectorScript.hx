@@ -176,13 +176,16 @@ class CollectorScript {
 		});
 		var endTime = now;
 
-		var interval = new DateInterval(startDate, endTime);
-		var tasks = new Array<CollectorTask>();
+		var interval = new DateInterval(startDate, endTime);		
 
 		// Process driver event
-		driver.onEvent = processDriverEvent;
-
-		for (device in devices) {
+		driver.onEvent.listen((ev) -> {
+			 processDriverEvent(driver, ev);
+		});
+		
+		for (device in devices) {			
+			var tasks = new Array<CollectorTask>();
+			
 			for (action in actions) {
 				tasks.push(new CollectorActionTask(action));
 			}

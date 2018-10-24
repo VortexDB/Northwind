@@ -1,5 +1,7 @@
 package collector.common.appdriver;
 
+import core.async.stream.Stream;
+import core.async.stream.StreamController;
 import collector.common.task.CollectorDeviceTasks;
 import collector.common.protocol.TransportProtocol;
 import collector.common.appdriver.event.CollectorDriverEvent;
@@ -8,6 +10,11 @@ import collector.common.appdriver.event.CollectorDriverEvent;
  * Collects data from devices
  */
 class CollectorDriver {
+	/**
+	 * Controller for on event stream
+	 */
+	private final onEventController:StreamController<CollectorDriverEvent>;
+
 	/**
 	 * Devices that can be processed by driver
 	 */
@@ -21,7 +28,7 @@ class CollectorDriver {
 	/**
 	 * On driver event
 	 */
-	public var onEvent:(CollectorDriver, CollectorDriverEvent) -> Void;
+	public final onEvent:Stream<CollectorDriverEvent>;
 
 	/**
 	 * Constructor
@@ -29,14 +36,15 @@ class CollectorDriver {
 	public function new(deviceTypes:Array<String>, protocol:TransportProtocol) {
 		this.deviceTypes = deviceTypes;
 		this.protocol = protocol;
+		this.onEventController = new StreamController<CollectorDriverEvent>();
+		this.onEvent = this.onEventController.stream;
 	}
 
 	/**
 	 * Notify about some event on taks
 	 */
 	public function notifyTaskEvent(event:CollectorDriverEvent) {
-		if (onEvent != null)
-			onEvent(this, event);
+		onEventController.add(event);
 	}
 
 	/**
