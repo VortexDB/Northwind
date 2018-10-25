@@ -1,12 +1,8 @@
 package collector.common;
 
+import core.async.stream.Stream;
 import haxe.ds.HashMap;
 import core.async.future.Future;
-import collector.common.appdriver.event.ReadTimeResponseEvent;
-import collector.common.appdriver.event.CollectorDriverEvent;
-import collector.common.appdriver.CollectorMeterDriver;
-import collector.common.appdriver.ExecutionContext;
-import collector.common.appdriver.IDriverWithExecutionContext;
 import core.time.TimeSpan;
 import core.time.DateTime;
 import haxe.Log;
@@ -14,9 +10,7 @@ import haxe.Timer;
 import core.time.schedule.ISchedule;
 import core.collections.HashSet;
 
-using core.utils.StringHelper;
-using core.utils.IterableHelper;
-
+import collector.common.util.NorthwindException;
 import collector.common.CollectorWorker.DriverMapKey;
 import collector.common.appdriver.CollectorDriver;
 import collector.common.task.CollectorDeviceTasks;
@@ -31,6 +25,34 @@ import collector.common.route.DirectSerialRoute;
 import collector.common.channel.TransportChannel;
 import collector.common.channel.ClientTransportChannel;
 import collector.channels.serial.SerialDirectChannel;
+import collector.common.appdriver.event.ReadTimeResponseEvent;
+import collector.common.appdriver.event.CollectorDriverEvent;
+import collector.common.appdriver.CollectorMeterDriver;
+import collector.common.appdriver.ExecutionContext;
+import collector.common.appdriver.IDriverWithExecutionContext;
+
+using core.utils.StringHelper;
+using core.utils.IterableHelper;
+
+/**
+ * State of script
+ */
+enum CollectorScriptState {
+	/**
+	 * Script is stopped and ready for launch
+	 */
+	Stoped;
+
+	/**
+	 * Launched and waiting for start by schedule
+	 */
+	Waiting;
+
+	/**
+	 * Script is working and collecting data
+	 */
+	Working;
+}
 
 /**
  * Execution context for driver
@@ -49,7 +71,7 @@ class ScriptDriverContext {
 	/**
 	 * Future that signals about completion of driver work
 	 */
-	public final completer:CompletionFuture<Bool>
+	public final completer:CompletionFuture<Bool>;
 
 	/**
 	 * Constructor
@@ -57,12 +79,12 @@ class ScriptDriverContext {
 	public function new(driver:CollectorDriver) {
 		this.driver = driver;
 		this.completer = new CompletionFuture<Bool>();
-		this.tasksByDevice  = new HashMap<CollectorDevice, Map<Int, CollectorTask>>();
+		this.tasksByDevice = new HashMap<CollectorDevice, Map<Int, CollectorTask>>();
 	}
 
 	/**
 	 * Add tasks for device
-	 * @param deviceTasks 
+	 * @param deviceTasks
 	 */
 	public function appendTask(deviceTasks:CollectorDeviceTasks) {
 		var tasks = tasksByDevice.get(deviceTasks.device);
@@ -122,6 +144,11 @@ class CollectorScript {
 	public final actions:HashSet<DeviceAction>;
 
 	/**
+	 * Current state of script
+	 */
+	public var state:CollectorScriptState;
+
+	/**
 	 * Get channel for route
 	 * @param route
 	 */
@@ -147,6 +174,7 @@ class CollectorScript {
 		Log.trace('Script: ${name}');
 		Log.trace('Next start: ${span}');
 		var ms = Math.floor(span.totalMilliseconds);
+		this.state = CollectorScriptState.Waiting;
 		Timer.delay(()
 			-> {
 				var stamp = Timer.stamp();
@@ -167,17 +195,34 @@ class CollectorScript {
 	 * Start collect from device
 	 */
 	private function startCollect():Future<Bool> {
+		if (state == CollectorScriptState.Working)
+			throw new NorthwindException("Script already in work");
+
+		state = CollectorScriptState.Working;
 		Log.trace('Device count: ${devices.length}');
 		Log.trace('Parameters: ${parameters.length}');
 		Log.trace('Actions: ${actions.length}');
 		Log.trace('Deep: ${deep}');
-
 		var routeDeviceGroups = devices.groupdBy((e) -> {
 			return e.route;
 		});
 
+		// Listen for route events(fatal and non fatal)
+		collectByRoutes(routeDeviceGroups).listen((e) -> {
+			// switch (e.kind) {
+			// 	case RouteFatalError:
+			// 	case RouteNonFatalError:
+			// }
+		});
+
+		return null;
+	}
+
+	/**
+	 * Collect data by route
+	 */
+	private function collectByRoutes(routeDeviceGroups:Map<DeviceRoute, Array<CollectorDevice>>):Stream<Bool> {
 		for (route in routeDeviceGroups.keys()) {
-			// Get channel
 			var channel = getChannelByRoute(route);
 			var clientChannel:ClientTransportChannel = cast channel;
 			// Open channel if it's a ClientChannel
@@ -187,12 +232,10 @@ class CollectorScript {
 			var routeDevices = routeDeviceGroups[route];
 			// For grouping by driver key
 			var driverKeys = new Array<DriverMapKey>();
-
 			for (device in routeDevices) {
 				var driverKey = new DriverMapKey(device.deviceType, device.protocolType);
 				driverKeys.push(driverKey);
 			}
-
 			var driverKeyGroups = driverKeys.groupdBy((e) -> {
 				return e.hashCode();
 			});
@@ -207,7 +250,6 @@ class CollectorScript {
 				driver.protocol.channel = channel;
 				collectByDriver(driver, routeDevices);
 			}
-
 			// Close channel if it's a ClientChannel
 			if (clientChannel != null)
 				clientChannel.close();
@@ -215,6 +257,49 @@ class CollectorScript {
 
 		return null;
 	}
+
+	// private function startCollect():Future<Bool> {
+	// 	this.state = CollectorScriptState.Working;
+	// 	Log.trace('Device count: ${devices.length}');
+	// 	Log.trace('Parameters: ${parameters.length}');
+	// 	Log.trace('Actions: ${actions.length}');
+	// 	Log.trace('Deep: ${deep}');
+	// 	var routeDeviceGroups = devices.groupdBy((e) -> {
+	// 		return e.route;
+	// 	});
+	// 	for (route in routeDeviceGroups.keys()) {
+	// 		// Get channel
+	// 		var channel = getChannelByRoute(route);
+	// 		var clientChannel:ClientTransportChannel = cast channel;
+	// 		// Open channel if it's a ClientChannel
+	// 		if (clientChannel != null)
+	// 			clientChannel.open(1000);
+	// 		var routeDevices = routeDeviceGroups[route];
+	// 		// For grouping by driver key
+	// 		var driverKeys = new Array<DriverMapKey>();
+	// 		for (device in routeDevices) {
+	// 			var driverKey = new DriverMapKey(device.deviceType, device.protocolType);
+	// 			driverKeys.push(driverKey);
+	// 		}
+	// 		var driverKeyGroups = driverKeys.groupdBy((e) -> {
+	// 			return e.hashCode();
+	// 		});
+	// 		for (driverKey in driverKeyGroups) {
+	// 			var first = driverKey[0];
+	// 			var driver = owner.getDriver(first);
+	// 			if (driver == null) {
+	// 				Log.trace('Driver for device ${first.deviceType} not found');
+	// 				continue;
+	// 			}
+	// 			driver.protocol.channel = channel;
+	// 			collectByDriver(driver, routeDevices);
+	// 		}
+	// 		// Close channel if it's a ClientChannel
+	// 		if (clientChannel != null)
+	// 			clientChannel.close();
+	// 	}
+	// 	return null;
+	// }
 
 	/**
 	 * Process events from driver
@@ -225,8 +310,7 @@ class CollectorScript {
 			trace(timeEvent.value);
 		}
 
-
-		//context.completer.complete(true);
+		// context.completer.complete(true);
 	}
 
 	/**
@@ -296,6 +380,7 @@ class CollectorScript {
 		this.actions = new HashSet<DeviceAction>();
 		this.devices = new HashSet<CollectorDevice>();
 		this.schedule = schedule;
+		this.state = CollectorScriptState.Stoped;
 	}
 
 	/**
@@ -352,7 +437,7 @@ class CollectorScript {
 	/**
 	 * Stop execution
 	 */
-	public function stop():Future<Bool> {		
+	public function stop():Future<Bool> {
 		return stopInternal();
 	}
 }
