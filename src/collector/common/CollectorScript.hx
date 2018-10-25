@@ -1,5 +1,6 @@
 package collector.common;
 
+import haxe.ds.HashMap;
 import core.async.future.Future;
 import collector.common.appdriver.event.ReadTimeResponseEvent;
 import collector.common.appdriver.event.CollectorDriverEvent;
@@ -30,6 +31,51 @@ import collector.common.route.DirectSerialRoute;
 import collector.common.channel.TransportChannel;
 import collector.common.channel.ClientTransportChannel;
 import collector.channels.serial.SerialDirectChannel;
+
+/**
+ * Execution context for driver
+ */
+class ScriptDriverContext {
+	/**
+	 * All tasks by device
+	 */
+	private final tasksByDevice:HashMap<CollectorDevice, Map<Int, CollectorTask>>;
+
+	/**
+	 * Collector driver
+	 */
+	public final driver:CollectorDriver;
+
+	/**
+	 * Future that signals about completion of driver work
+	 */
+	public final completer:CompletionFuture<Bool>
+
+	/**
+	 * Constructor
+	 */
+	public function new(driver:CollectorDriver) {
+		this.driver = driver;
+		this.completer = new CompletionFuture<Bool>();
+		this.tasksByDevice  = new HashMap<CollectorDevice, Map<Int, CollectorTask>>();
+	}
+
+	/**
+	 * Add tasks for device
+	 * @param deviceTasks 
+	 */
+	public function appendTask(deviceTasks:CollectorDeviceTasks) {
+		var tasks = tasksByDevice.get(deviceTasks.device);
+		if (tasks == null) {
+			tasks = new Map<Int, CollectorTask>();
+			tasksByDevice.set(deviceTasks.device, tasks);
+		}
+
+		for (task in deviceTasks.tasks) {
+			tasks.set(task.taskId, task);
+		}
+	}
+}
 
 /**
  * Collects data from app layer drivers
@@ -83,6 +129,13 @@ class CollectorScript {
 		if ((route is DirectSerialRoute)) {
 			return new SerialDirectChannel(route);
 		}
+		return null;
+	}
+
+	/**
+	 * Return future that will completed when script will be stopped
+	 */
+	private function stopInternal():Future<Bool> {
 		return null;
 	}
 
@@ -166,11 +219,14 @@ class CollectorScript {
 	/**
 	 * Process events from driver
 	 */
-	private function processDriverEvent(driver:CollectorDriver, event:CollectorDriverEvent) {
+	private function processDriverEvent(context:ScriptDriverContext, event:CollectorDriverEvent) {
 		var timeEvent:ReadTimeResponseEvent = cast event;
 		if (timeEvent != null) {
 			trace(timeEvent.value);
 		}
+
+
+		//context.completer.complete(true);
 	}
 
 	/**
@@ -187,9 +243,11 @@ class CollectorScript {
 
 		var interval = new DateInterval(startDate, endTime);
 
+		var driverContext = new ScriptDriverContext(driver);
+
 		// Process driver event
 		driver.onEvent.listen((ev) -> {
-			processDriverEvent(driver, ev);
+			processDriverEvent(driverContext, ev);
 		});
 
 		for (device in devices) {
@@ -215,13 +273,15 @@ class CollectorScript {
 			}
 
 			try {
-				driver.appendTask(new CollectorDeviceTasks(device, tasks));
+				var deviceTask = new CollectorDeviceTasks(device, tasks);
+				driver.appendTask(deviceTask);
+				driverContext.appendTask(deviceTask);
 			} catch (e:Dynamic) {
 				trace(e);
 			}
 		}
 
-		return null;
+		return driverContext.completer;
 	}
 
 	/**
@@ -287,5 +347,12 @@ class CollectorScript {
 	 */
 	public function start() {
 		startSchedule();
+	}
+
+	/**
+	 * Stop execution
+	 */
+	public function stop():Future<Bool> {		
+		return stopInternal();
 	}
 }
