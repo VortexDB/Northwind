@@ -1,5 +1,6 @@
 package collector.channels.serial;
 
+import core.async.future.Future;
 import core.async.stream.StreamController;
 import core.async.stream.Stream;
 import core.io.port.SerialPort;
@@ -50,8 +51,12 @@ class SerialDirectChannel extends ClientTransportChannel implements IBinaryChann
 	/**
 	 * Open channel with timeout in milliseconds
 	 */
-	public override function open(timeout:Int):Void {
-		port.open();
+	public override function open(timeout:Int):Future<Bool> {
+		// TODO: timeout
+		return Future.sync(() -> {
+			port.open();
+			return true;
+		});
 	}
 
 	/**

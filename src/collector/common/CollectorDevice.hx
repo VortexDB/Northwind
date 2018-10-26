@@ -1,6 +1,7 @@
 package collector.common;
 
 import collector.common.route.DeviceRoute;
+import collector.common.collect.CollectorScript;
 
 using core.utils.StringHelper;
 
@@ -52,7 +53,7 @@ class CollectorDevice {
 	 * @return Bool
 	 */
 	public function equals(other:Dynamic):Bool {
-		if (Std.is(other, CollectorScript)) {
+		if ((other is CollectorScript)) {
 			return hashCode() == cast(other, CollectorScript).hashCode();
 		}
 

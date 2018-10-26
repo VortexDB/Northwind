@@ -1,5 +1,6 @@
 package collector.common.channel;
 
+import core.async.future.Future;
 import collector.common.route.DeviceRoute;
 
 /**
@@ -22,7 +23,7 @@ class TransportChannel {
 	/**
 	 * Open channel with timeout in milliseconds
 	 */
-	public function open(timeout:Int):Void {
+	public function open(timeout:Int):Future<Bool> {
 		throw "Not implemented";
 	}
 

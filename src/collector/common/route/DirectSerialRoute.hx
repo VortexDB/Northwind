@@ -33,7 +33,7 @@ class DirectSerialRoute extends DeviceRoute {
     /**
      * Convert to string
      */
-    public function toString() {
+    public override function toString() {
         return 'Port: ${portName} Speed: ${speed} ByteType: ${byteType}';
     }
 }
