@@ -1,9 +1,6 @@
 package collector.common.collect;
 
-import haxe.ds.HashMap;
 import core.async.future.Future;
-import core.time.TimeSpan;
-import core.time.DateTime;
 import haxe.Log;
 import haxe.Timer;
 import core.time.schedule.ISchedule;
@@ -11,23 +8,14 @@ import core.collections.HashSet;
 import collector.common.util.NorthwindException;
 import collector.common.appdriver.DriverMapKey;
 import collector.common.appdriver.CollectorDriver;
-import collector.common.task.CollectorDeviceTasks;
-import collector.common.task.CollectorDataTask;
-import collector.common.task.CollectorTask;
-import collector.common.task.CollectorActionTask;
 import collector.common.parameters.MeasureParameter;
 import collector.common.parameters.DeviceAction;
-import collector.common.parameters.DateInterval;
 import collector.common.route.DeviceRoute;
 import collector.common.route.DirectSerialRoute;
 import collector.common.channel.TransportChannel;
-import collector.common.channel.ClientTransportChannel;
 import collector.channels.serial.SerialDirectChannel;
 import collector.common.appdriver.event.ReadTimeResponseEvent;
 import collector.common.appdriver.event.CollectorDriverEvent;
-import collector.common.appdriver.CollectorMeterDriver;
-import collector.common.appdriver.ExecutionContext;
-import collector.common.appdriver.IDriverWithExecutionContext;
 
 using core.utils.StringHelper;
 using core.utils.IterableHelper;
@@ -50,45 +38,6 @@ enum CollectorScriptState {
 	 * Script is working and collecting data
 	 */
 	Working;
-}
-
-/**
- * Execution context for driver
- */
-class ScriptDriverContext {
-	/**
-	 * All tasks by device
-	 */
-	private final tasksByDevice:HashMap<CollectorDevice, Map<Int, CollectorTask>>;
-
-	/**
-	 * Collector driver
-	 */
-	public final driver:CollectorDriver;
-
-	/**
-	 * Constructor
-	 */
-	public function new(driver:CollectorDriver) {
-		this.driver = driver;
-		this.tasksByDevice = new HashMap<CollectorDevice, Map<Int, CollectorTask>>();
-	}
-
-	/**
-	 * Add tasks for device
-	 * @param deviceTasks
-	 */
-	public function appendTask(deviceTasks:CollectorDeviceTasks) {
-		var tasks = tasksByDevice.get(deviceTasks.device);
-		if (tasks == null) {
-			tasks = new Map<Int, CollectorTask>();
-			tasksByDevice.set(deviceTasks.device, tasks);
-		}
-
-		for (task in deviceTasks.tasks) {
-			tasks.set(task.taskId, task);
-		}
-	}
 }
 
 /**
@@ -214,74 +163,7 @@ class CollectorScript implements IScriptContext {
 
 		return null;
 	}
-
-	/**
-	 * Process events from driver
-	 */
-	private function processDriverEvent(context:ScriptDriverContext, event:CollectorDriverEvent) {
-		var timeEvent:ReadTimeResponseEvent = cast event;
-		if (timeEvent != null) {
-			trace(timeEvent.value);
-		}
-
-		// context.completer.complete(true);
-	}
-
-	/**
-	 * Collect data by driver
-	 * @param driver
-	 * @param devices
-	 */
-	private function collectByDriver(driver:CollectorDriver, devices:Array<CollectorDevice>) {
-		var driverName = Type.getClassName(Type.getClass(driver));
-		trace('CollectByDriver ${driverName}');
-		var now = DateTime.now();
-		var startDate = now + new TimeSpan({
-			days: deep
-		});
-		var endTime = now;
-
-		var interval = new DateInterval(startDate, endTime);
-
-		var driverContext = new ScriptDriverContext(driver);
-
-		// Process driver event
-		driver.onEvent.listen((ev) -> {
-			processDriverEvent(driverContext, ev);
-		});
-
-		for (device in devices) {
-			var tasks = new Array<CollectorTask>();
-
-			for (action in actions) {
-				tasks.push(new CollectorActionTask(action));
-			}
-
-			for (parameter in parameters) {
-				tasks.push(new CollectorDataTask(parameter, interval));
-			}
-
-			var meterDriver:CollectorMeterDriver = cast driver;
-			if (meterDriver != null) {
-				// Create device info
-				meterDriver.deviceInfo = meterDriver.getDeviceInfo(device);
-				// Create execution context
-				var driverWithContext:IDriverWithExecutionContext<ExecutionContext> = cast driver;
-				if (driverWithContext != null) {
-					driverWithContext.executionContext = driverWithContext.createExecutionContext(meterDriver.deviceInfo, driver.protocol);
-				}
-			}
-
-			try {
-				var deviceTask = new CollectorDeviceTasks(device, tasks);
-				driver.appendTask(deviceTask);
-				driverContext.appendTask(deviceTask);
-			} catch (e:Dynamic) {
-				trace(e);
-			}
-		}
-	}
-
+	
 	/**
 	 * Constructor
 	 * @param name
@@ -295,6 +177,30 @@ class CollectorScript implements IScriptContext {
 		this.devices = new HashSet<CollectorDevice>();
 		this.schedule = schedule;
 		this.state = CollectorScriptState.Stoped;
+	}
+
+	/**
+     * Get collect deep
+     * @return Int
+     */
+    public function getDeep():Int {
+		return deep;
+	}
+
+    /**
+     * Get actions to execute
+     * @return Array<DeviceAction>
+     */
+    public function getActions():HashSet<DeviceAction> {
+		return actions;
+	}
+
+    /**
+     * Get parameters to read
+     * @return Array<DeviceAction>
+     */
+    public function getParameters():HashSet<MeasureParameter> {
+		return parameters;
 	}
 
 	/**

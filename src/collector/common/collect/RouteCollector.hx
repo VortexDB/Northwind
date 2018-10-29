@@ -41,45 +41,47 @@ class RouteCollector {
 	 */
 	public function collect():Future<Bool> {
 		var channel = owner.getChannelByRoute(route);
+		var completer = new CompletionFuture<Bool>();
+
 		trace('Opening port: ${route.toString()}');
 		channel.open(1000)
 			.onSuccess((_)
 				-> {
 					trace('Port opened');
-					// For grouping by driver key
-					var driverKeys = new Array<DriverMapKey>();
-					for (device in routeDevices) {
-						var driverKey = new DriverMapKey(device.deviceType, device.protocolType);
-						driverKeys.push(driverKey);
-					}
-					var driverKeyGroups = driverKeys.groupdBy((e) -> {
+					var deviceMap = routeDevices.groupdBy((e) -> {
 						return e.hashCode();
 					});
+					for (devices in deviceMap) {
+						if (devices.length < 1)
+							continue;
 
-					for (driverKey in driverKeyGroups) {
-						var first = driverKey[0];
-						var driver = owner.getDriver(first);
+						var device = devices[0];
+						var driver = owner.getDriver(new DriverMapKey(device.deviceType, device.protocolType));
 						if (driver == null) {
-							trace('Driver for device ${first.deviceType} not found');
+							trace('Driver for device ${device.deviceType} not found');
 							continue;
 						}
 						driver.protocol.channel = channel;
-						//collectByDriver(driver, routeDevices);
+						// TODO: register collector to have possibility cancel
+						var driverCollector = new DriverCollector(owner, driver, devices);
+						// TODO: timeout
+						// TODO: notify on error
+						driverCollector.collect().onSuccess((e) -> {
+							// 
+						});
 					}
 				})
 			.onError((ex) -> {
-				trace(ex);
-			})
-			.onComplete((_)
-				-> {
-					var clientChannel:ClientTransportChannel = cast channel;
-					// Close channel if it's a ClientChannel
-					if (clientChannel != null) {
-						clientChannel.close();
-						trace('Port closed');
-					}
-				});
-		return null;
+				completer.throwError(ex);
+			});
+
+		// var clientChannel:ClientTransportChannel = cast channel;
+		// // Close channel if it's a ClientChannel
+		// if (clientChannel != null) {
+		// 	clientChannel.close();
+		// 	trace('Port closed');
+		// }			
+		return completer;
 	}
 
 	/**

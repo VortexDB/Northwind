@@ -1,5 +1,8 @@
 package collector.common.collect;
 
+import core.collections.HashSet;
+import collector.common.parameters.MeasureParameter;
+import collector.common.parameters.DeviceAction;
 import collector.common.appdriver.CollectorDriver;
 import collector.common.appdriver.DriverMapKey;
 import collector.common.channel.TransportChannel;
@@ -21,4 +24,22 @@ interface IScriptContext {
      * @return CollectorDriver
      */
     function getDriver(key:DriverMapKey):CollectorDriver;
+
+    /**
+     * Get collect deep
+     * @return Int
+     */
+    function getDeep():Int;
+
+    /**
+     * Get actions to execute
+     * @return Array<DeviceAction>
+     */
+    function getActions():HashSet<DeviceAction>;
+
+    /**
+     * Get parameters to read
+     * @return Array<DeviceAction>
+     */
+    function getParameters():HashSet<MeasureParameter>;
 }
