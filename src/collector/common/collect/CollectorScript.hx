@@ -152,12 +152,15 @@ class CollectorScript implements IScriptContext {
 	 * Collect data by routes
 	 */
 	private function collectByRoutes(routeDeviceGroups:Map<DeviceRoute, Array<CollectorDevice>>) {
-		var states = [];
+		var states = new Array<RouteCollector>();
 		for (route in routeDeviceGroups.keys()) {
 			var routeDevices = routeDeviceGroups[route];
 			var routeCollector = new RouteCollector(this, route, routeDevices);
-			routeCollector.collect().onSuccess((_) -> {
-				states.push(1);
+			routeCollector.collect().onSuccess((collector) -> {				
+				states.remove(collector);
+				if (states.length < 1) {
+					scriptDoneCompleter.complete(true);
+				}
 			});
 		}
 

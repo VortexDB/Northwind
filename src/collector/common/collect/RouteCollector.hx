@@ -1,5 +1,6 @@
 package collector.common.collect;
 
+import collector.common.channel.TransportChannel;
 import collector.common.channel.ClientTransportChannel;
 import collector.common.appdriver.DriverMapKey;
 import core.async.future.Future;
@@ -8,9 +9,37 @@ import collector.common.route.DeviceRoute;
 using core.utils.IterableHelper;
 
 /**
+ * Context for route collectors
+ */
+class RouteCollectorContext {
+	/**
+	 * Channel for route
+	 */
+	public final channel:TransportChannel;
+
+	/**
+	 * All collectors
+	 */
+	public final collectors:Array<DriverCollector>;
+
+	/**
+	 * Constructor
+	 */
+	public function new(channel:TransportChannel) {
+		this.channel = channel;
+		this.collectors = new Array<DriverCollector>();
+	}
+}
+
+/**
  * Collect data from devices by route
  */
 class RouteCollector {
+	/**
+	 * For signal of work completion
+	 */
+	private final completer:CompletionFuture<RouteCollector>;
+
 	/**
 	 * Context of collector script
 	 */
@@ -27,30 +56,45 @@ class RouteCollector {
 	public final routeDevices:Array<CollectorDevice>;
 
 	/**
+	 * Process state change
+	 * @param collector 
+	 */
+	private function processStates(context:RouteCollectorContext, collector:DriverCollector) {
+		context.collectors.remove(collector);		
+		if (context.collectors.length < 1) {
+			 if ((context.channel is ClientTransportChannel))
+			 	context.channel.close();			
+			completer.complete(this);
+		}
+	}
+
+	/**
 	 * Constructor
 	 */
 	public function new(owner:IScriptContext, route:DeviceRoute, routeDevices:Array<CollectorDevice>) {
 		this.owner = owner;
 		this.route = route;
 		this.routeDevices = routeDevices;
+		completer = new CompletionFuture<RouteCollector>();
 	}
 
 	/**
 	 * Return future that will signal about complete
 	 * @return Future<Bool>
 	 */
-	public function collect():Future<Bool> {
+	public function collect():Future<RouteCollector> {
 		var channel = owner.getChannelByRoute(route);
-		var completer = new CompletionFuture<Bool>();
 
 		trace('Opening port: ${route.toString()}');
 		channel.open(1000)
 			.onSuccess((_)
 				-> {
 					trace('Port opened');
+					var context = new RouteCollectorContext(channel);
 					var deviceMap = routeDevices.groupdBy((e) -> {
 						return e.hashCode();
-					});
+					});					
+
 					for (devices in deviceMap) {
 						if (devices.length < 1)
 							continue;
@@ -64,23 +108,20 @@ class RouteCollector {
 						driver.protocol.channel = channel;
 						// TODO: register collector to have possibility cancel
 						var driverCollector = new DriverCollector(owner, driver, devices);
+						context.collectors.push(driverCollector);
 						// TODO: timeout
-						// TODO: notify on error
-						driverCollector.collect().onSuccess((e) -> {
-							// 
+						driverCollector.collect().onSuccess((collector) -> {
+							// Change state
+							// Complete if all is done
+							processStates(context, collector);
+						}).onError((ex) -> {
+							trace(ex);
 						});
 					}
 				})
 			.onError((ex) -> {
 				completer.throwError(ex);
 			});
-
-		// var clientChannel:ClientTransportChannel = cast channel;
-		// // Close channel if it's a ClientChannel
-		// if (clientChannel != null) {
-		// 	clientChannel.close();
-		// 	trace('Port closed');
-		// }			
 		return completer;
 	}
 

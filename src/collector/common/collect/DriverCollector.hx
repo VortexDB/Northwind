@@ -19,7 +19,7 @@ import collector.common.appdriver.CollectorDriver;
 /**
  * Execution context for driver
  */
-class ScriptDriverContext {
+class DriverCollectorContext {
 	/**
 	 * All tasks by device
 	 */
@@ -62,7 +62,7 @@ class DriverCollector {
     /**
      * Future that completes on collection over or error
      */
-    private final completer:CompletionFuture<Bool>;
+    private final completer:CompletionFuture<DriverCollector>;
 
     /**
 	 * Context of collector script
@@ -88,37 +88,37 @@ class DriverCollector {
         this.owner = owner;
         this.driver = driver;
         this.driverDevices = driverDevices;
-        this.completer = new CompletionFuture<Bool>();
+        this.completer = new CompletionFuture<DriverCollector>();
     }
 
     /**
 	 * Process events from driver
 	 */
-	private function processDriverEvent(context:ScriptDriverContext, event:CollectorDriverEvent) {
+	private function processDriverEvent(context:DriverCollectorContext, event:CollectorDriverEvent) {
 		var timeEvent:ReadTimeResponseEvent = cast event;
 		if (timeEvent != null) {
 			trace(timeEvent.value);
 		}
 
-		// context.completer.complete(true);
+		completer.complete(this);
 	}
 
     /**
      * Return future that will be completed when 
      * @return Future<Bool>
      */
-    public function collect():Future<Bool> {
+    public function collect():Future<DriverCollector> {
         var driverName = Type.getClassName(Type.getClass(driver));
 		trace('CollectByDriver ${driverName}');
 		var now = DateTime.now();
 		var startDate = now + new TimeSpan({
-			days: deep            
+			days: owner.getDeep()
 		});
 		var endTime = now;
 
 		var interval = new DateInterval(startDate, endTime);
 
-		var driverContext = new ScriptDriverContext(driver);
+		var driverContext = new DriverCollectorContext(driver);
 
 		// Process driver event
 		driver.onEvent.listen((ev) -> {
@@ -128,11 +128,11 @@ class DriverCollector {
 		for (device in driverDevices) {
 			var tasks = new Array<CollectorTask>();
 
-			for (action in actions) {
+			for (action in owner.getActions()) {
 				tasks.push(new CollectorActionTask(action));
 			}
 
-			for (parameter in parameters) {
+			for (parameter in owner.getParameters()) {
 				tasks.push(new CollectorDataTask(parameter, interval));
 			}
 
