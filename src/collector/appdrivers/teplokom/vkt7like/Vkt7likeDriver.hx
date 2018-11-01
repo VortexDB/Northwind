@@ -40,11 +40,11 @@ class Vkt7likeDriver extends CollectorMeterDriver implements IDriverWithExecutio
 	 * Process execute actions. Virtual
 	 * @param action
 	 */
-	public override function executeActions(actions:Array<CollectorActionTask>):Void {
+	public override function executeActions(actions:Array<CollectorActionTask>):Void {		
 		for (taskAction in actions) {
 			switch (taskAction.action.actionType) {
-				case ActionType.ReadDateTime:
-					var reader = new TimeReader(executionContext);
+				case ActionType.ReadDateTime:					
+					var reader = new TimeReader(executionContext);					
 					reader.executeOne().onSuccess((dateTime) -> {
 						notifyTaskEvent(new ReadTimeResponseEvent(taskAction.taskId, dateTime));
 					});

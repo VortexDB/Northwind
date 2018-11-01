@@ -57,34 +57,36 @@ class ModbusRtuProtocol extends ModbusProtocol {
 	 */
 	public function sendRequestWithResponse(request:ModbusRtuRequest):Future<ModbusRtuResponse> {
 		var chan = cast(channel, IBinaryChannel);
+		if (chan == null)
+			throw new NorthwindException("Wrong channel type");
 
 		// Send data to device
 		var pdu = request.getData();
 		var fullFrame = new BinaryData();
 		// TODO: remove. It's VKT only
-		fullFrame.addInt16(0xFFFF);
+		fullFrame.addInt16(0xFFFF);		
 
 		var payload = new BinaryData();
 		payload.addByte(request.networkAddress);
 		payload.addByte(request.functionId());
 		payload.addBytes(pdu);
-		fullFrame.addBinaryData(payload);
+		fullFrame.addBinaryData(payload);		
 
 		var crc = ModbusRtuCrcHelper.calcCrc(payload.toBytes());
-		fullFrame.addInt16(crc);
-		
-		chan.write(fullFrame.toBytes());
+		fullFrame.addInt16(crc);		
+					
+		chan.write(fullFrame.toBytes());		
 
 		var binary = new BinaryData();
 		var network:Null<Int> = null;
 		var fullSize = 0;
 		var functionId:Null<Int> = null;
 		var lengthRead = false;
-		var answerLength = -1;
+		var answerLength = -1;		
 
 		var completer = new CompletionFuture<ModbusRtuResponse>();
 		var packCompleter = new CompletionFuture<Bool>();
-
+		
 		// Read from channel
 		chan.onData.timeout(TimeSpan.fromMSeconds(READ_TIMEOUT)).listen((data)
 			-> {

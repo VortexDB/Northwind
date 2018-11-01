@@ -30,7 +30,7 @@ class TransportChannel {
 	/**
 	 * Close channel
 	 */
-	public function close():Void {
+	public function close():Future<Bool> {
 		throw "Not implemented";
 	}
 }

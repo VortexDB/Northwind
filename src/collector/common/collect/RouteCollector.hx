@@ -57,14 +57,20 @@ class RouteCollector {
 
 	/**
 	 * Process state change
-	 * @param collector 
+	 * @param collector
 	 */
 	private function processStates(context:RouteCollectorContext, collector:DriverCollector) {
-		context.collectors.remove(collector);		
+		context.collectors.remove(collector);
 		if (context.collectors.length < 1) {
-			 if ((context.channel is ClientTransportChannel))
-			 	context.channel.close();			
-			completer.complete(this);
+			if ((context.channel is ClientTransportChannel)) {				
+				context.channel.close().onSuccess((_) -> {					
+					completer.complete(this);					
+				}).onError((ex) -> {
+					trace(ex);
+				});
+			} else {				
+				completer.complete(this);
+			}
 		}
 	}
 
@@ -93,7 +99,7 @@ class RouteCollector {
 					var context = new RouteCollectorContext(channel);
 					var deviceMap = routeDevices.groupdBy((e) -> {
 						return e.hashCode();
-					});					
+					});
 
 					for (devices in deviceMap) {
 						if (devices.length < 1)
@@ -105,18 +111,24 @@ class RouteCollector {
 							trace('Driver for device ${device.deviceType} not found');
 							continue;
 						}
+
+						driver.initialize();
 						driver.protocol.channel = channel;
 						// TODO: register collector to have possibility cancel
 						var driverCollector = new DriverCollector(owner, driver, devices);
 						context.collectors.push(driverCollector);
 						// TODO: timeout
-						driverCollector.collect().onSuccess((collector) -> {
-							// Change state
-							// Complete if all is done
-							processStates(context, collector);
-						}).onError((ex) -> {
-							trace(ex);
-						});
+						driverCollector.collect()
+							.onSuccess((_)
+								-> {
+									// Change state
+									// Complete if all is done
+									processStates(context, driverCollector);
+								})
+							.onError((ex) -> {
+								processStates(context, driverCollector);
+								trace(ex);
+							});
 					}
 				})
 			.onError((ex) -> {

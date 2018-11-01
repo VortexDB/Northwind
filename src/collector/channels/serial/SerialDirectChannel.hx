@@ -62,9 +62,14 @@ class SerialDirectChannel extends ClientTransportChannel implements IBinaryChann
 	/**
 	 * Close channel
 	 */
-	public override function close():Void {
-		port.close();
-		dataController.close();
+	public override function close():Future<Bool> {
+		var completer = new CompletionFuture<Bool>();
+		port.close().onSuccess((_) -> {
+			dataController.close();
+			completer.complete(true);
+		});		
+
+		return completer;
 	}
 
 	/**

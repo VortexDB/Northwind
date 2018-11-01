@@ -13,7 +13,7 @@ class CollectorDriver {
 	/**
 	 * Controller for on event stream
 	 */
-	private final onEventController:StreamController<CollectorDriverEvent>;
+	private var onEventController:StreamController<CollectorDriverEvent>;
 
 	/**
 	 * Devices that can be processed by driver
@@ -28,7 +28,7 @@ class CollectorDriver {
 	/**
 	 * On driver event
 	 */
-	public final onEvent:Stream<CollectorDriverEvent>;
+	public var onEvent:Stream<CollectorDriverEvent>;
 
 	/**
 	 * Constructor
@@ -36,8 +36,6 @@ class CollectorDriver {
 	public function new(deviceTypes:Array<String>, protocol:TransportProtocol) {
 		this.deviceTypes = deviceTypes;
 		this.protocol = protocol;
-		this.onEventController = new StreamController<CollectorDriverEvent>();
-		this.onEvent = this.onEventController.stream;
 	}
 
 	/**
@@ -45,6 +43,14 @@ class CollectorDriver {
 	 */
 	public function notifyTaskEvent(event:CollectorDriverEvent) {
 		onEventController.add(event);
+	}
+
+	/**
+	 * Reset state to start
+	 */
+	public function initialize() {
+		onEventController = new StreamController<CollectorDriverEvent>();
+		onEvent = onEventController.stream;
 	}
 
 	/**

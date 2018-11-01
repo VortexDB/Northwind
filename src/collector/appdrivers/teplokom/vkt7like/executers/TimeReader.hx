@@ -33,12 +33,12 @@ class TimeReader extends CollectorDriverExecuter<VktExecuterContext, DateTime> {
 	public override function executeOne():Future<DateTime> {
 		var network = executionContext.model.networkAddress;
 		var request = new ReadHoldingRegistersRequest(network, VktStartAddress.TIME_ADDRESS, 0);
-		var completer = new CompletionFuture<DateTime>();		
+		var completer = new CompletionFuture<DateTime>();
 		executionContext.modbusProtocol.sendRequestWithResponse(request).onSuccess((response)
 			-> {				
 				if (response.networkAddress != network)
 					throw new NorthwindException("Request network address not equals response network address");
-
+				
 				var binary = BinaryData.ofBytes(response.data);
 				var day = binary.getByte(1);
 				var month = binary.getByte(2);
