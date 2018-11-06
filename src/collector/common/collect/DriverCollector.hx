@@ -1,5 +1,6 @@
 package collector.common.collect;
 
+import collector.common.appdriver.event.DriverTaskCompleteEvent;
 import collector.common.appdriver.ExecutionContext;
 import collector.common.task.CollectorActionTask;
 import collector.common.task.CollectorDataTask;
@@ -53,6 +54,15 @@ class DriverCollectorContext {
 			tasks.set(task.taskId, task);
 		}
 	}
+
+	/**
+	 * Check about task complete and return true if all task done, either false
+	 * @param taskId
+	 * @return Bool
+	 */
+	public function completeTask(taskId:Int):Bool {
+		return true;
+	}
 }
 
 /**
@@ -97,14 +107,19 @@ class DriverCollector {
 	private function processDriverEvent(context:DriverCollectorContext, event:CollectorDriverEvent) {
 		var timeEvent:ReadTimeResponseEvent = cast event;
 		if (timeEvent != null) {
+			// TODO: notify about data
 			trace(timeEvent.value);
 		}
 
-		completer.complete(true);
+		var completeEvent:DriverTaskCompleteEvent = cast event;
+		if (completeEvent != null) {
+			if (context.completeTask(completeEvent.taskId))
+				completer.complete(true);
+		}
 	}
 
 	/**
-	 * Return future that will be completed when
+	 * Return future that will be completed when all tasks are completed
 	 * @return Future<Bool>
 	 */
 	public function collect():Future<Bool> {
@@ -119,7 +134,7 @@ class DriverCollector {
 
 			var interval = new DateInterval(startDate, endTime);
 			var driverContext = new DriverCollectorContext(driver);
-			
+
 			// Process driver event
 			driver.onEvent.listen((ev) -> {
 				processDriverEvent(driverContext, ev);
@@ -154,7 +169,7 @@ class DriverCollector {
 				} catch (e:Dynamic) {
 					// TODO: notify
 					trace(e);
-					processDriverEvent(driverContext, null);					
+					processDriverEvent(driverContext, null);
 				}
 			}
 		} catch (ex:Dynamic) {

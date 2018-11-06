@@ -3,7 +3,7 @@ package collector.common.appdriver.event;
 /**
  * Event on collector task
  */
-class DriverTaskResponseEvent extends CollectorDriverEvent {
+class DriverTaskEvent extends CollectorDriverEvent {
     /**
      * Collector task id
      */

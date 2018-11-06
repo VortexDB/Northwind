@@ -1,5 +1,6 @@
 package collector.common.appdriver;
 
+import core.async.stream.Stream;
 import core.async.future.Future;
 import collector.common.appdriver.ExecutionContext;
 
@@ -24,7 +25,7 @@ class CollectorDriverExecuter<TContext:ExecutionContext, TResult> {
      * @param call 
      * @return -> Void)
      */
-    public function execute(call:(TResult) -> Void): Future<Void> { throw "Not implemented"; }
+    public function execute():Stream<TResult> { throw "Not implemented"; }
 
     /**
      * Execute one iteration and get result

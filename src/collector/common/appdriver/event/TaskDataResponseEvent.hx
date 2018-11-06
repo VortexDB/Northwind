@@ -3,7 +3,7 @@ package collector.common.appdriver.event;
 /**
  * Event about data from device
  */
-class TaskDataResponseEvent extends DriverTaskResponseEvent {
+class TaskDataResponseEvent extends DriverTaskEvent {
     /**
      * Constructor
      * @param taskId 
