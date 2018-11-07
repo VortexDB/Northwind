@@ -2,6 +2,8 @@ package webadmin.view.pages;
 
 import coconut.ui.View;
 import coconut.Ui.hxx;
+import webadmin.model.DataGridModel;
+import webadmin.view.controls.DataGrid;
 
 /**
  * Page for devices
@@ -16,9 +18,12 @@ class DevicesPage extends View {
 	 * Render component
 	 */
     function render() {
+        var devices = new DataGridModel();
+        devices.addColumn(new GridColumnModel({ title: "Id", index: 1 }));
+
         return hxx('
         <div>
-            Devices
+            <DataGrid model=${devices} />
         </div>
         ');
     }

@@ -4,6 +4,8 @@ import coconut.ui.View;
 import coconut.Ui.hxx;
 import webadmin.view.pages.DevicesPage;
 import webadmin.view.pages.RoutesPage;
+import webadmin.view.pages.ScriptsPage;
+import webadmin.view.pages.DiagnosticsPage;
 
 /**
  * Left menu panel
@@ -25,6 +27,10 @@ class ContentPanel extends View {
 						<DevicesPage />
 					<case {RoutesPage.ID}>
 						<RoutesPage />
+					<case {ScriptsPage.ID}>
+						<ScriptsPage />
+					<case {DiagnosticsPage.ID}>
+						<DiagnosticsPage />
 				</switch>
 			</div>
         ');
