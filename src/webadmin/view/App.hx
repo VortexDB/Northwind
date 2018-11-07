@@ -1,39 +1,31 @@
 package webadmin.view;
 
-import react.ReactComponent;
-import react.ReactMacro.jsx;
+import coconut.ui.View;
+import coconut.Ui.hxx;
 import webadmin.view.Header;
 import webadmin.view.MenuPanel;
-
+import webadmin.view.ContentPanel;
+import webadmin.model.AppModel;
 
 /**
  * Main app
  */
-class App extends ReactComponent {
+class App extends View {
 	/**
-	 * Constructor
-	 * @param props
+	 * Main model
 	 */
-	public function new() {
-		super();
-	}
+	@:attribute public var model:AppModel;
 
 	/**
 	 * Render component
 	 */
-	override function render() {
-		return jsx('
-		<div>
-			<div><$Header/></div>
-			<div>
-				<div>
-					<$MenuPanel/>
-				</div>
-				<div>
-					Content
-				</div>
+	function render() {
+		return hxx('
+			<div id="app">
+				<Header title=${model.title} />
+				<MenuPanel />
+				<ContentPanel />
 			</div>
-		</div>
 		');
 	}
 }

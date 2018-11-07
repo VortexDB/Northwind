@@ -1,29 +1,25 @@
 package webadmin.view;
 
-import react.React;
-import react.ReactComponent;
-import react.ReactMacro.jsx;
+import coconut.ui.View;
+import coconut.Ui.hxx;
 
 /**
  * Header
  */
-class Header extends ReactComponent {
+class Header extends View {
 	/**
-	 * Constructor
+	 * Title of header
 	 */
-	public function new() {
-		super();
-	}
+	@:attribute public var title:String;
 
 	/**
 	 * Render component
 	 */
-	override function render() {
-		return jsx
-			('
-            <nav className="navbar navbar-expand-lg navbar-light bg-light">
-                <a className="navbar-brand" href="#">Northwind</a>
-            </nav>
-        ');
+	function render() {
+		return hxx('
+			<div class="navbar navbar-expand-lg navbar-light bg-light">
+				<div class="navbar-brand">${title}</div>
+			</div>
+		');
 	}
 }

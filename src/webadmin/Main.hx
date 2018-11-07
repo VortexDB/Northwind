@@ -1,9 +1,9 @@
 package webadmin;
 
-import js.Browser;
-import react.ReactDOM;
-import react.ReactMacro.jsx;
+import js.Browser.*;
+import coconut.Ui.hxx;
 import webadmin.view.App;
+import webadmin.model.AppModel;
 
 
 /**
@@ -16,6 +16,7 @@ class Main
 	 */
 	public static function main()
 	{
-		ReactDOM.render(jsx('<$App/>'), Browser.document.getElementById('app'));
+		var appModel = new AppModel();
+		document.body.appendChild(hxx('<App model={appModel} />').toElement());
 	}
 }

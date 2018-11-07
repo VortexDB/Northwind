@@ -6,13 +6,13 @@ import coconut.Ui.hxx;
 /**
  * Left menu panel
  */
-class MenuPanel extends View {
+class ContentPanel extends View {
 	/**
 	 * Render component
 	 */
 	function render() {
 		return hxx('
-            <div>Menu panel</div>
+            <div>Content panel</div>
         ');
 	}
 }
