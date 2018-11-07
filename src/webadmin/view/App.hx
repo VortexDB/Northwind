@@ -1,5 +1,6 @@
 package webadmin.view;
 
+import webadmin.model.MenuModel.MenuItemModel;
 import coconut.ui.View;
 import coconut.Ui.hxx;
 import webadmin.view.Header;
@@ -17,14 +18,25 @@ class App extends View {
 	@:attribute public var model:AppModel;
 
 	/**
+	 * On menu item select
+	 * @param item 
+	 */
+	private function onSelect(item:MenuItemModel) {
+		if (model.currentPageId != item.id)
+			model.currentPageId = item.id;
+	}
+
+	/**
 	 * Render component
 	 */
 	function render() {
 		return hxx('
 			<div id="app">
 				<Header title=${model.title} />
-				<MenuPanel />
-				<ContentPanel />
+				<div id="main-panel">
+					<MenuPanel model=${model.menuModel} onSelect={onSelect} />
+					<ContentPanel pageId=${model.currentPageId} />
+				</div>
 			</div>
 		');
 	}

@@ -17,7 +17,7 @@ class Header extends View {
 	 */
 	function render() {
 		return hxx('
-			<div class="navbar navbar-expand-lg navbar-light bg-light">
+			<div class="header navbar navbar-expand-lg navbar-light bg-light">
 				<div class="navbar-brand">${title}</div>
 			</div>
 		');
