@@ -26,7 +26,7 @@ class MenuPanel extends View {
             <div class="menu-panel">
 				<for { item in model.items }>
 					<div class="menu-item" onclick={onSelect(item)}>
-						<img class="icon" src="#"></img>
+						<img class="icon" src=${item.icon}></img>
 						<div class="title">${item.title}</div>
 					</div>
 				</for>

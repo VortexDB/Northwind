@@ -12,6 +12,11 @@ class MenuItemModel implements Model {
     @:constant public var id:String;
 
     /**
+     * Icon for menu item
+     */
+    @:constant public var icon:String;
+
+    /**
      * Title of item
      */
     @:constant public var title:String;

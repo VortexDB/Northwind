@@ -19,7 +19,7 @@ class DevicesPage extends View {
 	 */
     function render() {
         var devices = new DataGridModel();
-        devices.addColumn(new GridColumnModel({ title: "Id", index: 1 }));
+        //devices.addColumn(new GridColumnModel({ title: "Id", index: 1 }));
 
         return hxx('
         <div>

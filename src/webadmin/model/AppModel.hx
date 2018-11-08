@@ -27,10 +27,10 @@ class AppModel implements Model {
      */
     @:constant public var menuModel:MenuModel = new MenuModel({
         items: [
-            new MenuItemModel({ id:DevicesPage.ID, title: "Devices" }),
-            new MenuItemModel({ id:RoutesPage.ID, title: "Routes" }),
-            new MenuItemModel({ id:ScriptsPage.ID, title: "Scripts" }),
-            new MenuItemModel({ id:DiagnosticsPage.ID, title: "Diagnostics" })
+            new MenuItemModel({ id:DevicesPage.ID, icon:"/assets/images/mobile-devices.svg", title: "Devices" }),
+            new MenuItemModel({ id:RoutesPage.ID, icon:"/assets/images/device_hub.svg", title: "Routes" }),
+            new MenuItemModel({ id:ScriptsPage.ID, icon:"/assets/images/harvest.svg", title: "Scripts" }),
+            new MenuItemModel({ id:DiagnosticsPage.ID, icon:"/assets/images/bar-chart.svg", title: "Diagnostics" })
         ]
     });
 }
