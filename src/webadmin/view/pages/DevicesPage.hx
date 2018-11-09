@@ -21,9 +21,12 @@ class DevicesPage extends View {
 	 */
 	function render() {
 		var devices = new DataGridModel({
-            columns: [ 
-                new GridColumnModel({ index: 1, title: "Caption" }),
-                new GridColumnModel({ index: 2, title: "Serial" })
+            columns: [
+                new GridColumnModel({ index: 1, title: "#" }),
+                new GridColumnModel({ index: 2, title: "Caption" }),
+                new GridColumnModel({ index: 3, title: "Device" }),
+                new GridColumnModel({ index: 4, title: "Protocol" }),
+                new GridColumnModel({ index: 5, title: "Serial" })
             ],
             rows: [
                 new GridRowModel(),

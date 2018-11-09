@@ -20,11 +20,13 @@ class DataGrid extends View {
         trace("RENDER");
         return hxx('
             <div class="data-grid">
-                <table>
+                <table class="table">
                     <thead>
-                        <for {col in model.columns}>
-                            <th>{col.title}</th>
-                        </for>
+                        <tr>
+                            <for {col in model.columns}>
+                                <th>{col.title}</th>
+                            </for>
+                        </tr>
                     </thead>
                     <tbody>
                         <for {row in model.rows}>
