@@ -17,21 +17,22 @@ class DataGrid extends View {
 	 * Render component
 	 */
     function render() {
+        trace("RENDER");
         return hxx('
             <div class="data-grid">
                 <table>
                     <thead>
                         <for {col in model.columns}>
-                            {col.title}
+                            <th>{col.title}</th>
                         </for>
                     </thead>
                     <tbody>
                         <for {row in model.rows}>
-                            <for {col in model.columns}>
-                                <tr>
-                                    <td>{row.getValue(col.index)}</td>
-                                </tr>
-                            </for>
+                            <tr>
+                                <for {col in model.columns}>
+                                        <td>{row.getValue(col.index)}</td>
+                                </for>
+                            </tr>
                         </for>                        
                     </tbody>
                 </table>

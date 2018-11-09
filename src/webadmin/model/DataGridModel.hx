@@ -37,24 +37,10 @@ class DataGridModel implements Model {
 	/**
 	 * Columns of grid
 	 */
-	@:observable public var columns:tink.pure.List<GridColumnModel> = @byDefault new tink.pure.List<GridColumnModel>();
+	@:constant public var columns:tink.pure.List<GridColumnModel> = @byDefault new tink.pure.List<GridColumnModel>();
 
 	/**
 	 * Rows of grid
 	 */
-	@:observable public var rows:tink.pure.List<GridRowModel> = @byDefault new tink.pure.List<GridRowModel>();
-
-    /**
-	 * Add new column to grid
-	 */
-	@:transition public function addColumn(column:GridColumnModel) {
-		return {columns: columns.append(column)};
-	}
-
-	/**
-	 * Add new row to grid
-	 */
-	@:transition public function addRow(row:GridRowModel) {
-		return {rows: rows.append(row)};
-	}
+	@:constant public var rows:tink.pure.List<GridRowModel> = @byDefault new tink.pure.List<GridRowModel>();
 }

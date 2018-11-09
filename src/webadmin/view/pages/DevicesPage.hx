@@ -3,28 +3,39 @@ package webadmin.view.pages;
 import coconut.ui.View;
 import coconut.Ui.hxx;
 import webadmin.model.DataGridModel;
+import webadmin.model.DataGridModel.GridColumnModel;
+import webadmin.model.DataGridModel.GridRowModel;
 import webadmin.view.controls.DataGrid;
 
 /**
  * Page for devices
  */
 class DevicesPage extends View {
-    /**
-     * Id of devices page
-     */
-    public static inline final ID = "Devices";
+	/**
+	 * Id of devices page
+	 */
+	public static inline final ID = "Devices";
 
-    /**
+	/**
 	 * Render component
 	 */
-    function render() {
-        var devices = new DataGridModel();
-        //devices.addColumn(new GridColumnModel({ title: "Id", index: 1 }));
+	function render() {
+		var devices = new DataGridModel({
+            columns: [ 
+                new GridColumnModel({ index: 1, title: "Caption" }),
+                new GridColumnModel({ index: 2, title: "Serial" })
+            ],
+            rows: [
+                new GridRowModel(),
+                new GridRowModel()
+            ]
+        });
+		// devices.addColumn(new GridColumnModel({ title: "Id", index: 1 }));
 
-        return hxx('
-        <div>
-            <DataGrid model=${devices} />
-        </div>
+		return hxx('
+            <div class="page">
+                <DataGrid model=${devices} />
+            </div>
         ');
-    }
+	}
 }
