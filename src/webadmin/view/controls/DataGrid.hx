@@ -17,7 +17,6 @@ class DataGrid extends View {
 	 * Render component
 	 */
     function render() {
-        trace("RENDER");
         return hxx('
             <div class="data-grid">
                 <table class="table">
@@ -30,9 +29,9 @@ class DataGrid extends View {
                     </thead>
                     <tbody>
                         <for {row in model.rows}>
-                            <tr>
+                            <tr class="grid-row">
                                 <for {col in model.columns}>
-                                        <td>{row.getValue(col.index)}</td>
+                                    <td>{model.adapter.getValue(row.values, col.index)}</td>
                                 </for>
                             </tr>
                         </for>                        

@@ -21,13 +21,30 @@ class GridColumnModel implements Model {
  * Grid row model
  */
 class GridRowModel implements Model {
-    /**
-     * Return value for row by column index
+
+	@:constant public var values:tink.pure.List<Dynamic> = @byDefault new tink.pure.List<Dynamic>();
+}
+
+/**
+ * Adapter for DataGridModel
+ */
+@:pure
+interface IDataGridModelAdapter {
+	/**
+	 * Return columns
+	 */
+	public function getColumns():tink.pure.List<GridColumnModel>;
+
+	/**
+	 * Return rows
+	 */
+	public function getRows():tink.pure.List<GridRowModel>;
+
+	/**
+     * Return value as formatted string for row by column index
      * @param index 
      */
-    public function getValue(index:Int) {
-        return "GOOD";
-    }
+    public function getValue(values:tink.pure.List<Dynamic>, index:Int):String;
 }
 
 /**
@@ -35,12 +52,17 @@ class GridRowModel implements Model {
  */
 class DataGridModel implements Model {
 	/**
+	 * Adapter for
+	 */
+	public var adapter:IDataGridModelAdapter;
+
+	/**
 	 * Columns of grid
 	 */
-	@:constant public var columns:tink.pure.List<GridColumnModel> = @byDefault new tink.pure.List<GridColumnModel>();
+	@:computed public var columns:tink.pure.List<GridColumnModel> = return adapter.getColumns();
 
 	/**
 	 * Rows of grid
 	 */
-	@:constant public var rows:tink.pure.List<GridRowModel> = @byDefault new tink.pure.List<GridRowModel>();
+	@:computed public var rows:tink.pure.List<GridRowModel> = return adapter.getRows();
 }
