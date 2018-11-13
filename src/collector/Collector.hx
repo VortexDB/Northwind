@@ -18,9 +18,11 @@ import collector.appdrivers.teplokom.vkt7like.Vkt7likeDriver;
  */
 class Collector {
 	/**
-	 * Entry point
+	 * Start collecting service
 	 */
-	public static function main() {
+	private function startCollectorService() {
+		trace("Start collector service");
+
 		// Prepare database
 		Database.instance.open();
 
@@ -39,23 +41,51 @@ class Collector {
 			var route = Database.instance.getById(routeId);
 			if (route == null)
 				continue;
-			
+
 			var devRoute:DeviceRoute = null;
 
 			var directSerialRoute:DbSerialRoute = cast route;
-			if (directSerialRoute != null) {				
+			if (directSerialRoute != null) {
 				devRoute = new DirectSerialRoute(directSerialRoute.port, directSerialRoute.speed, directSerialRoute.byteType);
 			}
 
 			if (devRoute == null)
 				continue;
-			
+
 			var colDevice = new CollectorDevice(device.serial, device.modelType, device.protocolType, devRoute);
 			script.addDevice(colDevice);
 		}
 
-		script.addAction(new DeviceAction(ActionType.ReadDateTime));
-					
+		// script.addAction(new DeviceAction(ActionType.ReadDateTime));
+
 		worker.start();
+	}
+
+	/**
+	 * Start web service for administration and for data
+	 */
+	private function startWebService() {
+		trace("Start web service");
+	}
+
+	/**
+	 * Start collector and all services
+	 */
+	private function start() {
+		startCollectorService();
+		startWebService();
+	}
+
+	/**
+	 * Constructor
+	 */
+	public function new() {}
+
+	/**
+	 * Entry point
+	 */
+	public static function main() {
+		var collector = new Collector();
+		collector.start();
 	}
 }
