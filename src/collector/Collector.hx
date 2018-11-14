@@ -1,16 +1,16 @@
 package collector;
 
+import core.io.http.server.handler.HttpHandler;
+import core.io.http.server.HttpServer;
 import collector.common.route.DeviceRoute;
 import collector.database.DbSerialRoute;
 import collector.database.Database;
 import collector.database.DbDevice;
 import core.time.schedule.PeriodicSchedule;
 import core.time.TimeSpan;
-import core.io.port.Parity;
 import collector.common.CollectorWorker;
 import collector.common.CollectorDevice;
 import collector.common.route.DirectSerialRoute;
-import collector.common.parameters.DeviceAction;
 import collector.appdrivers.teplokom.vkt7like.Vkt7likeDriver;
 
 /**
@@ -66,6 +66,14 @@ class Collector {
 	 */
 	private function startWebService() {
 		trace("Start web service");
+		var httpServer = new HttpServer();
+		httpServer.addHandler(new HttpHandler((context) -> {
+			context.response.writeString("Hello");
+		}));
+
+		httpServer.bind({
+			port: 26301
+		});
 	}
 
 	/**
