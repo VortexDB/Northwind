@@ -1,5 +1,6 @@
 package collector;
 
+import core.io.http.server.handler.StaticHandler;
 import core.io.http.server.handler.HttpHandler;
 import core.io.http.server.HttpServer;
 import collector.common.route.DeviceRoute;
@@ -67,9 +68,13 @@ class Collector {
 	private function startWebService() {
 		trace("Start web service");
 		var httpServer = new HttpServer();
-		httpServer.addHandler(new HttpHandler((context) -> {
+		/*httpServer.addHandler(new HttpHandler((context) -> {
 			context.response.writeString("Hello");
-		}));
+		}));*/
+
+		var staticHandler = new StaticHandler();
+		staticHandler.addPath("out/webadmin");
+		httpServer.addHandler(staticHandler);
 
 		httpServer.bind({
 			port: 26301
