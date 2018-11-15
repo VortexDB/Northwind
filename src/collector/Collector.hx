@@ -73,7 +73,7 @@ class Collector {
 		}));*/
 
 		var staticHandler = new StaticHandler();
-		staticHandler.addPath("out/webadmin");
+		staticHandler.addPath("/", "out/webadmin");
 		httpServer.addHandler(staticHandler);
 
 		httpServer.bind({
